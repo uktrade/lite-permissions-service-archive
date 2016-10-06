@@ -11,11 +11,14 @@ public class OgelRegistrationMapper implements ResultSetMapper<OgelRegistration>
 
   @Override
   public OgelRegistration map(int index, ResultSet r, StatementContext ctx) throws SQLException {
-
     OgelRegistration ogReg = new OgelRegistration(r.getInt("ID"));
-    ogReg.setStatus(OgelRegistration.Status.valueOf(r.getString("STATUS")));
-    ogReg.setOgelType(r.getString("TYPE"));
     ogReg.setUserId(r.getString("USER_ID"));
+    ogReg.setOgelType(r.getString("OGEL_TYPE"));
+    ogReg.setLiteId(r.getString("LITE_ID"));
+    ogReg.setCustomerId(r.getString("CUSTOMER_ID"));
+    ogReg.setStatus(OgelRegistration.Status.valueOf(r.getString("STATUS")));
+    ogReg.setSiteId(r.getString("SITE_ID"));
+    ogReg.setJson(r.getString("JSON"));
     ogReg.setCreated(r.getString("CREATED"));
     return ogReg;
   }

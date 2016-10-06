@@ -8,12 +8,13 @@ public class OgelRegistration {
   private static final Logger LOGGER = LoggerFactory.getLogger(OgelRegistration.class);
 
   private int id;
-  private String liteId;
-  private String ogelType;
   private String userId;
+  private String ogelType;
+  private Status status;
+  private String liteId;
   private String customerId;
   private String siteId;
-  private Status status;
+  private String json;
   private String created;
 
   public enum Status {
@@ -28,6 +29,14 @@ public class OgelRegistration {
     this.userId = userId;
     this.ogelType = ogelType;
     this.status = Status.CREATED;
+  }
+
+  public String getJson() {
+    return json;
+  }
+
+  public void setJson(String json) {
+    this.json = json;
   }
 
   public String getLiteId() {

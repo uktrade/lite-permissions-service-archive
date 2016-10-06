@@ -3,39 +3,76 @@ package uk.gov.bis.lite.permissions.model.request;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.bis.lite.permissions.util.Util;
 
+import java.util.Objects;
+
 class Site {
 
-  private String useCustomerAddress;
+  private boolean useCustomerAddress;
   private String siteName;
   private Address address;
 
-  public boolean isValid() {
+  /**
+   * We pass in Customer so check can be done against Customer Address if required
+   */
+  boolean isValid(Customer customer) {
     boolean valid = false;
-    if(StringUtils.isBlank(useCustomerAddress)) {
-      if(!StringUtils.isBlank(siteName) && address != null) {
-        if(address.isFullAddress()) {
-          valid = true;
+    if (useCustomerAddress) {
+      if (customer != null) {
+        Address customerAddress = customer.getRegisteredAddress();
+        if (customerAddress != null) {
+          if (customerAddress.isFullAddress()) {
+            return true;
+          }
         }
       }
     } else {
-      if(StringUtils.isBlank(siteName) && address == null) {
-        valid = true;
-      }
+      valid = isValid(siteName, address);
     }
     return valid;
   }
 
-  public String getInfo() {
-    String info =  "\nSite " +
-        Util.info("useCustomerAddress", useCustomerAddress)  +
-        Util.info("siteName", siteName);
-
-    if(address != null) {
-      info = info + "\nSite" + address.getInfo();
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof Site) {
+      Site site = (Site) o;
+      return Objects.equals(useCustomerAddress, site.isUseCustomerAddress())
+          && Objects.equals(siteName, site.getSiteName())
+          && Objects.equals(address, site.getAddress());
     }
-    return info;
+    return false;
   }
 
+  @Override
+  public int hashCode() {
+    return Objects.hash(useCustomerAddress, siteName, address);
+  }
+
+  public String getInfo() {
+    String info = "\nSite " +
+        Util.info("useCustomerAddress", useCustomerAddress) +
+        Util.info("siteName", siteName);
+    return info + (address != null ? address.getInfo() : "");
+  }
+
+  String getJoinedInstanceStateData() {
+    String strings = Util.joinAll(siteName);
+    String booleans = Util.joinAll(useCustomerAddress);
+    String add = address != null ? address.getJoinedInstanceStateData() : "";
+    return strings + booleans + add;
+  }
+
+  private boolean isValid(String siteName, Address address) {
+    if (!StringUtils.isBlank(siteName) && address != null) {
+      if (address.isFullAddress()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Getters/Setters
+   */
   public Address getAddress() {
     return address;
   }
@@ -44,11 +81,11 @@ class Site {
     this.address = address;
   }
 
-  public String getUseCustomerAddress() {
+  public boolean isUseCustomerAddress() {
     return useCustomerAddress;
   }
 
-  public void setUseCustomerAddress(String useCustomerAddress) {
+  public void setUseCustomerAddress(boolean useCustomerAddress) {
     this.useCustomerAddress = useCustomerAddress;
   }
 

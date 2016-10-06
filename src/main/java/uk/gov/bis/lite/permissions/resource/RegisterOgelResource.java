@@ -32,16 +32,31 @@ public class RegisterOgelResource {
   public Response registerOgel(RegisterOgel registerOgel) {
     LOGGER.info(registerOgel.toString());
 
-    if (registerOgel.isValid()) {
-      if (registerService.isRegistrationPermitted(registerOgel)) {
-        registerService.startRegistrationProcess(registerOgel);
-        return goodRequest();
-      } else {
-        return badRequest("Registration is not permitted");
-      }
-    } else {
+    // Check valid request data
+    if (!registerOgel.isValid()) {
       return badRequest("Request invalid - " + registerOgel.getValidityInfo());
     }
+
+    // Check if request is for existing Customer and existing Site
+    if (registerOgel.isExistingCustomerAndSite()) {
+      // delegate to the SPIRE_OGEL_REGISTRATIONS endpoint
+      return goodRequest();
+    }
+
+    // Check if registration is already PENDING
+    if (registerService.isPending(registerOgel)) {
+      return badRequest(registerOgel.getResponseMessage());
+    }
+
+    // Check if this registration is permitted by Spire
+    if (!registerService.isSpirePermitted(registerOgel)) {
+      return badRequest(registerOgel.getResponseMessage());
+    }
+
+    // Do registration
+    registerService.register(registerOgel);
+
+    return goodRequest();
   }
 
   private Response badRequest(String message) {

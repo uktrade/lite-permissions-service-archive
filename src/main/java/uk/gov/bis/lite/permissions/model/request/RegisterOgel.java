@@ -1,9 +1,16 @@
 package uk.gov.bis.lite.permissions.model.request;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.util.Util;
 
+import java.util.Base64;
+import java.util.Objects;
+
 public class RegisterOgel {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(RegisterOgel.class);
 
   private String userId;
   private String ogelType;
@@ -13,10 +20,19 @@ public class RegisterOgel {
   private Site newSite;
   private AdminApproval adminApproval;
 
+  private transient String responseMessage;
+
+  public boolean isExistingCustomerAndSite() {
+    return !StringUtils.isBlank(existingCustomer) && !StringUtils.isBlank(existingSite);
+  }
+
   public boolean isValid() {
     boolean valid = mandatoryFieldsOk() && customerFieldsOk() && siteFieldsOk();
-    if (newSite != null) {
-      valid = newSite.isValid();
+    if (valid && newSite != null) {
+      valid = newSite.isValid(newCustomer);
+    }
+    if (!valid) {
+      responseMessage = getValidityInfo();
     }
     return valid;
   }
@@ -26,7 +42,7 @@ public class RegisterOgel {
     info = info + Util.getOptString("Must have existing Customer or new Customer fields. ", !customerFieldsOk());
     info = info + Util.getOptString("Must have existing Site or new Site fields. ", !siteFieldsOk());
     if (newSite != null) {
-      if (!newSite.isValid()) {
+      if (!newSite.isValid(newCustomer)) {
         info = info + "New Site must have full address";
       }
     }
@@ -34,18 +50,76 @@ public class RegisterOgel {
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (o instanceof RegisterOgel) {
+      RegisterOgel regOgel = (RegisterOgel) o;
+      return Objects.equals(userId, regOgel.getUserId())
+          && Objects.equals(ogelType, regOgel.getOgelType())
+          && Objects.equals(existingCustomer, regOgel.getExistingCustomer())
+          && Objects.equals(existingSite, regOgel.getExistingSite())
+          && Objects.equals(newCustomer, regOgel.getNewCustomer())
+          && Objects.equals(newSite, regOgel.getNewSite())
+          && Objects.equals(adminApproval, regOgel.getAdminApproval());
+    }
+    return false;
+  }
+
+  /**
+   * Gathers data, encodes and returns it
+   */
+  public String getIdentifier() {
+    String data = getJoinedInstanceStateData().replaceAll("\\s+", "").toUpperCase();
+    return Base64.getEncoder().encodeToString(data.getBytes());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(userId, ogelType, existingCustomer, existingSite, newCustomer, newSite, adminApproval);
+  }
+
+  @Override
   public String toString() {
     String info = "\nRegisterOgel " + Util.info("userId", userId) + Util.info("ogelType", ogelType);
-    if (newCustomer != null) {
-      info = info + newCustomer.getInfo();
-    }
-    if (adminApproval != null) {
-      info = info + adminApproval.getInfo();
-    }
-    if (newSite != null) {
-      info = info + newSite.getInfo();
-    }
-    return info;
+    info = info + (newCustomer != null ? newCustomer.getInfo() : "");
+    info = info + (adminApproval != null ? adminApproval.getInfo() : "");
+    return info + (newSite != null ? newSite.getInfo() : "");
+  }
+
+  /**
+   * Private methods
+   */
+  private String getJoinedInstanceStateData() {
+    String strings = Util.joinAll(userId, ogelType, existingCustomer, existingSite);
+    String customer = newCustomer != null ? newCustomer.getJoinedInstanceStateData() : "";
+    String site = newSite != null ? newSite.getJoinedInstanceStateData() : "";
+    String admin = adminApproval != null ? adminApproval.getJoinedInstanceStateData() : "";
+    LOGGER.info(strings + customer + site + admin);
+    return strings + customer + site + admin;
+  }
+
+  private boolean mandatoryFieldsOk() {
+    return !StringUtils.isBlank(userId) && !StringUtils.isBlank(ogelType);
+  }
+
+  private boolean customerFieldsOk() {
+    return (StringUtils.isBlank(existingCustomer) && newCustomer != null) ||
+        (!StringUtils.isBlank(existingCustomer) && newCustomer == null);
+  }
+
+  private boolean siteFieldsOk() {
+    return (StringUtils.isBlank(existingSite) && newSite != null) ||
+        (!StringUtils.isBlank(existingSite) && newSite == null);
+  }
+
+  /**
+   * Getters/Setters
+   */
+  public String getResponseMessage() {
+    return responseMessage;
+  }
+
+  public void setResponseMessage(String responseMessage) {
+    this.responseMessage = responseMessage;
   }
 
   public String getExistingCustomer() {
@@ -102,19 +176,5 @@ public class RegisterOgel {
 
   public void setOgelType(String ogelType) {
     this.ogelType = ogelType;
-  }
-
-  private boolean mandatoryFieldsOk() {
-    return !StringUtils.isBlank(userId) && !StringUtils.isBlank(ogelType);
-  }
-
-  private boolean customerFieldsOk() {
-    return (StringUtils.isBlank(existingCustomer) && newCustomer != null) ||
-        (!StringUtils.isBlank(existingCustomer) && newCustomer == null);
-  }
-
-  private boolean siteFieldsOk() {
-    return (StringUtils.isBlank(existingSite) && newSite != null) ||
-        (!StringUtils.isBlank(existingSite) && newSite == null);
   }
 }

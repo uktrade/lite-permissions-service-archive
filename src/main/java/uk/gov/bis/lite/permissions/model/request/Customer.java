@@ -2,15 +2,24 @@ package uk.gov.bis.lite.permissions.model.request;
 
 import uk.gov.bis.lite.permissions.util.Util;
 
+import java.util.Objects;
+
 class Customer {
 
   private String customerType;
   private String chNumber;
-  private String chNumberValidated;
+  private boolean chNumberValidated;
   private String eoriNumber;
-  private String eoriNumberValidated;
+  private boolean eoriNumberValidated;
   private String website;
   private Address registeredAddress;
+
+  String getJoinedInstanceStateData() {
+    String strings = Util.joinAll(customerType, chNumber, eoriNumber, website);
+    String booleans = Util.joinAll(chNumberValidated, eoriNumberValidated);
+    String address = registeredAddress != null ? registeredAddress.getJoinedInstanceStateData() : "";
+    return strings + booleans + address;
+  }
 
   public String getInfo() {
     String info = "\nCustomer " +
@@ -20,12 +29,32 @@ class Customer {
         Util.info("eoriNumber", eoriNumber) +
         Util.info("eoriNumberValidated", eoriNumberValidated) +
         Util.info("website", website);
-    if (registeredAddress != null) {
-      info = info + "\nCustomerRegistered" + registeredAddress.getInfo();
-    }
-    return info;
+    return info + (registeredAddress != null ? registeredAddress.getInfo() : "");
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof Customer) {
+      Customer customer = (Customer) o;
+      return Objects.equals(customerType, customer.getCustomerType())
+          && Objects.equals(chNumber, customer.getChNumber())
+          && Objects.equals(chNumberValidated, customer.isChNumberValidated())
+          && Objects.equals(eoriNumber, customer.getEoriNumber())
+          && Objects.equals(eoriNumberValidated, customer.isEoriNumberValidated())
+          && Objects.equals(website, customer.getWebsite())
+          && Objects.equals(registeredAddress, customer.getRegisteredAddress());
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(customerType, chNumber, chNumberValidated, eoriNumber, eoriNumberValidated, website, registeredAddress);
+  }
+
+  /**
+   * Getters/Setters
+   */
   public Address getRegisteredAddress() {
     return registeredAddress;
   }
@@ -42,28 +71,12 @@ class Customer {
     this.chNumber = chNumber;
   }
 
-  public String getChNumberValidated() {
-    return chNumberValidated;
-  }
-
-  public void setChNumberValidated(String chNumberValidated) {
-    this.chNumberValidated = chNumberValidated;
-  }
-
   public String getEoriNumber() {
     return eoriNumber;
   }
 
   public void setEoriNumber(String eoriNumber) {
     this.eoriNumber = eoriNumber;
-  }
-
-  public String getEoriNumberValidated() {
-    return eoriNumberValidated;
-  }
-
-  public void setEoriNumberValidated(String eoriNumberValidated) {
-    this.eoriNumberValidated = eoriNumberValidated;
   }
 
   public String getWebsite() {
@@ -80,5 +93,21 @@ class Customer {
 
   public void setCustomerType(String customerType) {
     this.customerType = customerType;
+  }
+
+  public boolean isChNumberValidated() {
+    return chNumberValidated;
+  }
+
+  public void setChNumberValidated(boolean chNumberValidated) {
+    this.chNumberValidated = chNumberValidated;
+  }
+
+  public boolean isEoriNumberValidated() {
+    return eoriNumberValidated;
+  }
+
+  public void setEoriNumberValidated(boolean eoriNumberValidated) {
+    this.eoriNumberValidated = eoriNumberValidated;
   }
 }

@@ -2,6 +2,8 @@ package uk.gov.bis.lite.permissions.model.request;
 
 import uk.gov.bis.lite.permissions.util.Util;
 
+import java.util.Objects;
+
 class Address {
 
   private String line1;
@@ -13,6 +15,24 @@ class Address {
 
   public boolean isFullAddress() {
     return Util.allNotBlank(line1, line2, town, county, postcode, country);
+  }
+
+  public String getJoinedInstanceStateData() {
+    return Util.joinAll(line1, line2, town, county, postcode, country);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof Address) {
+      Address address = (Address) o;
+      return Objects.equals(line1, address.getLine1())
+          && Objects.equals(line2, address.getLine2())
+          && Objects.equals(town, address.getTown())
+          && Objects.equals(county, address.getCounty())
+          && Objects.equals(postcode, address.getPostcode())
+          && Objects.equals(country, address.getCountry());
+    }
+    return false;
   }
 
   public String getInfo() {

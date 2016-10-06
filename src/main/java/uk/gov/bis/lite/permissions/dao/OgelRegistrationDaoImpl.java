@@ -38,7 +38,11 @@ public class OgelRegistrationDaoImpl implements OgelRegistrationDao {
       ori.insert(
           ogReg.getUserId(),
           ogReg.getOgelType(),
-          ogReg.getCreated());
+          ogReg.getLiteId(),
+          ogReg.getCustomerId(),
+          ogReg.getSiteId(),
+          ogReg.getJson(),
+          ogReg.getStatus().name());
     }
   }
 }

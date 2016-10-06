@@ -2,8 +2,29 @@ package uk.gov.bis.lite.permissions.model.request;
 
 import uk.gov.bis.lite.permissions.util.Util;
 
+import java.util.Objects;
+
 class AdminApproval {
+
   private String adminUserId;
+
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof AdminApproval) {
+      AdminApproval admin = (AdminApproval) o;
+      return Objects.equals(adminUserId, admin.getAdminUserId());
+    }
+    return false;
+  }
+
+  String getJoinedInstanceStateData() {
+    return adminUserId != null ? adminUserId : "";
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(adminUserId);
+  }
 
   public String getInfo() {
     return "\nAdminApproval " + Util.info("adminUserId", adminUserId);

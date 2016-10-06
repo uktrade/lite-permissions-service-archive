@@ -25,6 +25,24 @@ public class Util {
     return allNotBlank;
   }
 
+  public static String joinAll(String... args) {
+    String all = "";
+    for (String arg : args) {
+      if (!StringUtils.isBlank(arg)) {
+        all = all + arg;
+      }
+    }
+    return all;
+  }
+
+  public static String joinAll(boolean... args) {
+    String all = "";
+    for (Boolean arg : args) {
+      all = all + arg.toString();
+    }
+    return all;
+  }
+
   public static String getOptString(String info, boolean add) {
     String result = "";
     if (add) {
