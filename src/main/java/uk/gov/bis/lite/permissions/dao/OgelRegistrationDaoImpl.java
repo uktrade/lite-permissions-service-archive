@@ -23,10 +23,17 @@ public class OgelRegistrationDaoImpl implements OgelRegistrationDao {
 
   @Override
   @Transaction
-  public List<OgelRegistration> getCreated() {
+  public OgelRegistration findByLiteId(String liteId) {
     try (final Handle handle = jdbi.open()) {
-      OgelRegistrationInterface ori = handle.attach(OgelRegistrationInterface.class);
-      return ori.getCreated();
+      return attach(handle).findByLiteId(liteId);
+    }
+  }
+
+  @Override
+  @Transaction
+  public List<OgelRegistration> getByStatus(String status) {
+    try (final Handle handle = jdbi.open()) {
+      return attach(handle).getByStatus(status);
     }
   }
 
@@ -34,8 +41,7 @@ public class OgelRegistrationDaoImpl implements OgelRegistrationDao {
   @Transaction
   public void create(OgelRegistration ogReg) {
     try (final Handle handle = jdbi.open()) {
-      OgelRegistrationInterface ori = handle.attach(OgelRegistrationInterface.class);
-      ori.insert(
+      attach(handle).insert(
           ogReg.getUserId(),
           ogReg.getOgelType(),
           ogReg.getLiteId(),
@@ -44,5 +50,22 @@ public class OgelRegistrationDaoImpl implements OgelRegistrationDao {
           ogReg.getJson(),
           ogReg.getStatus().name());
     }
+  }
+
+  @Override
+  @Transaction
+  public void update(OgelRegistration ogReg) {
+    try (final Handle handle = jdbi.open()) {
+      attach(handle).update(
+          ogReg.getCustomerId(),
+          ogReg.getSiteId(),
+          ogReg.getStatus().name(),
+          ogReg.getId());
+    }
+  }
+
+
+  private OgelRegistrationInterface attach(Handle handle) {
+    return handle.attach(OgelRegistrationInterface.class);
   }
 }

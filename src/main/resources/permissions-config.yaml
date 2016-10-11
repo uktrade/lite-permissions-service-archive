@@ -1,14 +1,24 @@
-notificationRetryJobCron: 0 0,5,10,15,20,25,30,35,40,45,50,55 * * * ? # every 5 minutes
+# notificationRetryJobCron: 0 0,5,10,15,20,25,30,35,40,45,50,55 * * * ? # every 5 minutes
+notificationRetryJobCron: 0/20 * * * * ?  # every 20 seconds
 
 soapUserName: bisdev.api@test.com
 spireOgelRegistrationsUrl: https://spiredevalpha.fivium.co.uk/spirefox4dev/fox/ispire/SPIRE_OGEL_REGISTRATIONS
+spireCreateLiteSarUrl: https://spiredevalpha.fivium.co.uk/spirefox4dev/fox/ispire/SPIRE_CREATE_LITE_SAR
 soapPassword: dev
+
+customerServiceHost: localhost
+customerServicePort: 8095
+customerServiceCustomerPath: /customer
+customerServiceSitePath: /site
 
 server:
   type: default
   applicationConnectors:
     - type: http
-      port: 8095
+      port: 8093
+  adminConnectors:
+    - type: http
+      port: 8094
 
 logging:
   level: INFO

@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
 import uk.gov.bis.lite.permissions.service.RegisterService;
+import uk.gov.bis.lite.permissions.service.RegistrationService;
 
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
@@ -18,15 +19,15 @@ public class PermissionsScheduler implements Managed {
 
   private final Scheduler scheduler;
   private final PermissionsAppConfig config;
-  private final RegisterService registerService;
-  public static final String OGEL_REG_SERVICE_NAME = "registerService";
+  private final RegistrationService registrationService;
+  public static final String REG_SERVICE_NAME = "registrationService";
 
   @Inject
   public PermissionsScheduler(Scheduler scheduler, PermissionsAppConfig config,
-                              RegisterService registerService) {
+                              RegistrationService registrationService) {
     this.scheduler = scheduler;
     this.config = config;
-    this.registerService = registerService;
+    this.registrationService = registrationService;
   }
 
   @Override
@@ -38,7 +39,7 @@ public class PermissionsScheduler implements Managed {
         .withIdentity(jobKey)
         .build();
 
-    jobDetail.getJobDataMap().put(OGEL_REG_SERVICE_NAME, registerService);
+    jobDetail.getJobDataMap().put(REG_SERVICE_NAME, registrationService);
 
     CronTrigger trigger = newTrigger()
         .withIdentity(TriggerKey.triggerKey("notificationRetryJobTrigger"))

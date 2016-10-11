@@ -7,6 +7,7 @@ import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.flywaydb.core.Flyway;
+import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.slf4j.LoggerFactory;
 import ru.vyarus.dropwizard.guice.GuiceBundle;
 import ru.vyarus.dropwizard.guice.module.installer.feature.ManagedInstaller;
@@ -16,6 +17,8 @@ import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
 import uk.gov.bis.lite.permissions.exception.PermissionsException;
 import uk.gov.bis.lite.permissions.resource.RegisterOgelResource;
 import uk.gov.bis.lite.permissions.scheduler.PermissionsScheduler;
+
+import javax.ws.rs.client.Client;
 
 public class PermissionsApp extends Application<PermissionsAppConfig> {
 
@@ -32,7 +35,7 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
   }
 
   @Override
-  public void run(PermissionsAppConfig configuration, Environment environment) throws Exception {
+  public void run(PermissionsAppConfig config, Environment environment) throws Exception {
 
     environment.jersey().register(PermissionsException.ServiceExceptionMapper.class);
 
@@ -42,10 +45,11 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
     appender.setIncludeCallerData(true);
 
     // Perform/validate flyway migration on startup
-    DataSourceFactory dataSourceFactory = configuration.getDataSourceFactory();
+    DataSourceFactory dataSourceFactory = config.getDataSourceFactory();
     Flyway flyway = new Flyway();
     flyway.setDataSource(dataSourceFactory.getUrl(), dataSourceFactory.getUser(), dataSourceFactory.getPassword());
     flyway.migrate();
+
   }
 
   public static void main(String[] args) throws Exception {

@@ -6,9 +6,11 @@ import java.util.List;
 
 public interface OgelRegistrationDao {
 
-  //OgelRegistration findById(int id);
+  void update(OgelRegistration ogReg);
 
   void create(OgelRegistration ogReg);
 
-  List<OgelRegistration> getCreated();
+  List<OgelRegistration> getByStatus(String status);
+
+  OgelRegistration findByLiteId(String liteId);
 }

@@ -1,10 +1,12 @@
 package uk.gov.bis.lite.permissions.model.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import uk.gov.bis.lite.permissions.util.Util;
 
 import java.util.Objects;
 
-class Customer {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Customer {
 
   private String customerType;
   private String chNumber;
@@ -95,7 +97,7 @@ class Customer {
     this.customerType = customerType;
   }
 
-  public boolean isChNumberValidated() {
+  public Boolean isChNumberValidated() {
     return chNumberValidated;
   }
 
@@ -103,7 +105,7 @@ class Customer {
     this.chNumberValidated = chNumberValidated;
   }
 
-  public boolean isEoriNumberValidated() {
+  public Boolean isEoriNumberValidated() {
     return eoriNumberValidated;
   }
 

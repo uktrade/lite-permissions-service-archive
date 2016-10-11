@@ -1,10 +1,12 @@
 package uk.gov.bis.lite.permissions.model.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import uk.gov.bis.lite.permissions.util.Util;
 
 import java.util.Objects;
 
-class Address {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Address {
 
   private String line1;
   private String line2;
@@ -12,6 +14,15 @@ class Address {
   private String county;
   private String postcode;
   private String country;
+
+
+  public String getLiteAddress() {
+    return getJoinedInstanceStateData();
+  }
+
+  public String getSpireAddress() {
+    return getJoinedInstanceStateData();
+  }
 
   public boolean isFullAddress() {
     return Util.allNotBlank(line1, line2, town, county, postcode, country);

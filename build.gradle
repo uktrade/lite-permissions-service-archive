@@ -22,6 +22,7 @@ dependencies {
     compile 'io.dropwizard:dropwizard-db:0.9.2'
     compile 'io.dropwizard:dropwizard-jdbi:0.9.2'
     compile 'io.dropwizard:dropwizard-auth:0.9.2'
+    compile 'io.dropwizard:dropwizard-client:0.9.2'
     compile 'ru.vyarus:dropwizard-guicey:3.2.0'
     compile 'org.quartz-scheduler:quartz:2.1.5'
     compile 'org.xerial:sqlite-jdbc:3.8.11.2'

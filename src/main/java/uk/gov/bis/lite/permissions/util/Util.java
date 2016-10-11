@@ -6,6 +6,30 @@ import java.util.Optional;
 
 public class Util {
 
+  public static boolean isBlank(String arg) {
+    return StringUtils.isBlank(arg);
+  }
+
+  public static boolean getRandomBoolean() {
+    return Math.random() < 0.5;
+  }
+
+  public static String generateHashFromString(String message) {
+    String hash = "hash";
+    try {
+      java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
+      byte[] array = md.digest(message.getBytes());
+      StringBuffer sb = new StringBuffer();
+      for (byte anArray : array) {
+        sb.append(Integer.toHexString((anArray & 0xFF) | 0x100).substring(1, 3));
+      }
+      hash = sb.toString();
+    } catch (java.security.NoSuchAlgorithmException e) {
+      // ignore
+    }
+    return hash;
+  }
+
   public static String info(String name, String arg) {
     return " [" + name + "|" + Optional.ofNullable(arg).map(Object::toString).orElse("null") + "] ";
   }

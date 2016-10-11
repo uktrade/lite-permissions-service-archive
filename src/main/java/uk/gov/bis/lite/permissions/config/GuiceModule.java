@@ -2,7 +2,9 @@ package uk.gov.bis.lite.permissions.config;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.setup.Environment;
 import org.quartz.Scheduler;
@@ -13,9 +15,19 @@ import ru.vyarus.dropwizard.guice.module.support.ConfigurationAwareModule;
 import uk.gov.bis.lite.permissions.dao.OgelRegistrationDao;
 import uk.gov.bis.lite.permissions.dao.OgelRegistrationDaoImpl;
 
+import javax.ws.rs.client.Client;
+
 public class GuiceModule extends AbstractModule implements ConfigurationAwareModule<PermissionsAppConfig> {
 
   private PermissionsAppConfig config;
+
+  @Provides
+  @Singleton
+  Client provideHttpClient(Environment environment, PermissionsAppConfig config) {
+    final Client client = new JerseyClientBuilder(environment).using(config.getJerseyClientConfiguration())
+        .build("jerseyClient");
+    return client;
+  }
 
   @Override
   protected void configure() {
@@ -23,9 +35,39 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
   }
 
   @Provides
+  @javax.inject.Named("customerServiceHost")
+  String provideCustomerServiceHost(PermissionsAppConfig config) {
+    return config.getCustomerServiceHost();
+  }
+
+  @Provides
+  @javax.inject.Named("customerServicePort")
+  String provideCustomerServicePort(PermissionsAppConfig config) {
+    return config.getCustomerServicePort();
+  }
+
+  @Provides
+  @javax.inject.Named("customerServiceCustomerPath")
+  String provideCustomerServiceCustomerPath(PermissionsAppConfig config) {
+    return config.getCustomerServiceCustomerPath();
+  }
+
+  @Provides
+  @javax.inject.Named("customerServiceSitePath")
+  String provideCustomerServiceSitePath(PermissionsAppConfig config) {
+    return config.getCustomerServiceSitePath();
+  }
+
+  @Provides
   @javax.inject.Named("spireOgelRegistrationsUrl")
-  public String provideSpireOgelRegistrationsUrl(PermissionsAppConfig config) {
+  String provideSpireOgelRegistrationsUrl(PermissionsAppConfig config) {
     return config.getSpireOgelRegistrationsUrl();
+  }
+
+  @Provides
+  @javax.inject.Named("spireCreateLiteSarUrl")
+  public String provideCreateLiteSarUrl(PermissionsAppConfig config) {
+    return config.getSpireCreateLiteSarUrl();
   }
 
   @Provides

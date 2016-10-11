@@ -1,10 +1,12 @@
 package uk.gov.bis.lite.permissions.model.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import uk.gov.bis.lite.permissions.util.Util;
 
 import java.util.Objects;
 
-class AdminApproval {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class AdminApproval {
 
   private String adminUserId;
 

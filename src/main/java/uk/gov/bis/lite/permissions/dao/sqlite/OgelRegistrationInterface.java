@@ -10,9 +10,13 @@ import java.util.List;
 
 public interface OgelRegistrationInterface {
 
-  @SqlQuery("SELECT * FROM LOCAL_OGEL_REGISTRATION WHERE ID = :id")
-  @Mapper(OgelRegistrationMapper.class)
-  OgelRegistration findById(@Bind("id") int id);
+
+  @SqlUpdate("UPDATE LOCAL_OGEL_REGISTRATION SET CUSTOMER_ID = :customerId, SITE_ID = :siteId, STATUS = :status " +
+      "WHERE id = :id")
+  void update(@Bind("customerId") String customerId,
+              @Bind("siteId") String siteId,
+              @Bind("status") String status,
+              @Bind("id") int id);
 
   @SqlUpdate("INSERT INTO LOCAL_OGEL_REGISTRATION (USER_ID, OGEL_TYPE, LITE_ID, CUSTOMER_ID, SITE_ID, JSON, STATUS) " +
       "VALUES (:userId, :ogelType, :liteId, :customerId, :siteId, :json, :status)")
@@ -25,8 +29,13 @@ public interface OgelRegistrationInterface {
               @Bind("status") String status);
 
 
-  @SqlQuery("SELECT * FROM LOCAL_OGEL_REGISTRATION WHERE STATUS = 'CREATED'")
+  @SqlQuery("SELECT * FROM LOCAL_OGEL_REGISTRATION WHERE STATUS = :status")
   @Mapper(OgelRegistrationMapper.class)
-  List<OgelRegistration> getCreated();
+  List<OgelRegistration> getByStatus(@Bind("status") String status);
+
+
+  @SqlQuery("SELECT * FROM LOCAL_OGEL_REGISTRATION WHERE LITE_ID = :liteId")
+  @Mapper(OgelRegistrationMapper.class)
+  OgelRegistration findByLiteId(@Bind("liteId") String liteId);
 
 }

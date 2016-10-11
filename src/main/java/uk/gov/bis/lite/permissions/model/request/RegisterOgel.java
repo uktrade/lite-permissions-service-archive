@@ -1,13 +1,14 @@
 package uk.gov.bis.lite.permissions.model.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.util.Util;
 
-import java.util.Base64;
 import java.util.Objects;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class RegisterOgel {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RegisterOgel.class);
@@ -24,6 +25,14 @@ public class RegisterOgel {
 
   public boolean isExistingCustomerAndSite() {
     return !StringUtils.isBlank(existingCustomer) && !StringUtils.isBlank(existingSite);
+  }
+
+  public boolean isExistingCustomer() {
+    return !StringUtils.isBlank(existingCustomer);
+  }
+
+  public boolean isExistingSite() {
+    return !StringUtils.isBlank(existingSite);
   }
 
   public boolean isValid() {
@@ -65,11 +74,11 @@ public class RegisterOgel {
   }
 
   /**
-   * Gathers data, encodes and returns it
+   * Gathers data, creates  hash
    */
-  public String getIdentifier() {
-    String data = getJoinedInstanceStateData().replaceAll("\\s+", "").toUpperCase();
-    return Base64.getEncoder().encodeToString(data.getBytes());
+  public String getHashIdentifier() {
+    String message = getJoinedInstanceStateData().replaceAll("\\s+", "").toUpperCase();
+    return Util.generateHashFromString(message);
   }
 
   @Override
@@ -93,7 +102,7 @@ public class RegisterOgel {
     String customer = newCustomer != null ? newCustomer.getJoinedInstanceStateData() : "";
     String site = newSite != null ? newSite.getJoinedInstanceStateData() : "";
     String admin = adminApproval != null ? adminApproval.getJoinedInstanceStateData() : "";
-    LOGGER.info(strings + customer + site + admin);
+    //LOGGER.info(strings + customer + site + admin);
     return strings + customer + site + admin;
   }
 

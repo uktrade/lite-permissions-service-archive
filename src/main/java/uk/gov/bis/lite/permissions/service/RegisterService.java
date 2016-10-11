@@ -6,49 +6,36 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.bis.lite.permissions.client.OgelRegistrationsClient;
-import uk.gov.bis.lite.permissions.client.unmarshall.OgelRegistrationsUnmarshaller;
 import uk.gov.bis.lite.permissions.dao.OgelRegistrationDao;
-import uk.gov.bis.lite.permissions.model.OgelReg;
 import uk.gov.bis.lite.permissions.model.OgelRegistration;
 import uk.gov.bis.lite.permissions.model.request.RegisterOgel;
-
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-
-import javax.xml.soap.SOAPMessage;
 
 @Singleton
 public class RegisterService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RegisterService.class);
 
-  private OgelRegistrationsClient client;
+  private SoapService soap;
   private OgelRegistrationDao dao;
-  private OgelRegistrationsUnmarshaller unmarshaller;
 
   @Inject
-  public RegisterService(OgelRegistrationsClient client,
-                         OgelRegistrationsUnmarshaller unmarshaller,
-                         OgelRegistrationDao dao) {
-    this.client = client;
-    this.unmarshaller = unmarshaller;
+  public RegisterService(SoapService soap, OgelRegistrationDao dao) {
+    this.soap = soap;
     this.dao = dao;
   }
 
   public void register(RegisterOgel regOgel) {
-    ObjectMapper mapper = new ObjectMapper();
-    OgelRegistration ogel = new OgelRegistration(regOgel.getUserId(), regOgel.getOgelType());
-    ogel.setCustomerId(regOgel.getExistingCustomer());
-    ogel.setSiteId(regOgel.getExistingSite());
-    ogel.setLiteId(regOgel.getIdentifier());
-    try {
-      ogel.setJson(mapper.writeValueAsString(regOgel));
-    } catch (JsonProcessingException e) {
-      e.printStackTrace();
+    LOGGER.info("Registering new Ogel request: " + regOgel.getUserId() + "/" + regOgel.getOgelType());
+    OgelRegistration reg = getOgelRegistration(regOgel);
+    reg.setInitialStatus();
+
+    // Check if we already have this OgelRegistration request
+    OgelRegistration existing = dao.findByLiteId(reg.getLiteId());
+    if(existing != null) {
+      LOGGER.info("OgelRegistration request already exists, current status: " + reg.getStatus().name());
+    } else {
+      dao.create(reg);
     }
-    dao.create(ogel);
   }
 
   /**
@@ -57,8 +44,6 @@ public class RegisterService {
    * the incoming request exactly match the field values of an object in the queue.
    */
   public boolean isPending(RegisterOgel registerOgel) {
-
-    // registerOgel.setResponseMessage("Registration is PENDING");
     return false;
   }
 
@@ -68,15 +53,20 @@ public class RegisterService {
    * Otherwise, assume valid
    */
   public boolean isSpirePermitted(RegisterOgel registerOgel) {
-
-    // registerOgel.setResponseMessage("SITE_ALREADY_REGISTERED");
     return true;
   }
 
-  public void register(String userId, String ogelType) {
-    SOAPMessage soapMessage = client.checkOgelStatus(userId);
-    List<OgelReg> ogelRegs = unmarshaller.execute(soapMessage);
-    LOGGER.info("register ogelRegs: " + ogelRegs.size());
+  private OgelRegistration getOgelRegistration(RegisterOgel regOgel) {
+    ObjectMapper mapper = new ObjectMapper();
+    OgelRegistration ogel = new OgelRegistration(regOgel.getUserId(), regOgel.getOgelType());
+    ogel.setCustomerId(regOgel.getExistingCustomer());
+    ogel.setSiteId(regOgel.getExistingSite());
+    ogel.setLiteId(regOgel.getHashIdentifier());
+    try {
+      ogel.setJson(mapper.writeValueAsString(regOgel).replaceAll("\\s+", "")); // remove whitespace
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    return ogel;
   }
-
 }

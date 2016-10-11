@@ -1,7 +1,13 @@
 package uk.gov.bis.lite.permissions.model;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.bis.lite.permissions.model.request.RegisterOgel;
+import uk.gov.bis.lite.permissions.util.Util;
+
+import java.io.IOException;
 
 public class OgelRegistration {
 
@@ -16,9 +22,11 @@ public class OgelRegistration {
   private String siteId;
   private String json;
   private String created;
+  private String approvalRequired;
+  private String approvalGranted;
 
   public enum Status {
-    CREATED, PENDING;
+    PENDING, CUSTOMER, SITE, SITE_PERMISSION, COMPLETED;
   }
 
   public OgelRegistration(int id) {
@@ -28,7 +36,48 @@ public class OgelRegistration {
   public OgelRegistration(String userId, String ogelType) {
     this.userId = userId;
     this.ogelType = ogelType;
-    this.status = Status.CREATED;
+    this.status = Status.PENDING;
+  }
+
+  public void updateStatus() {
+    if(needsCustomer()) {
+      this.status = Status.CUSTOMER;
+    } else if(needsSite()) {
+      this.status = Status.SITE;
+    } else {
+      this.status = Status.SITE_PERMISSION;
+    }
+  }
+
+  public void setInitialStatus() {
+    if(status.equals(Status.PENDING)) {
+      if(StringUtils.isBlank(customerId)) {
+        this.status = Status.CUSTOMER;
+      } else if (StringUtils.isBlank(siteId)) {
+        this.status = Status.SITE;
+      } else {
+        this.status = Status.SITE_PERMISSION;
+      }
+    }
+  }
+
+  private boolean needsCustomer() {
+    return Util.isBlank(customerId);
+  }
+
+  private boolean needsSite() {
+    return Util.isBlank(siteId);
+  }
+
+  public RegisterOgel getRegisterOgelFromJson() {
+    RegisterOgel regOgel = null;
+    ObjectMapper mapper = new ObjectMapper();
+    try {
+      regOgel = mapper.readValue(this.getJson(), RegisterOgel.class);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return regOgel;
   }
 
   public String getJson() {
@@ -83,7 +132,7 @@ public class OgelRegistration {
     return ogelType;
   }
 
-  public void setOgelType(String type) {
+  public void setOgelType(String ogelType) {
     this.ogelType = ogelType;
   }
 
