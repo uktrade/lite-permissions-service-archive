@@ -18,15 +18,16 @@ public interface OgelRegistrationInterface {
               @Bind("status") String status,
               @Bind("id") int id);
 
-  @SqlUpdate("INSERT INTO LOCAL_OGEL_REGISTRATION (USER_ID, OGEL_TYPE, LITE_ID, CUSTOMER_ID, SITE_ID, JSON, STATUS) " +
-      "VALUES (:userId, :ogelType, :liteId, :customerId, :siteId, :json, :status)")
+  @SqlUpdate("INSERT INTO LOCAL_OGEL_REGISTRATION (USER_ID, OGEL_TYPE, LITE_ID, CUSTOMER_ID, SITE_ID, JSON, STATUS, ROLE_UPDATE) " +
+      "VALUES (:userId, :ogelType, :liteId, :customerId, :siteId, :json, :status, :roleUpdate)")
   void insert(@Bind("userId") String userId,
               @Bind("ogelType") String ogelType,
               @Bind("liteId") String liteId,
               @Bind("customerId") String customerId,
               @Bind("siteId") String siteId,
               @Bind("json") String json,
-              @Bind("status") String status);
+              @Bind("status") String status,
+              @Bind("roleUpdate") Boolean roleUpdate);
 
 
   @SqlQuery("SELECT * FROM LOCAL_OGEL_REGISTRATION WHERE STATUS = :status")

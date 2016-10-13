@@ -6,7 +6,7 @@ import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
-import uk.gov.bis.lite.permissions.service.RegisterService;
+import uk.gov.bis.lite.permissions.service.OgelService;
 import uk.gov.bis.lite.permissions.service.RegistrationService;
 
 import static org.quartz.CronScheduleBuilder.cronSchedule;
@@ -20,35 +20,52 @@ public class PermissionsScheduler implements Managed {
   private final Scheduler scheduler;
   private final PermissionsAppConfig config;
   private final RegistrationService registrationService;
-  public static final String REG_SERVICE_NAME = "registrationService";
+  private final OgelService ogelService;
+
+  static final String REG_SERVICE_NAME = "registrationService";
+  static final String OGEL_SERVICE_NAME = "ogelService";
 
   @Inject
   public PermissionsScheduler(Scheduler scheduler, PermissionsAppConfig config,
-                              RegistrationService registrationService) {
+                              RegistrationService registrationService, OgelService ogelService) {
     this.scheduler = scheduler;
     this.config = config;
     this.registrationService = registrationService;
+    this.ogelService = ogelService;
   }
 
   @Override
   public void start() throws Exception {
     LOGGER.info("PermissionsScheduler start...");
 
-    JobKey jobKey = JobKey.jobKey("notificationJob");
-    JobDetail jobDetail = newJob(PermissionsProcessJob.class)
-        .withIdentity(jobKey)
+    // Set up Ogel prepare job
+    JobKey prepareJobKey = JobKey.jobKey("OgelPrepareJob");
+    JobDetail prepareJobDetail = newJob(OgelPrepareJob.class)
+        .withIdentity(prepareJobKey)
+        .build();
+    prepareJobDetail.getJobDataMap().put(REG_SERVICE_NAME, registrationService);
+    CronTrigger prepareTrigger = newTrigger()
+        .withIdentity(TriggerKey.triggerKey("OgelPrepareJobTrigger"))
+        .withSchedule(cronSchedule(config.getOgelPrepareJobCron()))
         .build();
 
-    jobDetail.getJobDataMap().put(REG_SERVICE_NAME, registrationService);
-
-    CronTrigger trigger = newTrigger()
-        .withIdentity(TriggerKey.triggerKey("notificationRetryJobTrigger"))
-        .withSchedule(cronSchedule(config.getNotificationRetryJobCron()))
+    // Set up Ogel create job
+    JobKey createJobKey = JobKey.jobKey("OgelCreateJob");
+    JobDetail createJobDetail = newJob(OgelCreateJob.class)
+        .withIdentity(createJobKey)
+        .build();
+    createJobDetail.getJobDataMap().put(OGEL_SERVICE_NAME, ogelService);
+    CronTrigger createTrigger = newTrigger()
+        .withIdentity(TriggerKey.triggerKey("OgelCreateJobTrigger"))
+        .withSchedule(cronSchedule(config.getOgelCreateJobCron()))
         .build();
 
-    scheduler.scheduleJob(jobDetail, trigger);
+    scheduler.scheduleJob(prepareJobDetail, prepareTrigger);
+    scheduler.scheduleJob(createJobDetail, createTrigger);
+
     scheduler.start();
-    scheduler.triggerJob(jobKey);
+    scheduler.triggerJob(prepareJobKey);
+    scheduler.triggerJob(createJobKey);
   }
 
   @Override

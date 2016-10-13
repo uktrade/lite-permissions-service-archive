@@ -24,46 +24,31 @@ public class RegisterService {
     this.dao = dao;
   }
 
-  public void register(RegisterOgel regOgel) {
+  public boolean register(RegisterOgel regOgel) {
     LOGGER.info("Registering new Ogel request: " + regOgel.getUserId() + "/" + regOgel.getOgelType());
     OgelRegistration reg = getOgelRegistration(regOgel);
     reg.setInitialStatus();
 
-    // Check if we already have this OgelRegistration request
-    OgelRegistration existing = dao.findByLiteId(reg.getLiteId());
-    if(existing != null) {
+    // Check if we already have this request
+    if (dao.findByLiteId(reg.getLiteId()) != null) {
       LOGGER.info("OgelRegistration request already exists, current status: " + reg.getStatus().name());
-    } else {
-      dao.create(reg);
+      return false;
     }
-  }
 
-  /**
-   * If the OGEL registration request is already in the pending local queue1, respond with PENDING
-   * A registration request is considered to already be in the pending local queue if all the field values of
-   * the incoming request exactly match the field values of an object in the queue.
-   */
-  public boolean isPending(RegisterOgel registerOgel) {
-    return false;
-  }
-
-  /**
-   * If status is PERMISSION_DENIED (not yet implemented on SPIRE), respond with PERMISSION_DENIED2
-   * If status is BLACKLISTED or SITE_ALREADY_REGISTERED, respond with that status
-   * Otherwise, assume valid
-   */
-  public boolean isSpirePermitted(RegisterOgel registerOgel) {
+    dao.create(reg);
     return true;
   }
 
-  private OgelRegistration getOgelRegistration(RegisterOgel regOgel) {
+  private OgelRegistration getOgelRegistration(RegisterOgel reg) {
     ObjectMapper mapper = new ObjectMapper();
-    OgelRegistration ogel = new OgelRegistration(regOgel.getUserId(), regOgel.getOgelType());
-    ogel.setCustomerId(regOgel.getExistingCustomer());
-    ogel.setSiteId(regOgel.getExistingSite());
-    ogel.setLiteId(regOgel.getHashIdentifier());
+    OgelRegistration ogel = new OgelRegistration(reg.getUserId(), reg.getOgelType());
+    ogel.setCustomerId(reg.getExistingCustomer());
+    ogel.setSiteId(reg.getExistingSite());
+    ogel.setLiteId(reg.getHashIdentifier());
+    ogel.setRoleUpdate(reg.isRoleUpdateRequired());
     try {
-      ogel.setJson(mapper.writeValueAsString(regOgel).replaceAll("\\s+", "")); // remove whitespace
+      //ogel.setJson(mapper.writeValueAsString(reg).replaceAll("\\s+", "")); // remove whitespace
+      ogel.setJson(mapper.writeValueAsString(reg).replaceAll("\\s{2,}", " ").trim()); // remove excessive whitespace
     } catch (JsonProcessingException e) {
       e.printStackTrace();
     }

@@ -20,6 +20,7 @@ public class OgelRegistrationMapper implements ResultSetMapper<OgelRegistration>
     ogReg.setSiteId(r.getString("SITE_ID"));
     ogReg.setJson(r.getString("JSON"));
     ogReg.setCreated(r.getString("CREATED"));
+    ogReg.setRoleUpdate(r.getBoolean("ROLE_UPDATE"));
     return ogReg;
   }
 }

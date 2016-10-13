@@ -35,6 +35,13 @@ public class RegisterOgel {
     return !StringUtils.isBlank(existingSite);
   }
 
+  public boolean isRoleUpdateRequired() {
+    if(adminApproval != null && !StringUtils.isBlank(adminApproval.getAdminUserId())) {
+      return true;
+    }
+    return false;
+  }
+
   public boolean isValid() {
     boolean valid = mandatoryFieldsOk() && customerFieldsOk() && siteFieldsOk();
     if (valid && newSite != null) {

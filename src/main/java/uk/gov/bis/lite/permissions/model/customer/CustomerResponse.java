@@ -2,23 +2,13 @@ package uk.gov.bis.lite.permissions.model.customer;
 
 public class CustomerResponse {
 
-  private String sarRef;
-  private String siteRef;
+  private String response;
 
-
-  public String getSiteRef() {
-    return siteRef;
+  public String getResponse() {
+    return response;
   }
 
-  public void setSiteRef(String siteRef) {
-    this.siteRef = siteRef;
-  }
-
-  public String getSarRef() {
-    return sarRef;
-  }
-
-  public void setSarRef(String sarRef) {
-    this.sarRef = sarRef;
+  public void setResponse(String response) {
+    this.response = response;
   }
 }

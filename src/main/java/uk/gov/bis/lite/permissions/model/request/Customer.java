@@ -8,6 +8,7 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Customer {
 
+  private String customerName;
   private String customerType;
   private String chNumber;
   private boolean chNumberValidated;
@@ -17,14 +18,15 @@ public class Customer {
   private Address registeredAddress;
 
   String getJoinedInstanceStateData() {
-    String strings = Util.joinAll(customerType, chNumber, eoriNumber, website);
+    String strings = Util.joinAll(customerName, customerType, chNumber, eoriNumber, website);
     String booleans = Util.joinAll(chNumberValidated, eoriNumberValidated);
-    String address = registeredAddress != null ? registeredAddress.getJoinedInstanceStateData() : "";
+    String address = registeredAddress != null ? registeredAddress.getAddressData() : "";
     return strings + booleans + address;
   }
 
   public String getInfo() {
     String info = "\nCustomer " +
+        Util.info("customerName", customerName) +
         Util.info("customerType", customerType) +
         Util.info("chNumber", chNumber) +
         Util.info("chNumberValidated", chNumberValidated) +
@@ -38,7 +40,8 @@ public class Customer {
   public boolean equals(Object o) {
     if (o instanceof Customer) {
       Customer customer = (Customer) o;
-      return Objects.equals(customerType, customer.getCustomerType())
+      return Objects.equals(customerName, customer.getCustomerName())
+          && Objects.equals(customerType, customer.getCustomerType())
           && Objects.equals(chNumber, customer.getChNumber())
           && Objects.equals(chNumberValidated, customer.isChNumberValidated())
           && Objects.equals(eoriNumber, customer.getEoriNumber())
@@ -51,7 +54,7 @@ public class Customer {
 
   @Override
   public int hashCode() {
-    return Objects.hash(customerType, chNumber, chNumberValidated, eoriNumber, eoriNumberValidated, website, registeredAddress);
+    return Objects.hash(customerName, customerType, chNumber, chNumberValidated, eoriNumber, eoriNumberValidated, website, registeredAddress);
   }
 
   /**
@@ -111,5 +114,13 @@ public class Customer {
 
   public void setEoriNumberValidated(boolean eoriNumberValidated) {
     this.eoriNumberValidated = eoriNumberValidated;
+  }
+
+  public String getCustomerName() {
+    return customerName;
+  }
+
+  public void setCustomerName(String customerName) {
+    this.customerName = customerName;
   }
 }

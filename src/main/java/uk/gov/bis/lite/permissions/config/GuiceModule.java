@@ -4,9 +4,12 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import io.dropwizard.client.HttpClientBuilder;
+import io.dropwizard.client.HttpClientConfiguration;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.setup.Environment;
+import io.dropwizard.util.Duration;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
@@ -24,9 +27,18 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
   @Provides
   @Singleton
   Client provideHttpClient(Environment environment, PermissionsAppConfig config) {
-    final Client client = new JerseyClientBuilder(environment).using(config.getJerseyClientConfiguration())
-        .build("jerseyClient");
-    return client;
+
+    // The default timeout is 500ms and often results in Timeout exceptions
+    HttpClientConfiguration httpClientConfiguration = new HttpClientConfiguration();
+    httpClientConfiguration.setTimeout(Duration.milliseconds(4000));
+
+    HttpClientBuilder clientBuilder = new HttpClientBuilder(environment);
+    clientBuilder.using(httpClientConfiguration);
+
+    JerseyClientBuilder builder = new JerseyClientBuilder(environment);
+    builder.setApacheHttpClientBuilder(clientBuilder);
+
+    return builder.build("jerseyClient");
   }
 
   @Override
@@ -35,15 +47,9 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
   }
 
   @Provides
-  @javax.inject.Named("customerServiceHost")
-  String provideCustomerServiceHost(PermissionsAppConfig config) {
-    return config.getCustomerServiceHost();
-  }
-
-  @Provides
-  @javax.inject.Named("customerServicePort")
-  String provideCustomerServicePort(PermissionsAppConfig config) {
-    return config.getCustomerServicePort();
+  @javax.inject.Named("customerServiceUrl")
+  String provideCustomerServiceUrl(PermissionsAppConfig config) {
+    return config.getCustomerServiceUrl();
   }
 
   @Provides
@@ -59,16 +65,17 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
   }
 
   @Provides
+  @javax.inject.Named("customerServiceUserRolePath")
+  String provideCustomerServiceUserRolePath(PermissionsAppConfig config) {
+    return config.getCustomerServiceUserRolePath();
+  }
+
+  @Provides
   @javax.inject.Named("spireOgelRegistrationsUrl")
   String provideSpireOgelRegistrationsUrl(PermissionsAppConfig config) {
     return config.getSpireOgelRegistrationsUrl();
   }
 
-  @Provides
-  @javax.inject.Named("spireCreateLiteSarUrl")
-  public String provideCreateLiteSarUrl(PermissionsAppConfig config) {
-    return config.getSpireCreateLiteSarUrl();
-  }
 
   @Provides
   @javax.inject.Named("soapUserName")

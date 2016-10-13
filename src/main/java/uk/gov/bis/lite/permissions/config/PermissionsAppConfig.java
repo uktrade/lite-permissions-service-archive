@@ -2,7 +2,6 @@ package uk.gov.bis.lite.permissions.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
-import io.dropwizard.client.JerseyClientConfiguration;
 import io.dropwizard.db.DataSourceFactory;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -11,20 +10,8 @@ import javax.validation.constraints.NotNull;
 
 public class PermissionsAppConfig extends Configuration {
 
-  @Valid
-  @NotNull
-  private JerseyClientConfiguration jerseyClient = new JerseyClientConfiguration();
-
-  @JsonProperty("jerseyClient")
-  public JerseyClientConfiguration getJerseyClientConfiguration() {
-    return jerseyClient;
-  }
-
   @NotEmpty
-  private String customerServiceHost;
-
-  @NotEmpty
-  private String customerServicePort;
+  private String customerServiceUrl;
 
   @NotEmpty
   private String customerServiceCustomerPath;
@@ -33,8 +20,7 @@ public class PermissionsAppConfig extends Configuration {
   private String customerServiceSitePath;
 
   @NotEmpty
-  @JsonProperty
-  private String spireCreateLiteSarUrl;
+  private String customerServiceUserRolePath;
 
   @NotEmpty
   @JsonProperty
@@ -51,6 +37,12 @@ public class PermissionsAppConfig extends Configuration {
   @NotEmpty
   private String notificationRetryJobCron;
 
+  @NotEmpty
+  private String ogelPrepareJobCron;
+
+  @NotEmpty
+  private String ogelCreateJobCron;
+
   @Valid
   @NotNull
   @JsonProperty("database")
@@ -66,12 +58,21 @@ public class PermissionsAppConfig extends Configuration {
     return database;
   }
 
-  public String getSpireCreateLiteSarUrl() {
-    return spireCreateLiteSarUrl;
+
+  public String getCustomerServiceUrl() {
+    return customerServiceUrl;
   }
 
-  public void setSpireCreateLiteSarUrl(String spireCreateLiteSarUrl) {
-    this.spireCreateLiteSarUrl = spireCreateLiteSarUrl;
+  public String getCustomerServiceCustomerPath() {
+    return customerServiceCustomerPath;
+  }
+
+  public String getCustomerServiceSitePath() {
+    return customerServiceSitePath;
+  }
+
+  public String getCustomerServiceUserRolePath() {
+    return customerServiceUserRolePath;
   }
 
   public String getSpireOgelRegistrationsUrl() {
@@ -90,44 +91,23 @@ public class PermissionsAppConfig extends Configuration {
     return notificationRetryJobCron;
   }
 
+  public String getOgelPrepareJobCron() {
+    return ogelPrepareJobCron;
+  }
+
+  public String getOgelCreateJobCron() {
+    return ogelCreateJobCron;
+  }
+
+  public DataSourceFactory getDatabase() {
+    return database;
+  }
+
   public String getAdminLogin() {
     return adminLogin;
   }
 
   public String getAdminPassword() {
     return adminPassword;
-  }
-
-  public String getCustomerServiceHost() {
-    return customerServiceHost;
-  }
-
-  public void setCustomerServiceHost(String customerServiceHost) {
-    this.customerServiceHost = customerServiceHost;
-  }
-
-  public String getCustomerServicePort() {
-    return customerServicePort;
-  }
-
-  public void setCustomerServicePort(String customerServicePort) {
-    this.customerServicePort = customerServicePort;
-  }
-
-
-  public String getCustomerServiceCustomerPath() {
-    return customerServiceCustomerPath;
-  }
-
-  public void setCustomerServiceCustomerPath(String customerServiceCustomerPath) {
-    this.customerServiceCustomerPath = customerServiceCustomerPath;
-  }
-
-  public String getCustomerServiceSitePath() {
-    return customerServiceSitePath;
-  }
-
-  public void setCustomerServiceSitePath(String customerServiceSitePath) {
-    this.customerServiceSitePath = customerServiceSitePath;
   }
 }

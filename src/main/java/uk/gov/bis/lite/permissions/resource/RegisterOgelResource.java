@@ -31,31 +31,25 @@ public class RegisterOgelResource {
   @Path("/register-ogel")
   public Response registerOgel(RegisterOgel registerOgel) {
     LOGGER.info("************ registerOgel ************ ");
-    //LOGGER.info(registerOgel.toString());
 
     // Check valid request
     if (!registerOgel.isValid()) {
       return badRequest("Request invalid - " + registerOgel.getValidityInfo());
     }
 
-    // Check registration is already PENDING
-    if (registerService.isPending(registerOgel)) {
-      return badRequest(registerOgel.getResponseMessage());
-    }
-
-    // Check registration is permitted by Spire
-    if (!registerService.isSpirePermitted(registerOgel)) {
-      return badRequest(registerOgel.getResponseMessage());
-    }
+    boolean created = true;
 
     // Check for existing Customer and existing Site
     if (registerOgel.isExistingCustomerAndSite() || registerOgel.isExistingCustomer() || registerOgel.isExistingSite()) {
       // assume valid for now
-      registerService.register(registerOgel);
+      created = registerService.register(registerOgel);
     } else {
-      registerService.register(registerOgel);
+      created = registerService.register(registerOgel);
     }
 
+    if(!created) {
+      return badRequest("The register Ogel request is currently being processed");
+    }
     return goodRequest();
   }
 

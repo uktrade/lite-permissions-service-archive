@@ -15,21 +15,20 @@ public class Address {
   private String postcode;
   private String country;
 
-
   public String getLiteAddress() {
-    return getJoinedInstanceStateData();
+    return Util.joinDelimited(", ", line1, line2, town, county, postcode, country);
   }
 
   public String getSpireAddress() {
-    return getJoinedInstanceStateData();
+    return Util.joinDelimited(", ", line1, line2, town, county, postcode, country);
+  }
+
+  public String getAddressData() {
+    return Util.joinDelimited("", line1, line2, town, county, postcode, country);
   }
 
   public boolean isFullAddress() {
     return Util.allNotBlank(line1, line2, town, county, postcode, country);
-  }
-
-  public String getJoinedInstanceStateData() {
-    return Util.joinAll(line1, line2, town, county, postcode, country);
   }
 
   @Override

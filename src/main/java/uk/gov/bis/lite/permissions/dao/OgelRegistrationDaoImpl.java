@@ -48,7 +48,8 @@ public class OgelRegistrationDaoImpl implements OgelRegistrationDao {
           ogReg.getCustomerId(),
           ogReg.getSiteId(),
           ogReg.getJson(),
-          ogReg.getStatus().name());
+          ogReg.getStatus().name(),
+          ogReg.isRoleUpdate());
     }
   }
 

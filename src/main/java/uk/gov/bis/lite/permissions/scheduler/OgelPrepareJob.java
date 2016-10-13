@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.model.OgelRegistration;
 import uk.gov.bis.lite.permissions.service.RegistrationService;
 
-public class PermissionsProcessJob implements Job {
+public class OgelPrepareJob implements Job {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(PermissionsProcessJob.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(OgelPrepareJob.class);
   private static int cycle = 0;
 
   @Override
@@ -23,12 +23,10 @@ public class PermissionsProcessJob implements Job {
     } else if(cycle == 2) {
       service.processRegistrations(OgelRegistration.Status.SITE);
     } else if(cycle == 3) {
-      service.processRegistrations(OgelRegistration.Status.SITE_PERMISSION);
-    } else if(cycle == 4) {
-      service.processRegistrations(OgelRegistration.Status.PENDING);
+      service.processRegistrations(OgelRegistration.Status.USER_ROLE);
     }
     cycle++;
-    if(cycle > 4) {
+    if(cycle > 3) {
       cycle = 1;
     }
 

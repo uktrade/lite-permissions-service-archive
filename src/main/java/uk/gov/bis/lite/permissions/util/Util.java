@@ -49,14 +49,12 @@ public class Util {
     return allNotBlank;
   }
 
+  public static String joinDelimited(String delimited, String... args) {
+    return StringUtils.join(args, delimited);
+  }
+
   public static String joinAll(String... args) {
-    String all = "";
-    for (String arg : args) {
-      if (!StringUtils.isBlank(arg)) {
-        all = all + arg;
-      }
-    }
-    return all;
+    return StringUtils.join(args);
   }
 
   public static String joinAll(boolean... args) {

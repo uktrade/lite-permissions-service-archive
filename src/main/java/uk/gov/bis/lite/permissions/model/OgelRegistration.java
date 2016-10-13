@@ -22,11 +22,18 @@ public class OgelRegistration {
   private String siteId;
   private String json;
   private String created;
-  private String approvalRequired;
-  private String approvalGranted;
+  private boolean roleUpdate;
 
+  /**
+   * PENDING    - transient state
+   * CUSTOMER   - we need to create a Customer and populate customerId with resulting sarRef
+   * SITE       - we need to create a Site and populate siteId with resulting siteRef
+   * USER_ROLE  - we need to update user role permissions
+   * READY      - this registration is now setUp and we can create the Ogel
+   * COMPLETE   - Ogel has been created and processing related to this registration is complete
+   */
   public enum Status {
-    PENDING, CUSTOMER, SITE, SITE_PERMISSION, COMPLETED;
+    PENDING, CUSTOMER, SITE, USER_ROLE, READY, COMPLETE;
   }
 
   public OgelRegistration(int id) {
@@ -39,24 +46,38 @@ public class OgelRegistration {
     this.status = Status.PENDING;
   }
 
+  public void updateStatusToReady() {
+    this.status = Status.READY;
+  }
+
+  public void updateStatusToComplete() {
+    this.status = Status.COMPLETE;
+  }
+
   public void updateStatus() {
-    if(needsCustomer()) {
-      this.status = Status.CUSTOMER;
-    } else if(needsSite()) {
-      this.status = Status.SITE;
-    } else {
-      this.status = Status.SITE_PERMISSION;
+    if(!this.status.equals(Status.READY)) {
+      if (needsCustomer()) {
+        this.status = Status.CUSTOMER;
+      } else if (needsSite()) {
+        this.status = Status.SITE;
+      } else if (needsRoleUpdate()) {
+        this.status = Status.USER_ROLE;
+      } else {
+        this.status = Status.READY;
+      }
     }
   }
 
   public void setInitialStatus() {
-    if(status.equals(Status.PENDING)) {
-      if(StringUtils.isBlank(customerId)) {
+    if(this.status.equals(Status.PENDING)) {
+      if(needsCustomer()) {
         this.status = Status.CUSTOMER;
-      } else if (StringUtils.isBlank(siteId)) {
+      } else if (needsSite()) {
         this.status = Status.SITE;
+      } else if(needsRoleUpdate()) {
+        this.status = Status.USER_ROLE;
       } else {
-        this.status = Status.SITE_PERMISSION;
+        this.status = Status.READY;
       }
     }
   }
@@ -67,6 +88,10 @@ public class OgelRegistration {
 
   private boolean needsSite() {
     return Util.isBlank(siteId);
+  }
+
+  private boolean needsRoleUpdate() {
+    return roleUpdate;
   }
 
   public RegisterOgel getRegisterOgelFromJson() {
@@ -150,5 +175,13 @@ public class OgelRegistration {
 
   public void setCreated(String created) {
     this.created = created;
+  }
+
+  public boolean isRoleUpdate() {
+    return roleUpdate;
+  }
+
+  public void setRoleUpdate(boolean roleUpdate) {
+    this.roleUpdate = roleUpdate;
   }
 }
