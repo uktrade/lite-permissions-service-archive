@@ -24,7 +24,7 @@ public class PermissionsAppConfig extends Configuration {
 
   @NotEmpty
   @JsonProperty
-  private String spireOgelRegistrationsUrl;
+  private String spireCreateOgelAppUrl;
 
   @NotEmpty
   @JsonProperty
@@ -33,9 +33,6 @@ public class PermissionsAppConfig extends Configuration {
   @NotEmpty
   @JsonProperty
   private String soapPassword;
-
-  @NotEmpty
-  private String notificationRetryJobCron;
 
   @NotEmpty
   private String ogelPrepareJobCron;
@@ -75,8 +72,8 @@ public class PermissionsAppConfig extends Configuration {
     return customerServiceUserRolePath;
   }
 
-  public String getSpireOgelRegistrationsUrl() {
-    return spireOgelRegistrationsUrl;
+  public String getSpireCreateOgelAppUrl() {
+    return spireCreateOgelAppUrl;
   }
 
   public String getSoapUserName() {
@@ -85,10 +82,6 @@ public class PermissionsAppConfig extends Configuration {
 
   public String getSoapPassword() {
     return soapPassword;
-  }
-
-  public String getNotificationRetryJobCron() {
-    return notificationRetryJobCron;
   }
 
   public String getOgelPrepareJobCron() {

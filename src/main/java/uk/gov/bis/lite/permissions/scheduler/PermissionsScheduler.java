@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
 import uk.gov.bis.lite.permissions.service.OgelService;
-import uk.gov.bis.lite.permissions.service.RegistrationService;
+import uk.gov.bis.lite.permissions.service.SubmissionService;
 
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
@@ -19,18 +19,18 @@ public class PermissionsScheduler implements Managed {
 
   private final Scheduler scheduler;
   private final PermissionsAppConfig config;
-  private final RegistrationService registrationService;
+  private final SubmissionService submissionService;
   private final OgelService ogelService;
 
-  static final String REG_SERVICE_NAME = "registrationService";
+  static final String SUBMISSION_SERVICE_NAME = "submissionService";
   static final String OGEL_SERVICE_NAME = "ogelService";
 
   @Inject
   public PermissionsScheduler(Scheduler scheduler, PermissionsAppConfig config,
-                              RegistrationService registrationService, OgelService ogelService) {
+                              SubmissionService submissionService, OgelService ogelService) {
     this.scheduler = scheduler;
     this.config = config;
-    this.registrationService = registrationService;
+    this.submissionService = submissionService;
     this.ogelService = ogelService;
   }
 
@@ -38,14 +38,14 @@ public class PermissionsScheduler implements Managed {
   public void start() throws Exception {
     LOGGER.info("PermissionsScheduler start...");
 
-    // Set up Ogel prepare job
-    JobKey prepareJobKey = JobKey.jobKey("OgelPrepareJob");
-    JobDetail prepareJobDetail = newJob(OgelPrepareJob.class)
+    // Set up OgelSubmission prepare job
+    JobKey prepareJobKey = JobKey.jobKey("OgelSubmissionPrepareJob");
+    JobDetail prepareJobDetail = newJob(OgelSubmissionPrepareJob.class)
         .withIdentity(prepareJobKey)
         .build();
-    prepareJobDetail.getJobDataMap().put(REG_SERVICE_NAME, registrationService);
+    prepareJobDetail.getJobDataMap().put(SUBMISSION_SERVICE_NAME, submissionService);
     CronTrigger prepareTrigger = newTrigger()
-        .withIdentity(TriggerKey.triggerKey("OgelPrepareJobTrigger"))
+        .withIdentity(TriggerKey.triggerKey("OgelSubmissionPrepareJobTrigger"))
         .withSchedule(cronSchedule(config.getOgelPrepareJobCron()))
         .build();
 

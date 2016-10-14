@@ -1,4 +1,4 @@
-package uk.gov.bis.lite.permissions.model.request;
+package uk.gov.bis.lite.permissions.model.register;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import uk.gov.bis.lite.permissions.util.Util;

@@ -1,11 +1,10 @@
-# notificationRetryJobCron: 0 0,5,10,15,20,25,30,35,40,45,50,55 * * * ? # every 5 minutes
-notificationRetryJobCron: 0/10 * * * * ?  # every 20 seconds
+# ogelPrepareJobCron: 0 0,5,10,15,20,25,30,35,40,45,50,55 * * * ? # every 5 minutes
 ogelPrepareJobCron: 0/10 * * * * ?  # every 10 seconds
 ogelCreateJobCron: 0/20 * * * * ?  # every 20 seconds
 
 soapUserName: bisdev.api@test.com
-spireOgelRegistrationsUrl: https://spiredevalpha.fivium.co.uk/spirefox4dev/fox/ispire/SPIRE_OGEL_REGISTRATIONS
 soapPassword: dev
+spireCreateOgelAppUrl: https://spiredevalpha.fivium.co.uk/spirefox4dev/fox/ispire/SPIRE_CREATE_OGEL_APP
 
 customerServiceUrl: http://localhost:8095
 customerServiceCustomerPath: /customer

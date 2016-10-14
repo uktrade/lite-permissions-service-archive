@@ -7,18 +7,14 @@ import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.flywaydb.core.Flyway;
-import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.slf4j.LoggerFactory;
 import ru.vyarus.dropwizard.guice.GuiceBundle;
 import ru.vyarus.dropwizard.guice.module.installer.feature.ManagedInstaller;
 import ru.vyarus.dropwizard.guice.module.installer.feature.jersey.ResourceInstaller;
 import uk.gov.bis.lite.permissions.config.GuiceModule;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
-import uk.gov.bis.lite.permissions.exception.PermissionsException;
 import uk.gov.bis.lite.permissions.resource.RegisterOgelResource;
 import uk.gov.bis.lite.permissions.scheduler.PermissionsScheduler;
-
-import javax.ws.rs.client.Client;
 
 public class PermissionsApp extends Application<PermissionsAppConfig> {
 
@@ -36,8 +32,6 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
 
   @Override
   public void run(PermissionsAppConfig config, Environment environment) throws Exception {
-
-    environment.jersey().register(PermissionsException.ServiceExceptionMapper.class);
 
     // Logback update
     Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);

@@ -1,25 +1,25 @@
 package uk.gov.bis.lite.permissions.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.bis.lite.permissions.model.request.RegisterOgel;
+import uk.gov.bis.lite.permissions.model.register.RegisterOgel;
 import uk.gov.bis.lite.permissions.util.Util;
 
 import java.io.IOException;
 
-public class OgelRegistration {
+public class OgelSubmission {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(OgelRegistration.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(OgelSubmission.class);
 
   private int id;
   private String userId;
   private String ogelType;
   private Status status;
-  private String liteId;
-  private String customerId;
-  private String siteId;
+  private String submissionRef;
+  private String customerRef;
+  private String siteRef;
+  private String spireRef;
   private String json;
   private String created;
   private boolean roleUpdate;
@@ -29,18 +29,18 @@ public class OgelRegistration {
    * CUSTOMER   - we need to create a Customer and populate customerId with resulting sarRef
    * SITE       - we need to create a Site and populate siteId with resulting siteRef
    * USER_ROLE  - we need to update user role permissions
-   * READY      - this registration is now setUp and we can create the Ogel
-   * COMPLETE   - Ogel has been created and processing related to this registration is complete
+   * READY      - this OgelSubmission is now setUp and we can create the Ogel via Spire
+   * COMPLETE   - Ogel has been created on Spire, OgelSubmission updated with SpireRef, processing submission complete
    */
   public enum Status {
     PENDING, CUSTOMER, SITE, USER_ROLE, READY, COMPLETE;
   }
 
-  public OgelRegistration(int id) {
+  public OgelSubmission(int id) {
     this.id = id;
   }
 
-  public OgelRegistration(String userId, String ogelType) {
+  public OgelSubmission(String userId, String ogelType) {
     this.userId = userId;
     this.ogelType = ogelType;
     this.status = Status.PENDING;
@@ -83,11 +83,11 @@ public class OgelRegistration {
   }
 
   private boolean needsCustomer() {
-    return Util.isBlank(customerId);
+    return Util.isBlank(customerRef);
   }
 
   private boolean needsSite() {
-    return Util.isBlank(siteId);
+    return Util.isBlank(siteRef);
   }
 
   private boolean needsRoleUpdate() {
@@ -113,28 +113,28 @@ public class OgelRegistration {
     this.json = json;
   }
 
-  public String getLiteId() {
-    return liteId;
+  public String getSubmissionRef() {
+    return submissionRef;
   }
 
-  public void setLiteId(String liteId) {
-    this.liteId = liteId;
+  public void setSubmissionRef(String submissionRef) {
+    this.submissionRef = submissionRef;
   }
 
-  public String getCustomerId() {
-    return customerId;
+  public String getCustomerRef() {
+    return customerRef;
   }
 
-  public void setCustomerId(String customerId) {
-    this.customerId = customerId;
+  public void setCustomerRef(String customerRef) {
+    this.customerRef = customerRef;
   }
 
-  public String getSiteId() {
-    return siteId;
+  public String getSiteRef() {
+    return siteRef;
   }
 
-  public void setSiteId(String siteId) {
-    this.siteId = siteId;
+  public void setSiteRef(String siteRef) {
+    this.siteRef = siteRef;
   }
 
   public int getId() {
@@ -183,5 +183,13 @@ public class OgelRegistration {
 
   public void setRoleUpdate(boolean roleUpdate) {
     this.roleUpdate = roleUpdate;
+  }
+
+  public String getSpireRef() {
+    return spireRef;
+  }
+
+  public void setSpireRef(String spireRef) {
+    this.spireRef = spireRef;
   }
 }

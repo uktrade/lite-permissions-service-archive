@@ -1,4 +1,4 @@
-package uk.gov.bis.lite.permissions.model.request;
+package uk.gov.bis.lite.permissions.model.register;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.StringUtils;
@@ -83,7 +83,7 @@ public class RegisterOgel {
   /**
    * Gathers data, creates  hash
    */
-  public String getHashIdentifier() {
+  public String generateSubmissionReference() {
     String message = getJoinedInstanceStateData().replaceAll("\\s+", "").toUpperCase();
     return Util.generateHashFromString(message);
   }

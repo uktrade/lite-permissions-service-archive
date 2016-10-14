@@ -6,16 +6,16 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.bis.lite.permissions.model.OgelRegistration;
+import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.model.customer.CustomerItem;
 import uk.gov.bis.lite.permissions.model.customer.CustomerResponse;
 import uk.gov.bis.lite.permissions.model.customer.UserRoleItem;
 import uk.gov.bis.lite.permissions.model.customer.SiteItem;
-import uk.gov.bis.lite.permissions.model.request.Address;
-import uk.gov.bis.lite.permissions.model.request.AdminApproval;
-import uk.gov.bis.lite.permissions.model.request.Customer;
-import uk.gov.bis.lite.permissions.model.request.RegisterOgel;
-import uk.gov.bis.lite.permissions.model.request.Site;
+import uk.gov.bis.lite.permissions.model.register.Address;
+import uk.gov.bis.lite.permissions.model.register.AdminApproval;
+import uk.gov.bis.lite.permissions.model.register.Customer;
+import uk.gov.bis.lite.permissions.model.register.RegisterOgel;
+import uk.gov.bis.lite.permissions.model.register.Site;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -52,10 +52,10 @@ public class CustomerService {
     this.userRolePath = userRolePath;
   }
 
-  public Optional<String> updateUserRole(OgelRegistration registration) {
+  public Optional<String> updateUserRole(OgelSubmission sub) {
     WebTarget target = httpClient.target(customerServiceUrl).path(userRolePath);
     try {
-      Response response = target.request().post(Entity.json(getUserRoleItem(registration)));
+      Response response = target.request().post(Entity.json(getUserRoleItem(sub)));
       if (isOk(response)) {
         CustomerResponse customerResponse = objectMapper.readValue(response.readEntity(String.class), CustomerResponse.class);
         LOGGER.info("CustomerResponse siteAccess: " + customerResponse.getResponse());
@@ -69,10 +69,10 @@ public class CustomerService {
     return Optional.empty();
   }
 
-  public Optional<String> createCustomer(OgelRegistration registration) {
+  public Optional<String> createCustomer(OgelSubmission sub) {
     WebTarget target = httpClient.target(customerServiceUrl).path(customerPath);
     try {
-      Response response = target.request().post(Entity.json(getCustomerItem(registration)));
+      Response response = target.request().post(Entity.json(getCustomerItem(sub)));
       if (isOk(response)) {
         CustomerResponse customerResponse = objectMapper.readValue(response.readEntity(String.class), CustomerResponse.class);
         LOGGER.info("CustomerResponse SarRef: " + customerResponse.getResponse());
@@ -86,10 +86,10 @@ public class CustomerService {
     return Optional.empty();
   }
 
-  public Optional<String> createSite(OgelRegistration registration) {
+  public Optional<String> createSite(OgelSubmission sub) {
     WebTarget target = httpClient.target(customerServiceUrl).path(sitePath);
     try {
-      Response response = target.request().post(Entity.json(getSiteItem(registration)));
+      Response response = target.request().post(Entity.json(getSiteItem(sub)));
       if (isOk(response)) {
         CustomerResponse customerResponse = objectMapper.readValue(response.readEntity(String.class), CustomerResponse.class);
         LOGGER.info("CustomerResponse SiteRef: " + customerResponse.getResponse());
@@ -103,12 +103,12 @@ public class CustomerService {
     return Optional.empty();
   }
 
-  private CustomerItem getCustomerItem(OgelRegistration ogel) {
-    RegisterOgel reg = ogel.getRegisterOgelFromJson();
+  private CustomerItem getCustomerItem(OgelSubmission sub) {
+    RegisterOgel reg = sub.getRegisterOgelFromJson();
     Customer customer = reg.getNewCustomer();
     Address address = customer.getRegisteredAddress();
     CustomerItem item = new CustomerItem();
-    item.setUserId(ogel.getUserId());
+    item.setUserId(sub.getUserId());
     item.setCustomerName(customer.getCustomerName());
     item.setAddress(address.getSpireAddress());
     item.setCompaniesHouseNumber(customer.getChNumber());
@@ -122,14 +122,14 @@ public class CustomerService {
     return item;
   }
 
-  private SiteItem getSiteItem(OgelRegistration ogel) {
-    RegisterOgel reg = ogel.getRegisterOgelFromJson();
+  private SiteItem getSiteItem(OgelSubmission sub) {
+    RegisterOgel reg = sub.getRegisterOgelFromJson();
     Customer customer = reg.getNewCustomer();
     Site site = reg.getNewSite();
     Address address = customer.getRegisteredAddress();
     SiteItem item = new SiteItem();
-    item.setUserId(ogel.getUserId());
-    item.setSarRef(ogel.getCustomerId());
+    item.setUserId(sub.getUserId());
+    item.setSarRef(sub.getCustomerRef());
     item.setAddress(address.getSpireAddress());
     item.setLiteAddress(address.getLiteAddress());
     item.setDivision(site.getSiteName());
@@ -137,13 +137,13 @@ public class CustomerService {
     return item;
   }
 
-  private UserRoleItem getUserRoleItem(OgelRegistration ogel) {
-    RegisterOgel reg = ogel.getRegisterOgelFromJson();
+  private UserRoleItem getUserRoleItem(OgelSubmission sub) {
+    RegisterOgel reg = sub.getRegisterOgelFromJson();
     AdminApproval admin = reg.getAdminApproval();
     UserRoleItem item = new UserRoleItem();
-    item.setUserId(ogel.getUserId());
+    item.setUserId(sub.getUserId());
     item.setAdminUserId(admin.getAdminUserId());
-    item.setSiteRef(ogel.getSiteId());
+    item.setSiteRef(sub.getSiteRef());
     return item;
   }
 

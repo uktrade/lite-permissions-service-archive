@@ -15,8 +15,8 @@ import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
 import org.skife.jdbi.v2.DBI;
 import ru.vyarus.dropwizard.guice.module.support.ConfigurationAwareModule;
-import uk.gov.bis.lite.permissions.dao.OgelRegistrationDao;
-import uk.gov.bis.lite.permissions.dao.OgelRegistrationDaoImpl;
+import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
+import uk.gov.bis.lite.permissions.dao.OgelSubmissionDaoImpl;
 
 import javax.ws.rs.client.Client;
 
@@ -30,7 +30,7 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
 
     // The default timeout is 500ms and often results in Timeout exceptions
     HttpClientConfiguration httpClientConfiguration = new HttpClientConfiguration();
-    httpClientConfiguration.setTimeout(Duration.milliseconds(4000));
+    httpClientConfiguration.setTimeout(Duration.milliseconds(7000));
 
     HttpClientBuilder clientBuilder = new HttpClientBuilder(environment);
     clientBuilder.using(httpClientConfiguration);
@@ -43,7 +43,7 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
 
   @Override
   protected void configure() {
-    bind(OgelRegistrationDao.class).to(OgelRegistrationDaoImpl.class);
+    bind(OgelSubmissionDao.class).to(OgelSubmissionDaoImpl.class);
   }
 
   @Provides
@@ -71,9 +71,9 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
   }
 
   @Provides
-  @javax.inject.Named("spireOgelRegistrationsUrl")
-  String provideSpireOgelRegistrationsUrl(PermissionsAppConfig config) {
-    return config.getSpireOgelRegistrationsUrl();
+  @javax.inject.Named("spireCreateOgelAppUrl")
+  String provideSpireCreateOgelAppUrl(PermissionsAppConfig config) {
+    return config.getSpireCreateOgelAppUrl();
   }
 
 

@@ -1,4 +1,4 @@
-package uk.gov.bis.lite.permissions.client;
+package uk.gov.bis.lite.permissions.spireclient;
 
 import com.google.common.base.Stopwatch;
 import org.slf4j.Logger;
@@ -28,6 +28,7 @@ class SpireClient {
   private String soapUrl;
   private String soapClientUserName;
   private String soapClientPassword;
+
   private boolean logRequest = true;
   private boolean logResponse = true;
 
@@ -38,22 +39,34 @@ class SpireClient {
   }
 
   SOAPMessage getRequest(String namespace, String childName) {
+    return doGetRequest(namespace, childName, false);
+  }
+
+  SOAPMessage getSpirRequest(String namespace, String childName) {
+    return doGetRequest(namespace, childName, true);
+  }
+
+  private SOAPMessage doGetRequest(String namespace, String childName, boolean includeSpir) {
     try {
       MessageFactory messageFactory = MessageFactory.newInstance();
-      SOAPMessage soapMessage = messageFactory.createMessage();
+      SOAPMessage message = messageFactory.createMessage();
 
-      SOAPPart soapPart = soapMessage.getSOAPPart();
-      SOAPEnvelope envelope = soapPart.getEnvelope();
+      SOAPPart part = message.getSOAPPart();
+      SOAPEnvelope envelope = part.getEnvelope();
       envelope.addNamespaceDeclaration("spir", "http://www.fivium.co.uk/fox/webservices/ispire/" + namespace);
-
       SOAPBody soapBody = envelope.getBody();
-      soapBody.addChildElement(childName, "spir");
 
-      MimeHeaders headers = soapMessage.getMimeHeaders();
+      if (includeSpir) {
+        soapBody.addChildElement(childName, "spir");
+      } else {
+        soapBody.addChildElement(childName);
+      }
+
+      MimeHeaders headers = message.getMimeHeaders();
       String authorization = Base64.getEncoder().encodeToString((soapClientUserName + ":" + soapClientPassword).getBytes("utf-8"));
       headers.addHeader("Authorization", "Basic " + authorization);
-      soapMessage.saveChanges();
-      return soapMessage;
+      message.saveChanges();
+      return message;
     } catch (SOAPException e) {
       throw new RuntimeException("An error occurred creating the SOAP request for retrieving Customer Information from Spire", e);
     } catch (UnsupportedEncodingException e) {
@@ -61,13 +74,27 @@ class SpireClient {
     }
   }
 
-  void addChild(SOAPMessage soapMessage, String childElementName, String childElementText) {
+  void addChild(SOAPMessage message, String childName, String childText) {
     try {
-      SOAPBody body = soapMessage.getSOAPPart().getEnvelope().getBody();
-      SOAPElement getCompaniesElement = (SOAPElement) body.getChildElements().next();
-      SOAPElement childElement = getCompaniesElement.addChildElement(childElementName);
-      childElement.addTextNode(childElementText);
-      soapMessage.saveChanges();
+      SOAPBody body = message.getSOAPPart().getEnvelope().getBody();
+      SOAPElement parent = (SOAPElement) body.getChildElements().next();
+      SOAPElement child = parent.addChildElement(childName);
+      child.addTextNode(childText);
+      message.saveChanges();
+    } catch (SOAPException e) {
+      throw new RuntimeException("An error occurred adding child element", e);
+    }
+  }
+
+  void addChildList(SOAPMessage message, String listName, String elementName, String childName, String childText) {
+    try {
+      SOAPBody body = message.getSOAPPart().getEnvelope().getBody();
+      SOAPElement parent = (SOAPElement) body.getChildElements().next();
+      SOAPElement list = parent.addChildElement(listName);
+      SOAPElement element = list.addChildElement(elementName);
+      SOAPElement child = element.addChildElement(childName);
+      child.addTextNode(childText);
+      message.saveChanges();
     } catch (SOAPException e) {
       throw new RuntimeException("An error occurred adding child element", e);
     }
@@ -84,23 +111,23 @@ class SpireClient {
     return response;
   }
 
-  private SOAPMessage executeRequest(SOAPMessage soap) {
-    SOAPConnectionFactory soapConnectionFactory;
-    SOAPConnection soapConnection = null;
+  private SOAPMessage executeRequest(SOAPMessage message) {
+    SOAPConnectionFactory connectionFactory;
+    SOAPConnection connection = null;
     try {
-      soapConnectionFactory = SOAPConnectionFactory.newInstance();
-      soapConnection = soapConnectionFactory.createConnection();
+      connectionFactory = SOAPConnectionFactory.newInstance();
+      connection = connectionFactory.createConnection();
       final Stopwatch stopwatch = Stopwatch.createStarted();
-      SOAPMessage response = soapConnection.call(soap, soapUrl);
+      SOAPMessage response = connection.call(message, soapUrl);
       stopwatch.stop();
       LOGGER.info("Spire list retrieved in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds ");
       return response;
     } catch (SOAPException e) {
       throw new RuntimeException("An error occurred establishing the connection with SOAP client", e);
     } finally {
-      if (soapConnection != null) {
+      if (connection != null) {
         try {
-          soapConnection.close();
+          connection.close();
         } catch (SOAPException e) {
           LOGGER.error("An error occurred closing the SOAP connection. ", e);
         }
@@ -108,11 +135,11 @@ class SpireClient {
     }
   }
 
-  private void log(String type, SOAPMessage soapMessage) {
+  private void log(String type, SOAPMessage message) {
     try {
-      ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-      soapMessage.writeTo(outputStream);
-      LOGGER.info(type + ": " + outputStream.toString());
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      message.writeTo(out);
+      LOGGER.info(type + ": " + out.toString());
     } catch (IOException | SOAPException e) {
       LOGGER.error("error", e);
     }
