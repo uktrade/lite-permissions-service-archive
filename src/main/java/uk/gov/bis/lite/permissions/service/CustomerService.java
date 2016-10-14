@@ -31,6 +31,8 @@ public class CustomerService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CustomerService.class);
 
+  private static final String DEFAULT_SITE_NAME = "Main Site";
+
   private final ObjectMapper objectMapper;
   private final String customerServiceUrl;
   private final String customerPath;
@@ -126,13 +128,16 @@ public class CustomerService {
     RegisterOgel reg = sub.getRegisterOgelFromJson();
     Customer customer = reg.getNewCustomer();
     Site site = reg.getNewSite();
-    Address address = customer.getRegisteredAddress();
+
+    Address address = site.isUseCustomerAddress() ? customer.getRegisteredAddress() : site.getAddress();
+    String siteName = site.getSiteName() != null ?  site.getSiteName() : DEFAULT_SITE_NAME;
+
     SiteItem item = new SiteItem();
     item.setUserId(sub.getUserId());
     item.setSarRef(sub.getCustomerRef());
     item.setAddress(address.getSpireAddress());
     item.setLiteAddress(address.getLiteAddress());
-    item.setDivision(site.getSiteName());
+    item.setDivision(siteName);
     item.setCountryRef(address.getCountry());
     return item;
   }
