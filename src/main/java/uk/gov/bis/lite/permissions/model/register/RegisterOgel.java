@@ -109,7 +109,6 @@ public class RegisterOgel {
     String customer = newCustomer != null ? newCustomer.getJoinedInstanceStateData() : "";
     String site = newSite != null ? newSite.getJoinedInstanceStateData() : "";
     String admin = adminApproval != null ? adminApproval.getJoinedInstanceStateData() : "";
-    //LOGGER.info(strings + customer + site + admin);
     return strings + customer + site + admin;
   }
 

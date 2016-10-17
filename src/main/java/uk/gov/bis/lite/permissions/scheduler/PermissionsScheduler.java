@@ -22,8 +22,9 @@ public class PermissionsScheduler implements Managed {
   private final SubmissionService submissionService;
   private final OgelService ogelService;
 
-  static final String SUBMISSION_SERVICE_NAME = "submissionService";
-  static final String OGEL_SERVICE_NAME = "ogelService";
+  public static final String SUBMISSION_SERVICE_NAME = "submissionService";
+  public static final String OGEL_SERVICE_NAME = "ogelService";
+  public static final String SUBMISSION_REF = "SUBMISSION_REF";
 
   @Inject
   public PermissionsScheduler(Scheduler scheduler, PermissionsAppConfig config,
@@ -39,8 +40,8 @@ public class PermissionsScheduler implements Managed {
     LOGGER.info("PermissionsScheduler start...");
 
     // Set up OgelSubmission prepare job
-    JobKey prepareJobKey = JobKey.jobKey("OgelSubmissionPrepareJob");
-    JobDetail prepareJobDetail = newJob(OgelSubmissionPrepareJob.class)
+    JobKey prepareJobKey = JobKey.jobKey("ScheduledPrepareJob");
+    JobDetail prepareJobDetail = newJob(ScheduledPrepareJob.class)
         .withIdentity(prepareJobKey)
         .build();
     prepareJobDetail.getJobDataMap().put(SUBMISSION_SERVICE_NAME, submissionService);
@@ -50,8 +51,8 @@ public class PermissionsScheduler implements Managed {
         .build();
 
     // Set up Ogel create job
-    JobKey createJobKey = JobKey.jobKey("OgelCreateJob");
-    JobDetail createJobDetail = newJob(OgelCreateJob.class)
+    JobKey createJobKey = JobKey.jobKey("ScheduledCreateJob");
+    JobDetail createJobDetail = newJob(ScheduledCreateJob.class)
         .withIdentity(createJobKey)
         .build();
     createJobDetail.getJobDataMap().put(OGEL_SERVICE_NAME, ogelService);

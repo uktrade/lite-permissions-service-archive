@@ -10,7 +10,9 @@ public interface OgelSubmissionDao {
 
   void create(OgelSubmission sub);
 
-  List<OgelSubmission> getByStatus(String status);
+  List<OgelSubmission> getScheduledByStatus(String status);
 
   OgelSubmission findBySubmissionRef(String submissionRef);
+
+  OgelSubmission findRecentBySubmissionRef(String submissionRef);
 }

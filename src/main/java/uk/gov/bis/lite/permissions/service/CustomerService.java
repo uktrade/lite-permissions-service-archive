@@ -133,11 +133,11 @@ public class CustomerService {
     String siteName = site.getSiteName() != null ?  site.getSiteName() : DEFAULT_SITE_NAME;
 
     SiteItem item = new SiteItem();
+    item.setDivision(siteName);
     item.setUserId(sub.getUserId());
     item.setSarRef(sub.getCustomerRef());
     item.setAddress(address.getSpireAddress());
     item.setLiteAddress(address.getLiteAddress());
-    item.setDivision(siteName);
     item.setCountryRef(address.getCountry());
     return item;
   }

@@ -33,30 +33,41 @@ public class OgelService {
     this.clientUnmarshaller = clientUnmarshaller;
   }
 
-  public void doCreateOgels() {
-    List<OgelSubmission> subs = submissionDao.getByStatus(OgelSubmission.Status.READY.name());
-    LOGGER.info("Found READY [" + subs.size() + "]");
-    for(OgelSubmission sub : subs) {
-
-      SOAPMessage message = clientCreateOgelApp.createOgelApp(
-          sub.getUserId(),
-          sub.getCustomerRef(),
-          sub.getSiteRef(),
-          sub.getOgelType());
-
-      Optional<String> result = clientUnmarshaller.getResponse(message, CLS_RESPONSE_ELEMENT_NAME, CLS_SAR_XPATH_EXPRESSION);
-
-      if(result.isPresent()) {
-        String spireRef = result.get();
-        sub.setSpireRef(spireRef);
-        sub.updateStatusToComplete();
-        submissionDao.update(sub);
-      } else {
-        LOGGER.warn("Unable to complete Ogel Registration for: " + sub.getSubmissionRef());
-      }
-
+  public boolean immediateCreate(String subRef) {
+    LOGGER.info("immediateCreate [" + subRef + "]");
+    boolean created = false;
+    OgelSubmission sub = submissionDao.findBySubmissionRef(subRef);
+    if(sub != null && sub.isImmediate() && sub.canCreateOgel()) {
+      created = doCreateOgel(sub);
+    } else {
+      LOGGER.warn("Unexpected OgelSubmission state");
     }
+    return created;
+  }
 
+  public void processScheduledCreate() {
+    List<OgelSubmission> subs = submissionDao.getScheduledByStatus(OgelSubmission.Status.READY.name());
+    LOGGER.info("Found READY [" + subs.size() + "]");
+    subs.forEach(this::doCreateOgel);
+  }
 
+  private boolean doCreateOgel(OgelSubmission sub) {
+    SOAPMessage message = clientCreateOgelApp.createOgelApp(
+        sub.getUserId(),
+        sub.getCustomerRef(),
+        sub.getSiteRef(),
+        sub.getOgelType());
+
+    Optional<String> result = clientUnmarshaller.getResponse(message, CLS_RESPONSE_ELEMENT_NAME, CLS_SAR_XPATH_EXPRESSION);
+    boolean created = result.isPresent();
+    if(created) {
+      String spireRef = result.get();
+      sub.setSpireRef(spireRef);
+      sub.updateStatusToComplete();
+      submissionDao.update(sub);
+    } else {
+      LOGGER.warn("Unable to complete Ogel Registration for: " + sub.getSubmissionRef());
+    }
+    return created;
   }
 }

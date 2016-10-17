@@ -15,6 +15,7 @@ public class OgelSubmission {
   private int id;
   private String userId;
   private String ogelType;
+  private Mode mode;
   private Status status;
   private String submissionRef;
   private String customerRef;
@@ -23,9 +24,18 @@ public class OgelSubmission {
   private String json;
   private String created;
   private boolean roleUpdate;
+  private boolean roleUpdated;
 
   /**
-   * PENDING    - transient state
+   * IMMEDIATE      - submission is being processed immediately, through all stages
+   * SCHEDULED      - submission is to processed by scheduled jobs
+   */
+  public enum Mode {
+    IMMEDIATE, SCHEDULED;
+  }
+
+  /**
+   * CREATED    - initial state on creation
    * CUSTOMER   - we need to create a Customer and populate customerId with resulting sarRef
    * SITE       - we need to create a Site and populate siteId with resulting siteRef
    * USER_ROLE  - we need to update user role permissions
@@ -33,7 +43,7 @@ public class OgelSubmission {
    * COMPLETE   - Ogel has been created on Spire, OgelSubmission updated with SpireRef, processing submission complete
    */
   public enum Status {
-    PENDING, CUSTOMER, SITE, USER_ROLE, READY, COMPLETE;
+    CREATED, CUSTOMER, SITE, USER_ROLE, READY, COMPLETE;
   }
 
   public OgelSubmission(int id) {
@@ -43,19 +53,35 @@ public class OgelSubmission {
   public OgelSubmission(String userId, String ogelType) {
     this.userId = userId;
     this.ogelType = ogelType;
-    this.status = Status.PENDING;
+    this.mode = Mode.IMMEDIATE;
+    this.status = Status.CREATED;
   }
 
-  public void updateStatusToReady() {
-    this.status = Status.READY;
+  public boolean isImmediate() {
+    return mode.equals(OgelSubmission.Mode.IMMEDIATE);
+  }
+
+  public boolean isScheduled() {
+    return mode.equals(OgelSubmission.Mode.SCHEDULED);
+  }
+
+  public boolean canCreateOgel() {
+    return !needsCustomer() && !needsSite() && !needsRoleUpdate();
+  }
+
+  public void changeToScheduledMode() {
+    this.mode = Mode.SCHEDULED;
   }
 
   public void updateStatusToComplete() {
     this.status = Status.COMPLETE;
   }
 
+  /**
+   * Sets appropriate Status value (only if current STATUS is not READY or COMPLETE)
+   */
   public void updateStatus() {
-    if(!this.status.equals(Status.READY)) {
+    if(!this.status.equals(Status.READY) || !this.status.equals(Status.COMPLETE)) {
       if (needsCustomer()) {
         this.status = Status.CUSTOMER;
       } else if (needsSite()) {
@@ -68,30 +94,16 @@ public class OgelSubmission {
     }
   }
 
-  public void setInitialStatus() {
-    if(this.status.equals(Status.PENDING)) {
-      if(needsCustomer()) {
-        this.status = Status.CUSTOMER;
-      } else if (needsSite()) {
-        this.status = Status.SITE;
-      } else if(needsRoleUpdate()) {
-        this.status = Status.USER_ROLE;
-      } else {
-        this.status = Status.READY;
-      }
-    }
-  }
-
-  private boolean needsCustomer() {
+  public boolean needsCustomer() {
     return Util.isBlank(customerRef);
   }
 
-  private boolean needsSite() {
+  public boolean needsSite() {
     return Util.isBlank(siteRef);
   }
 
-  private boolean needsRoleUpdate() {
-    return roleUpdate;
+  public boolean needsRoleUpdate() {
+    return roleUpdate && !roleUpdated;
   }
 
   public RegisterOgel getRegisterOgelFromJson() {
@@ -191,5 +203,21 @@ public class OgelSubmission {
 
   public void setSpireRef(String spireRef) {
     this.spireRef = spireRef;
+  }
+
+  public Mode getMode() {
+    return mode;
+  }
+
+  public void setMode(Mode mode) {
+    this.mode = mode;
+  }
+
+  public boolean isRoleUpdated() {
+    return roleUpdated;
+  }
+
+  public void setRoleUpdated(boolean roleUpdated) {
+    this.roleUpdated = roleUpdated;
   }
 }

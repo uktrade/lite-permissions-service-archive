@@ -27,16 +27,63 @@ public class SubmissionService {
     this.customerService = customerService;
   }
 
-  public void processOgelSubmissions(OgelSubmission.Status status) {
+  public boolean submissionCurrentlyExists(String subRef) {
+    return submissionDao.findRecentBySubmissionRef(subRef) != null;
+  }
 
+  /**
+   * If current Status is not COMPLETE, sets submission mode to SCHEDULED
+   */
+  public void scheduleIfNotComplete(String subRef) {
+    LOGGER.info("scheduleIfNotComplete [" + subRef + "]");
+    OgelSubmission sub = submissionDao.findBySubmissionRef(subRef);
+    if(!sub.getStatus().equals(OgelSubmission.Status.COMPLETE)) {
+      sub.changeToScheduledMode();
+      sub.updateStatus();
+      submissionDao.update(sub);
+    }
+  }
+
+  public boolean immediatePrepare(String subRef) {
+    LOGGER.info("immediatePrepare [" + subRef + "]");
+    boolean allCreated = true;
+    OgelSubmission sub = submissionDao.findBySubmissionRef(subRef);
+    if(sub != null && sub.isImmediate()) {
+
+      // Create Customer if needed
+      if(sub.needsCustomer()) {
+        if(!doCreateCustomer(sub)) {
+          allCreated = false;
+        }
+      }
+
+      // Create Site if needed
+      if(sub.needsSite() && allCreated) {
+        if(!doCreateSite(sub)) {
+          allCreated = false;
+        }
+      }
+
+      // Update User Role if needed
+      if(sub.isRoleUpdate() && allCreated) {
+        if(!doUserRoleUpdate(sub)) {
+          allCreated = false;
+        }
+      }
+
+    } else {
+      LOGGER.warn("Unexpected OgelSubmission state");
+    }
+    return allCreated;
+  }
+
+  public void processScheduled(OgelSubmission.Status status) {
     if(status.equals(OgelSubmission.Status.CUSTOMER)) {
-      doCreateCustomers();
-    }
-    if(status.equals(OgelSubmission.Status.SITE)) {
-      doCreateSites();
-    }
-    if(status.equals(OgelSubmission.Status.USER_ROLE)) {
-      doUserRoleUpdates();
+      doScheduledCreateCustomers();
+    } else if(status.equals(OgelSubmission.Status.SITE)) {
+      doScheduledCreateSites();
+    } else if(status.equals(OgelSubmission.Status.USER_ROLE)) {
+      doScheduledUserRoleUpdates();
     }
   }
 
@@ -44,53 +91,66 @@ public class SubmissionService {
    * For each OgelSubmission we need to create a Customer on Spire
    * and then update the OgelSubmission status
    */
-  private void doCreateCustomers() {
-    List<OgelSubmission> subs = submissionDao.getByStatus(OgelSubmission.Status.CUSTOMER.name());
+  private void doScheduledCreateCustomers() {
+    List<OgelSubmission> subs = submissionDao.getScheduledByStatus(OgelSubmission.Status.CUSTOMER.name());
     LOGGER.info("Found CUSTOMER [" + subs.size() + "]");
-    for(OgelSubmission sub : subs) {
-      Optional<String> sarRef = customerService.createCustomer(sub);
-      if(sarRef.isPresent()) {
-        sub.setCustomerRef(sarRef.get());
-        sub.updateStatus();
-        submissionDao.update(sub);
-        LOGGER.info("Customer created. Updated record: " + sarRef.get());
-      }
+    subs.forEach(this::doCreateCustomer);
+  }
+
+  private boolean doCreateCustomer(OgelSubmission sub) {
+    Optional<String> sarRef = customerService.createCustomer(sub);
+    boolean created = sarRef.isPresent();
+    if(created) {
+      sub.setCustomerRef(sarRef.get());
+      sub.updateStatus();
+      submissionDao.update(sub);
+      LOGGER.info("Customer created. Updated record: " + sarRef.get());
     }
+    return created;
   }
 
   /**
    * For each OgelSubmission we need to create a Site on Spire
    * and then update the OgelSubmission status
    */
-  private void doCreateSites() {
-    List<OgelSubmission> subs = submissionDao.getByStatus(OgelSubmission.Status.SITE.name());
+  private void doScheduledCreateSites() {
+    List<OgelSubmission> subs = submissionDao.getScheduledByStatus(OgelSubmission.Status.SITE.name());
     LOGGER.info("Found SITE [" + subs.size() + "]");
-    for(OgelSubmission sub : subs) {
-      Optional<String> siteRef = customerService.createSite(sub);
-      if(siteRef.isPresent()) {
-        sub.setSiteRef(siteRef.get());
-        sub.updateStatus();
-        submissionDao.update(sub);
-        LOGGER.info("Site created. Updated record: " + siteRef.get());
-      }
+    subs.forEach(this::doCreateSite);
+  }
+
+  private boolean doCreateSite(OgelSubmission sub) {
+    Optional<String> siteRef = customerService.createSite(sub);
+    boolean created = siteRef.isPresent();
+    if(created) {
+      sub.setSiteRef(siteRef.get());
+      sub.updateStatus();
+      submissionDao.update(sub);
+      LOGGER.info("Site created. Updated record: " + siteRef.get());
     }
+    return created;
   }
 
   /**
    * For each OgelSubmission we update site access permissions and
    * then set the OgelSubmission status to READY
    */
-  private void doUserRoleUpdates() {
-    List<OgelSubmission> subs = submissionDao.getByStatus(OgelSubmission.Status.USER_ROLE.name());
+  private void doScheduledUserRoleUpdates() {
+    List<OgelSubmission> subs = submissionDao.getScheduledByStatus(OgelSubmission.Status.USER_ROLE.name());
     LOGGER.info("Found USER_ROLE [" + subs.size() + "]");
-    for(OgelSubmission sub : subs) {
-      Optional<String> status = customerService.updateUserRole(sub);
-      if(status.isPresent() && status.get().equals(USER_ROLE_UPDATE_STATUS_COMPLETE)) {
-        sub.updateStatusToReady();
-        submissionDao.update(sub);
-        LOGGER.info("User role updated. Updated OgelSubmission to READY: " + sub.getUserId() + "/" + sub.getOgelType());
-      }
+    subs.forEach(this::doUserRoleUpdate);
+  }
+
+  private boolean doUserRoleUpdate(OgelSubmission sub) {
+    Optional<String> status = customerService.updateUserRole(sub);
+    boolean created = status.isPresent() && status.get().equals(USER_ROLE_UPDATE_STATUS_COMPLETE);
+    if(created) {
+      sub.setRoleUpdated(true);
+      sub.updateStatus();
+      submissionDao.update(sub);
+      LOGGER.info("User role updated. Updated OgelSubmission: " + sub.getUserId() + "/" + sub.getOgelType());
     }
+    return created;
   }
 
 }

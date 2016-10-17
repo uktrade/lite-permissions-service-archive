@@ -31,9 +31,17 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
 
   @Override
   @Transaction
-  public List<OgelSubmission> getByStatus(String status) {
+  public OgelSubmission findRecentBySubmissionRef(String submissionRef) {
     try (final Handle handle = jdbi.open()) {
-      return attach(handle).getByStatus(status);
+      return attach(handle).findRecentBySubmissionRef(submissionRef);
+    }
+  }
+
+  @Override
+  @Transaction
+  public List<OgelSubmission> getScheduledByStatus(String status) {
+    try (final Handle handle = jdbi.open()) {
+      return attach(handle).getScheduledByStatus(status);
     }
   }
 
@@ -49,8 +57,10 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
           sub.getSiteRef(),
           sub.getSpireRef(),
           sub.getJson(),
+          sub.getMode().name(),
           sub.getStatus().name(),
-          sub.isRoleUpdate());
+          sub.isRoleUpdate(),
+          sub.isRoleUpdated());
     }
   }
 
@@ -62,7 +72,9 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
           sub.getCustomerRef(),
           sub.getSiteRef(),
           sub.getSpireRef(),
+          sub.getMode().name(),
           sub.getStatus().name(),
+          sub.isRoleUpdated(),
           sub.getId());
     }
   }
