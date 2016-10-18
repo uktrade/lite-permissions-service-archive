@@ -7,6 +7,7 @@ import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
+import uk.gov.bis.lite.permissions.model.customer.AddressItem;
 import uk.gov.bis.lite.permissions.model.customer.CustomerItem;
 import uk.gov.bis.lite.permissions.model.customer.CustomerResponse;
 import uk.gov.bis.lite.permissions.model.customer.UserRoleItem;
@@ -32,6 +33,10 @@ public class CustomerService {
   private static final Logger LOGGER = LoggerFactory.getLogger(CustomerService.class);
 
   private static final String DEFAULT_SITE_NAME = "Main Site";
+
+  private static final String ROLE_TYPE_ADMIN = "ADMIN";
+  private static final String ROLE_TYPE_SUBMITTER = "SUBMITTER";
+  private static final String ROLE_TYPE_PREPARER = "PREPARER";
 
   private final ObjectMapper objectMapper;
   private final String customerServiceUrl;
@@ -112,15 +117,19 @@ public class CustomerService {
     CustomerItem item = new CustomerItem();
     item.setUserId(sub.getUserId());
     item.setCustomerName(customer.getCustomerName());
-    item.setAddress(address.getSpireAddress());
+    item.setAddressItem(getAddressItem(address));
     item.setCompaniesHouseNumber(customer.getChNumber());
     item.setCompaniesHouseValidated(customer.isChNumberValidated());
     item.setCustomerType(customer.getCustomerType());
     item.setEoriNumber(customer.getEoriNumber());
     item.setEoriValidated(customer.isEoriNumberValidated());
-    item.setLiteAddress(address.getLiteAddress());
-    item.setCountryRef(address.getCountry());
     item.setWebsite(customer.getWebsite());
+    return item;
+  }
+
+  private AddressItem getAddressItem(Address address) {
+    AddressItem item = new AddressItem();
+    item.init(address);
     return item;
   }
 
@@ -133,19 +142,21 @@ public class CustomerService {
     String siteName = site.getSiteName() != null ?  site.getSiteName() : DEFAULT_SITE_NAME;
 
     SiteItem item = new SiteItem();
-    item.setDivision(siteName);
+    item.setSiteName(siteName);
     item.setUserId(sub.getUserId());
     item.setSarRef(sub.getCustomerRef());
-    item.setAddress(address.getSpireAddress());
-    item.setLiteAddress(address.getLiteAddress());
-    item.setCountryRef(address.getCountry());
+    item.setAddressItem(getAddressItem(address));
     return item;
   }
 
+  /**
+   * Creates a UserRoleItem with an ADMIN roleType
+   */
   private UserRoleItem getUserRoleItem(OgelSubmission sub) {
     RegisterOgel reg = sub.getRegisterOgelFromJson();
     AdminApproval admin = reg.getAdminApproval();
     UserRoleItem item = new UserRoleItem();
+    item.setRoleType(ROLE_TYPE_ADMIN); // hardcoded for now
     item.setUserId(sub.getUserId());
     item.setAdminUserId(admin.getAdminUserId());
     item.setSiteRef(sub.getSiteRef());

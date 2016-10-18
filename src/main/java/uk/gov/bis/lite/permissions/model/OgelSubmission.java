@@ -21,6 +21,7 @@ public class OgelSubmission {
   private String customerRef;
   private String siteRef;
   private String spireRef;
+  private String callbackUrl;
   private String json;
   private String created;
   private boolean roleUpdate;
@@ -219,5 +220,13 @@ public class OgelSubmission {
 
   public void setRoleUpdated(boolean roleUpdated) {
     this.roleUpdated = roleUpdated;
+  }
+
+  public String getCallbackUrl() {
+    return callbackUrl;
+  }
+
+  public void setCallbackUrl(String callbackUrl) {
+    this.callbackUrl = callbackUrl;
   }
 }

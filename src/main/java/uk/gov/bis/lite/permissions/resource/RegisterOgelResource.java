@@ -12,6 +12,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -36,7 +37,7 @@ public class RegisterOgelResource {
   @Consumes({MediaType.APPLICATION_JSON})
   @Produces({MediaType.APPLICATION_JSON})
   @Path("/register-ogel")
-  public Response registerOgel(RegisterOgel registerOgel) {
+  public Response registerOgel(RegisterOgel registerOgel, @QueryParam("callbackUrl") String callbackUrl) {
     LOGGER.info("************ registerOgel ************ ");
 
     // Check if register Ogel request is valid
@@ -48,6 +49,9 @@ public class RegisterOgelResource {
     if (submissionService.submissionCurrentlyExists(registerOgel.generateSubmissionReference())) {
       return badRequest(ERROR_ALREADY_IN_QUEUE, "Duplicate request exists in the queue");
     }
+
+    // Set callback url
+    registerOgel.setCallbackUrl(callbackUrl);
 
     // Creates and persists an OgelSubmission
     String submissionRef = registerService.register(registerOgel);

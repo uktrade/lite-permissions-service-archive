@@ -74,6 +74,7 @@ public class RegisterService {
     sub.setSiteRef(reg.getExistingSite());
     sub.setSubmissionRef(reg.generateSubmissionReference());
     sub.setRoleUpdate(reg.isRoleUpdateRequired());
+    sub.setCallbackUrl(reg.getCallbackUrl());
     try {
       sub.setJson(mapper.writeValueAsString(reg).replaceAll("\\s{2,}", " ").trim()); // remove excessive whitespace
     } catch (JsonProcessingException e) {

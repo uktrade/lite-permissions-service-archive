@@ -20,14 +20,16 @@ public interface OgelSubmissionInterface {
               @Bind("roleUpdated") Boolean roleUpdated,
               @Bind("id") int id);
 
-  @SqlUpdate("INSERT INTO LOCAL_OGEL_SUBMISSION (USER_ID, OGEL_TYPE, SUBMISSION_REF, CUSTOMER_REF, SITE_REF, SPIRE_REF, JSON, MODE, STATUS, ROLE_UPDATE, ROLE_UPDATED) " +
-      "VALUES (:userId, :ogelType, :submissionRef, :customerRef, :siteRef, :spireRef, :json, :mode, :status, :roleUpdate, :roleUpdated)")
+  @SqlUpdate("INSERT INTO LOCAL_OGEL_SUBMISSION (USER_ID, OGEL_TYPE, SUBMISSION_REF, CUSTOMER_REF, SITE_REF, SPIRE_REF, " +
+      "CALLBACK_URL, JSON, MODE, STATUS, ROLE_UPDATE, ROLE_UPDATED) VALUES (:userId, :ogelType, :submissionRef, :customerRef, :siteRef, " +
+      " :spireRef, :callbackUrl, :json, :mode, :status, :roleUpdate, :roleUpdated)")
   void insert(@Bind("userId") String userId,
               @Bind("ogelType") String ogelType,
               @Bind("submissionRef") String submissionRef,
               @Bind("customerRef") String customerRef,
               @Bind("siteRef") String siteRef,
               @Bind("spireRef") String spireRef,
+              @Bind("callbackUrl") String callbackUrl,
               @Bind("json") String json,
               @Bind("mode") String mode,
               @Bind("status") String status,

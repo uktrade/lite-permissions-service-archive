@@ -2,13 +2,17 @@
 ogelPrepareJobCron: 0/10 * * * * ?  # every 10 seconds
 ogelCreateJobCron: 0/20 * * * * ?  # every 20 seconds
 
-soapUserName: bisdev.api@test.com
-soapPassword: dev
-spireCreateOgelAppUrl: https://spiredevalpha.fivium.co.uk/spirefox4dev/fox/ispire/SPIRE_CREATE_OGEL_APP
+# soapUserName: bisdev.api@test.com
+# soapPassword: dev
+# spireCreateOgelAppUrl: https://spiredevalpha.fivium.co.uk/spirefox4dev/fox/ispire/SPIRE_CREATE_OGEL_APP
+
+soapUserName: bisuat.api@test.com
+soapPassword: sp1reUAT
+spireCreateOgelAppUrl: https://www.spiretest.trade.gov.uk/spireuat/fox/ispire/SPIRE_CREATE_OGEL_APP
 
 customerServiceUrl: http://localhost:8095
-customerServiceCustomerPath: /customer
-customerServiceSitePath: /site
+customerServiceCustomerPath: /create-customer
+customerServiceSitePath: /create-site
 customerServiceUserRolePath: /userRole
 
 server:

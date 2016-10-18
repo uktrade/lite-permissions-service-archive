@@ -20,6 +20,7 @@ public class RegisterOgel {
   private Customer newCustomer;
   private Site newSite;
   private AdminApproval adminApproval;
+  private String callbackUrl;
 
   private transient String responseMessage;
 
@@ -191,5 +192,13 @@ public class RegisterOgel {
 
   public void setOgelType(String ogelType) {
     this.ogelType = ogelType;
+  }
+
+  public String getCallbackUrl() {
+    return callbackUrl;
+  }
+
+  public void setCallbackUrl(String callbackUrl) {
+    this.callbackUrl = callbackUrl;
   }
 }

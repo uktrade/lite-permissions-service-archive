@@ -5,15 +5,12 @@ public class CustomerItem {
   private String userId;
   private String customerName;
   private String customerType;
-  private String liteAddress;
-  private String address;
-  private String countryRef;
+  private AddressItem addressItem;
   private String website;
   private String companiesHouseNumber;
   private Boolean companiesHouseValidated;
   private String eoriNumber;
   private Boolean eoriValidated;
-
 
   public String getUserId() {
     return userId;
@@ -39,28 +36,12 @@ public class CustomerItem {
     this.customerType = customerType;
   }
 
-  public String getLiteAddress() {
-    return liteAddress;
+  public AddressItem getAddressItem() {
+    return addressItem;
   }
 
-  public void setLiteAddress(String liteAddress) {
-    this.liteAddress = liteAddress;
-  }
-
-  public String getAddress() {
-    return address;
-  }
-
-  public void setAddress(String address) {
-    this.address = address;
-  }
-
-  public String getCountryRef() {
-    return countryRef;
-  }
-
-  public void setCountryRef(String countryRef) {
-    this.countryRef = countryRef;
+  public void setAddressItem(AddressItem addressItem) {
+    this.addressItem = addressItem;
   }
 
   public String getWebsite() {
@@ -103,4 +84,5 @@ public class CustomerItem {
     this.eoriValidated = eoriValidated;
   }
 }
+
 

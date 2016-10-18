@@ -56,6 +56,7 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
           sub.getCustomerRef(),
           sub.getSiteRef(),
           sub.getSpireRef(),
+          sub.getCallbackUrl(),
           sub.getJson(),
           sub.getMode().name(),
           sub.getStatus().name(),

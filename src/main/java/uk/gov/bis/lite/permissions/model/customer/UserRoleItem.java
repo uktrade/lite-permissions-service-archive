@@ -5,6 +5,7 @@ public class UserRoleItem {
   private String userId;
   private String adminUserId;
   private String siteRef;
+  private String roleType;
 
   public String getUserId() {
     return userId;
@@ -28,5 +29,13 @@ public class UserRoleItem {
 
   public void setSiteRef(String siteRef) {
     this.siteRef = siteRef;
+  }
+
+  public String getRoleType() {
+    return roleType;
+  }
+
+  public void setRoleType(String roleType) {
+    this.roleType = roleType;
   }
 }
