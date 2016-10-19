@@ -3,19 +3,19 @@ package uk.gov.bis.lite.permissions.scheduler;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import uk.gov.bis.lite.permissions.service.OgelService;
+import uk.gov.bis.lite.permissions.service.CallbackService;
 
-public class ScheduledCreateJob implements Job {
+public class ScheduledCallbackJob implements Job {
 
-  private OgelService ogelService;
+  private CallbackService callbackService;
 
   @Override
   public void execute(JobExecutionContext context) throws JobExecutionException {
     init(context);
-    ogelService.processScheduledCreate();
+    callbackService.completeScheduledCallbacks();
   }
 
   private void init(JobExecutionContext context) {
-    ogelService = (OgelService) context.getMergedJobDataMap().get(Scheduler.OGEL_SERVICE_NAME);
+    callbackService = (CallbackService) context.getMergedJobDataMap().get(Scheduler.CLIENT_CALLBACK_SERVICE_NAME);
   }
 }

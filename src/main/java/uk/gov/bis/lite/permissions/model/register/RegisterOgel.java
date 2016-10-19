@@ -20,7 +20,6 @@ public class RegisterOgel {
   private Customer newCustomer;
   private Site newSite;
   private AdminApproval adminApproval;
-  private String callbackUrl;
 
   private transient String responseMessage;
 
@@ -37,7 +36,7 @@ public class RegisterOgel {
   }
 
   public boolean isRoleUpdateRequired() {
-    if(adminApproval != null && !StringUtils.isBlank(adminApproval.getAdminUserId())) {
+    if (adminApproval != null && !StringUtils.isBlank(adminApproval.getAdminUserId())) {
       return true;
     }
     return false;
@@ -192,13 +191,5 @@ public class RegisterOgel {
 
   public void setOgelType(String ogelType) {
     this.ogelType = ogelType;
-  }
-
-  public String getCallbackUrl() {
-    return callbackUrl;
-  }
-
-  public void setCallbackUrl(String callbackUrl) {
-    this.callbackUrl = callbackUrl;
   }
 }

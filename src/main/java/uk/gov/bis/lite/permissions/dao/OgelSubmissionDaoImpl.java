@@ -47,6 +47,14 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
 
   @Override
   @Transaction
+  public List<OgelSubmission> getScheduledCallbacks() {
+    try (final Handle handle = jdbi.open()) {
+      return attach(handle).getScheduledCallbacks();
+    }
+  }
+
+  @Override
+  @Transaction
   public void create(OgelSubmission sub) {
     try (final Handle handle = jdbi.open()) {
       attach(handle).insert(
@@ -57,6 +65,7 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
           sub.getSiteRef(),
           sub.getSpireRef(),
           sub.getCallbackUrl(),
+          sub.isCalledBack(),
           sub.getJson(),
           sub.getMode().name(),
           sub.getStatus().name(),
@@ -76,6 +85,7 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
           sub.getMode().name(),
           sub.getStatus().name(),
           sub.isRoleUpdated(),
+          sub.isCalledBack(),
           sub.getId());
     }
   }

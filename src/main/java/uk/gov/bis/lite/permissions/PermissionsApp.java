@@ -14,7 +14,7 @@ import ru.vyarus.dropwizard.guice.module.installer.feature.jersey.ResourceInstal
 import uk.gov.bis.lite.permissions.config.GuiceModule;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
 import uk.gov.bis.lite.permissions.resource.RegisterOgelResource;
-import uk.gov.bis.lite.permissions.scheduler.PermissionsScheduler;
+import uk.gov.bis.lite.permissions.scheduler.Scheduler;
 
 public class PermissionsApp extends Application<PermissionsAppConfig> {
 
@@ -25,7 +25,7 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
     guiceBundle = new GuiceBundle.Builder<PermissionsAppConfig>()
         .modules(new GuiceModule())
         .installers(ResourceInstaller.class, ManagedInstaller.class)
-        .extensions(RegisterOgelResource.class, PermissionsScheduler.class)
+        .extensions(RegisterOgelResource.class, Scheduler.class)
         .build();
     bootstrap.addBundle(guiceBundle);
   }

@@ -11,18 +11,19 @@ import java.util.List;
 public interface OgelSubmissionInterface {
 
   @SqlUpdate("UPDATE LOCAL_OGEL_SUBMISSION SET CUSTOMER_REF = :customerRef, SITE_REF = :siteRef, SPIRE_REF = :spireRef, " +
-      "MODE = :mode, STATUS = :status, ROLE_UPDATED = :roleUpdated WHERE id = :id")
+      "MODE = :mode, STATUS = :status, ROLE_UPDATED = :roleUpdated, CALLED_BACK = :calledBack WHERE id = :id")
   void update(@Bind("customerRef") String customerRef,
               @Bind("siteRef") String siteRef,
               @Bind("spireRef") String spireRef,
               @Bind("mode") String mode,
               @Bind("status") String status,
               @Bind("roleUpdated") Boolean roleUpdated,
+              @Bind("calledBack") Boolean calledBack,
               @Bind("id") int id);
 
   @SqlUpdate("INSERT INTO LOCAL_OGEL_SUBMISSION (USER_ID, OGEL_TYPE, SUBMISSION_REF, CUSTOMER_REF, SITE_REF, SPIRE_REF, " +
-      "CALLBACK_URL, JSON, MODE, STATUS, ROLE_UPDATE, ROLE_UPDATED) VALUES (:userId, :ogelType, :submissionRef, :customerRef, :siteRef, " +
-      " :spireRef, :callbackUrl, :json, :mode, :status, :roleUpdate, :roleUpdated)")
+      "CALLBACK_URL, CALLED_BACK, JSON, MODE, STATUS, ROLE_UPDATE, ROLE_UPDATED) VALUES (:userId, :ogelType, :submissionRef, :customerRef, :siteRef, " +
+      " :spireRef, :callbackUrl, :calledBack, :json, :mode, :status, :roleUpdate, :roleUpdated)")
   void insert(@Bind("userId") String userId,
               @Bind("ogelType") String ogelType,
               @Bind("submissionRef") String submissionRef,
@@ -30,6 +31,7 @@ public interface OgelSubmissionInterface {
               @Bind("siteRef") String siteRef,
               @Bind("spireRef") String spireRef,
               @Bind("callbackUrl") String callbackUrl,
+              @Bind("calledBack") Boolean calledBack,
               @Bind("json") String json,
               @Bind("mode") String mode,
               @Bind("status") String status,
@@ -40,6 +42,11 @@ public interface OgelSubmissionInterface {
   @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE STATUS = :status AND MODE = 'SCHEDULED'")
   @Mapper(OgelSubmissionMapper.class)
   List<OgelSubmission> getScheduledByStatus(@Bind("status") String status);
+
+  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE (STATUS = 'SUCCESS' || STATUS = 'FAILURE') " +
+      "  AND MODE = 'SCHEDULED' AND (CALLBACK_URL IS NOT NULL AND CALLBACK_URL != '') AND CALLED_BACK = 0")
+  @Mapper(OgelSubmissionMapper.class)
+  List<OgelSubmission> getScheduledCallbacks();
 
   @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE SUBMISSION_REF = :submissionRef")
   @Mapper(OgelSubmissionMapper.class)

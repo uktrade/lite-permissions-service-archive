@@ -12,6 +12,8 @@ public interface OgelSubmissionDao {
 
   List<OgelSubmission> getScheduledByStatus(String status);
 
+  List<OgelSubmission> getScheduledCallbacks();
+
   OgelSubmission findBySubmissionRef(String submissionRef);
 
   OgelSubmission findRecentBySubmissionRef(String submissionRef);

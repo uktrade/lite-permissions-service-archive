@@ -10,8 +10,8 @@ import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.model.customer.AddressItem;
 import uk.gov.bis.lite.permissions.model.customer.CustomerItem;
 import uk.gov.bis.lite.permissions.model.customer.CustomerResponse;
-import uk.gov.bis.lite.permissions.model.customer.UserRoleItem;
 import uk.gov.bis.lite.permissions.model.customer.SiteItem;
+import uk.gov.bis.lite.permissions.model.customer.UserRoleItem;
 import uk.gov.bis.lite.permissions.model.register.Address;
 import uk.gov.bis.lite.permissions.model.register.AdminApproval;
 import uk.gov.bis.lite.permissions.model.register.Customer;
@@ -139,7 +139,7 @@ public class CustomerService {
     Site site = reg.getNewSite();
 
     Address address = site.isUseCustomerAddress() ? customer.getRegisteredAddress() : site.getAddress();
-    String siteName = site.getSiteName() != null ?  site.getSiteName() : DEFAULT_SITE_NAME;
+    String siteName = site.getSiteName() != null ? site.getSiteName() : DEFAULT_SITE_NAME;
 
     SiteItem item = new SiteItem();
     item.setSiteName(siteName);

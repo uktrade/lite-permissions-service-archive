@@ -35,10 +35,13 @@ public class PermissionsAppConfig extends Configuration {
   private String soapPassword;
 
   @NotEmpty
-  private String ogelPrepareJobCron;
+  private String scheduledPrepareJobCron;
 
   @NotEmpty
-  private String ogelCreateJobCron;
+  private String scheduledCreateJobCron;
+
+  @NotEmpty
+  private String scheduledCallbackJobCron;
 
   @Valid
   @NotNull
@@ -84,12 +87,16 @@ public class PermissionsAppConfig extends Configuration {
     return soapPassword;
   }
 
-  public String getOgelPrepareJobCron() {
-    return ogelPrepareJobCron;
+  public String getScheduledPrepareJobCron() {
+    return scheduledPrepareJobCron;
   }
 
-  public String getOgelCreateJobCron() {
-    return ogelCreateJobCron;
+  public String getScheduledCreateJobCron() {
+    return scheduledCreateJobCron;
+  }
+
+  public String getScheduledCallbackJobCron() {
+    return scheduledCallbackJobCron;
   }
 
   public DataSourceFactory getDatabase() {

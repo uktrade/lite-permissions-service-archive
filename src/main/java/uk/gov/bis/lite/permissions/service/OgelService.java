@@ -4,10 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.bis.lite.permissions.spireclient.ClientCreateOgelApp;
-import uk.gov.bis.lite.permissions.spireclient.ClientUnmarshaller;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
+import uk.gov.bis.lite.permissions.spireclient.ClientCreateOgelApp;
+import uk.gov.bis.lite.permissions.spireclient.ClientUnmarshaller;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,7 +37,7 @@ public class OgelService {
     LOGGER.info("immediateCreate [" + subRef + "]");
     boolean created = false;
     OgelSubmission sub = submissionDao.findBySubmissionRef(subRef);
-    if(sub != null && sub.isImmediate() && sub.canCreateOgel()) {
+    if (sub != null && sub.isImmediate() && sub.canCreateOgel()) {
       created = doCreateOgel(sub);
     } else {
       LOGGER.warn("Unexpected OgelSubmission state");
@@ -60,10 +60,10 @@ public class OgelService {
 
     Optional<String> result = clientUnmarshaller.getResponse(message, CLS_RESPONSE_ELEMENT_NAME, CLS_SAR_XPATH_EXPRESSION);
     boolean created = result.isPresent();
-    if(created) {
+    if (created) {
       String spireRef = result.get();
       sub.setSpireRef(spireRef);
-      sub.updateStatusToComplete();
+      sub.updateStatusToSuccess();
       submissionDao.update(sub);
     } else {
       LOGGER.warn("Unable to complete Ogel Registration for: " + sub.getSubmissionRef());

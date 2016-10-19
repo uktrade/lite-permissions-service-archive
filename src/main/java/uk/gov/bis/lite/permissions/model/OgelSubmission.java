@@ -22,6 +22,7 @@ public class OgelSubmission {
   private String siteRef;
   private String spireRef;
   private String callbackUrl;
+  private boolean calledBack;
   private String json;
   private String created;
   private boolean roleUpdate;
@@ -36,15 +37,16 @@ public class OgelSubmission {
   }
 
   /**
-   * CREATED    - initial state on creation
+   * CREATED    - initial status on creation
    * CUSTOMER   - we need to create a Customer and populate customerId with resulting sarRef
    * SITE       - we need to create a Site and populate siteId with resulting siteRef
    * USER_ROLE  - we need to update user role permissions
    * READY      - this OgelSubmission is now setUp and we can create the Ogel via Spire
-   * COMPLETE   - Ogel has been created on Spire, OgelSubmission updated with SpireRef, processing submission complete
+   * SUCCESS    - Ogel has been created on Spire, OgelSubmission updated with SpireRef, processing submission complete
+   * FAILURE    - Ogel has not been created on Spire, terminal failure, processing submission complete
    */
   public enum Status {
-    CREATED, CUSTOMER, SITE, USER_ROLE, READY, COMPLETE;
+    CREATED, CUSTOMER, SITE, USER_ROLE, READY, SUCCESS, FAILURE;
   }
 
   public OgelSubmission(int id) {
@@ -62,6 +64,18 @@ public class OgelSubmission {
     return mode.equals(OgelSubmission.Mode.IMMEDIATE);
   }
 
+  public boolean hasCompleted() {
+    return isSuccess() || isFailure();
+  }
+
+  public boolean isSuccess() {
+    return status.equals(Status.SUCCESS);
+  }
+
+  public boolean isFailure() {
+    return status.equals(Status.FAILURE);
+  }
+
   public boolean isScheduled() {
     return mode.equals(OgelSubmission.Mode.SCHEDULED);
   }
@@ -71,26 +85,39 @@ public class OgelSubmission {
   }
 
   public void changeToScheduledMode() {
-    this.mode = Mode.SCHEDULED;
+    mode = Mode.SCHEDULED;
   }
 
-  public void updateStatusToComplete() {
-    this.status = Status.COMPLETE;
+  public void updateStatusToSuccess() {
+    status = Status.SUCCESS;
+  }
+
+  public String getFailedReason() {
+    String reason = " Unable to create Ogel";
+    if (needsCustomer()) {
+      reason = " Unable to create Customer for Ogel";
+    } else if (needsSite()) {
+      reason = " Unable to create Site for Ogel";
+    } else if (needsRoleUpdate()) {
+      reason = " Unable to do role update for Ogel";
+    }
+    return reason;
   }
 
   /**
-   * Sets appropriate Status value (only if current STATUS is not READY or COMPLETE)
+   * Sets appropriate Status value
+   * - only if current STATUS is not READY or if OgelSubmission has not completed
    */
   public void updateStatus() {
-    if(!this.status.equals(Status.READY) || !this.status.equals(Status.COMPLETE)) {
+    if (!status.equals(Status.READY) || !hasCompleted()) {
       if (needsCustomer()) {
-        this.status = Status.CUSTOMER;
+        status = Status.CUSTOMER;
       } else if (needsSite()) {
-        this.status = Status.SITE;
+        status = Status.SITE;
       } else if (needsRoleUpdate()) {
-        this.status = Status.USER_ROLE;
+        status = Status.USER_ROLE;
       } else {
-        this.status = Status.READY;
+        status = Status.READY;
       }
     }
   }
@@ -228,5 +255,13 @@ public class OgelSubmission {
 
   public void setCallbackUrl(String callbackUrl) {
     this.callbackUrl = callbackUrl;
+  }
+
+  public boolean isCalledBack() {
+    return calledBack;
+  }
+
+  public void setCalledBack(boolean calledBack) {
+    this.calledBack = calledBack;
   }
 }

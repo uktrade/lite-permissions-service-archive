@@ -38,7 +38,7 @@ public class RegisterOgelResource {
   @Produces({MediaType.APPLICATION_JSON})
   @Path("/register-ogel")
   public Response registerOgel(RegisterOgel registerOgel, @QueryParam("callbackUrl") String callbackUrl) {
-    LOGGER.info("************ registerOgel ************ ");
+    LOGGER.info("************ register-ogel ************ ");
 
     // Check if register Ogel request is valid
     if (!registerOgel.isValid()) {
@@ -50,13 +50,10 @@ public class RegisterOgelResource {
       return badRequest(ERROR_ALREADY_IN_QUEUE, "Duplicate request exists in the queue");
     }
 
-    // Set callback url
-    registerOgel.setCallbackUrl(callbackUrl);
-
     // Creates and persists an OgelSubmission
-    String submissionRef = registerService.register(registerOgel);
+    String submissionRef = registerService.register(registerOgel, callbackUrl);
 
-    LOGGER.info("************ registerOgel : " + submissionRef);
+    LOGGER.info("************ register-ogel : " + submissionRef);
 
     // Return with new submission reference
     return goodSubmissionRequest(submissionRef);
@@ -69,18 +66,7 @@ public class RegisterOgelResource {
         .build();
   }
 
-  private Response badRequest(String message) {
-    return Response.status(Response.Status.BAD_REQUEST)
-        .entity(ImmutableMap.of("code", Response.Status.BAD_REQUEST, "message", message))
-        .type(MediaType.APPLICATION_JSON_TYPE)
-        .build();
-  }
-
   private Response goodSubmissionRequest(String ref) {
     return Response.ok("{\"requestId\": \"" + ref + "\"}", MediaType.APPLICATION_JSON).build();
-  }
-
-  private Response goodRequest() {
-    return Response.ok("{\"status\": \"success\"}", MediaType.APPLICATION_JSON).build();
   }
 }

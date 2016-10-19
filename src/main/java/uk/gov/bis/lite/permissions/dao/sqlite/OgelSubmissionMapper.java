@@ -21,6 +21,7 @@ public class OgelSubmissionMapper implements ResultSetMapper<OgelSubmission> {
     sub.setSiteRef(r.getString("SITE_REF"));
     sub.setSpireRef(r.getString("SPIRE_REF"));
     sub.setCallbackUrl(r.getString("CALLBACK_URL"));
+    sub.setCalledBack(r.getBoolean("CALLED_BACK"));
     sub.setJson(r.getString("JSON"));
     sub.setCreated(r.getString("CREATED"));
     sub.setRoleUpdate(r.getBoolean("ROLE_UPDATE"));

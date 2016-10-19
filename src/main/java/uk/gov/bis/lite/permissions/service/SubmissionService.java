@@ -32,12 +32,12 @@ public class SubmissionService {
   }
 
   /**
-   * If current Status is not COMPLETE, sets submission mode to SCHEDULED
+   * If OgelSubmission has not completed processing, set submission mode to SCHEDULED
    */
-  public void scheduleIfNotComplete(String subRef) {
-    LOGGER.info("scheduleIfNotComplete [" + subRef + "]");
+  public void checkToResetMode(String subRef) {
+    LOGGER.info("checkToResetMode [" + subRef + "]");
     OgelSubmission sub = submissionDao.findBySubmissionRef(subRef);
-    if(!sub.getStatus().equals(OgelSubmission.Status.COMPLETE)) {
+    if (!sub.hasCompleted()) {
       sub.changeToScheduledMode();
       sub.updateStatus();
       submissionDao.update(sub);
@@ -48,29 +48,25 @@ public class SubmissionService {
     LOGGER.info("immediatePrepare [" + subRef + "]");
     boolean allCreated = true;
     OgelSubmission sub = submissionDao.findBySubmissionRef(subRef);
-    if(sub != null && sub.isImmediate()) {
-
+    if (sub != null && sub.isImmediate()) {
       // Create Customer if needed
-      if(sub.needsCustomer()) {
-        if(!doCreateCustomer(sub)) {
+      if (sub.needsCustomer()) {
+        if (!doCreateCustomer(sub)) {
           allCreated = false;
         }
       }
-
       // Create Site if needed
-      if(sub.needsSite() && allCreated) {
-        if(!doCreateSite(sub)) {
+      if (sub.needsSite() && allCreated) {
+        if (!doCreateSite(sub)) {
           allCreated = false;
         }
       }
-
       // Update User Role if needed
-      if(sub.isRoleUpdate() && allCreated) {
-        if(!doUserRoleUpdate(sub)) {
+      if (sub.isRoleUpdate() && allCreated) {
+        if (!doUserRoleUpdate(sub)) {
           allCreated = false;
         }
       }
-
     } else {
       LOGGER.warn("Unexpected OgelSubmission state");
     }
@@ -78,11 +74,11 @@ public class SubmissionService {
   }
 
   public void processScheduled(OgelSubmission.Status status) {
-    if(status.equals(OgelSubmission.Status.CUSTOMER)) {
+    if (status.equals(OgelSubmission.Status.CUSTOMER)) {
       doScheduledCreateCustomers();
-    } else if(status.equals(OgelSubmission.Status.SITE)) {
+    } else if (status.equals(OgelSubmission.Status.SITE)) {
       doScheduledCreateSites();
-    } else if(status.equals(OgelSubmission.Status.USER_ROLE)) {
+    } else if (status.equals(OgelSubmission.Status.USER_ROLE)) {
       doScheduledUserRoleUpdates();
     }
   }
@@ -93,14 +89,14 @@ public class SubmissionService {
    */
   private void doScheduledCreateCustomers() {
     List<OgelSubmission> subs = submissionDao.getScheduledByStatus(OgelSubmission.Status.CUSTOMER.name());
-    LOGGER.info("Found CUSTOMER [" + subs.size() + "]");
+    LOGGER.info("CUSTOMERS [" + subs.size() + "]");
     subs.forEach(this::doCreateCustomer);
   }
 
   private boolean doCreateCustomer(OgelSubmission sub) {
     Optional<String> sarRef = customerService.createCustomer(sub);
     boolean created = sarRef.isPresent();
-    if(created) {
+    if (created) {
       sub.setCustomerRef(sarRef.get());
       sub.updateStatus();
       submissionDao.update(sub);
@@ -115,14 +111,14 @@ public class SubmissionService {
    */
   private void doScheduledCreateSites() {
     List<OgelSubmission> subs = submissionDao.getScheduledByStatus(OgelSubmission.Status.SITE.name());
-    LOGGER.info("Found SITE [" + subs.size() + "]");
+    LOGGER.info("SITES [" + subs.size() + "]");
     subs.forEach(this::doCreateSite);
   }
 
   private boolean doCreateSite(OgelSubmission sub) {
     Optional<String> siteRef = customerService.createSite(sub);
     boolean created = siteRef.isPresent();
-    if(created) {
+    if (created) {
       sub.setSiteRef(siteRef.get());
       sub.updateStatus();
       submissionDao.update(sub);
@@ -137,14 +133,14 @@ public class SubmissionService {
    */
   private void doScheduledUserRoleUpdates() {
     List<OgelSubmission> subs = submissionDao.getScheduledByStatus(OgelSubmission.Status.USER_ROLE.name());
-    LOGGER.info("Found USER_ROLE [" + subs.size() + "]");
+    LOGGER.info("USER_ROLES [" + subs.size() + "]");
     subs.forEach(this::doUserRoleUpdate);
   }
 
   private boolean doUserRoleUpdate(OgelSubmission sub) {
     Optional<String> status = customerService.updateUserRole(sub);
     boolean created = status.isPresent() && status.get().equals(USER_ROLE_UPDATE_STATUS_COMPLETE);
-    if(created) {
+    if (created) {
       sub.setRoleUpdated(true);
       sub.updateStatus();
       submissionDao.update(sub);
