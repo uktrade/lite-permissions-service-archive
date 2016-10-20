@@ -4,6 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Optional;
 
+import javax.ws.rs.core.Response;
+
 public class Util {
 
   public static boolean isBlank(String arg) {
@@ -28,6 +30,23 @@ public class Util {
       // ignore
     }
     return hash;
+  }
+
+  public static String getInfo(Exception e) {
+    String info = e.getClass().getCanonicalName();
+    String message = e.getMessage();
+    if(message != null) {
+      info = info + " [" + message + "]";
+    }
+    return info;
+  }
+
+  public static String getInfo(Response response) {
+    String info = "Response is null";
+    if(response != null) {
+      info = "Status [" + response.getStatus() + " |" + response.readEntity(String.class) + "]";
+    }
+    return info;
   }
 
   public static String info(String name, String arg) {

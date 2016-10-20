@@ -6,8 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.util.Util;
 
-import java.util.Objects;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RegisterOgel {
 
@@ -65,32 +63,12 @@ public class RegisterOgel {
     return info;
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (o instanceof RegisterOgel) {
-      RegisterOgel regOgel = (RegisterOgel) o;
-      return Objects.equals(userId, regOgel.getUserId())
-          && Objects.equals(ogelType, regOgel.getOgelType())
-          && Objects.equals(existingCustomer, regOgel.getExistingCustomer())
-          && Objects.equals(existingSite, regOgel.getExistingSite())
-          && Objects.equals(newCustomer, regOgel.getNewCustomer())
-          && Objects.equals(newSite, regOgel.getNewSite())
-          && Objects.equals(adminApproval, regOgel.getAdminApproval());
-    }
-    return false;
-  }
-
   /**
    * Gathers data, creates  hash
    */
   public String generateSubmissionReference() {
     String message = getJoinedInstanceStateData().replaceAll("\\s+", "").toUpperCase();
     return Util.generateHashFromString(message);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(userId, ogelType, existingCustomer, existingSite, newCustomer, newSite, adminApproval);
   }
 
   @Override

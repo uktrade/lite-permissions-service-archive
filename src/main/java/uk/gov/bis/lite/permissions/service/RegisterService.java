@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.model.register.RegisterOgel;
-import uk.gov.bis.lite.permissions.scheduler.ImmediateProcessJob;
+import uk.gov.bis.lite.permissions.scheduler.ProcessImmediateJob;
 import uk.gov.bis.lite.permissions.scheduler.Scheduler;
 
 @Singleton
@@ -25,24 +25,26 @@ public class RegisterService {
   private static final Logger LOGGER = LoggerFactory.getLogger(RegisterService.class);
 
   private OgelSubmissionDao submissionDao;
-  private final org.quartz.Scheduler scheduler;
-  private final SubmissionService submissionService;
-  private final OgelService ogelService;
-  private final CallbackService callbackService;
+  private org.quartz.Scheduler scheduler;
+  private SubmissionService submissionService;
+  private OgelService ogelService;
+  private CallbackService callbackService;
+  private JobProcessService jobProcessService;
 
   @Inject
   public RegisterService(OgelSubmissionDao submissionDao, org.quartz.Scheduler scheduler, SubmissionService submissionService,
-                         OgelService ogelService, CallbackService callbackService) {
+                         OgelService ogelService, CallbackService callbackService, JobProcessService jobProcessService) {
     this.submissionDao = submissionDao;
     this.scheduler = scheduler;
     this.submissionService = submissionService;
     this.ogelService = ogelService;
     this.callbackService = callbackService;
+    this.jobProcessService = jobProcessService;
   }
 
   /**
    * Creates and persists OgelSubmission in IMMEDIATE mode
-   * Triggers a ImmediateProcessJob job to process submission
+   * Triggers a ProcessImmediateJob job to process submission
    */
   public String register(RegisterOgel reg, String callbackUrl) {
     LOGGER.info("Creating OgelSubmission: " + reg.getUserId() + "/" + reg.getOgelType());
@@ -61,15 +63,13 @@ public class RegisterService {
     return sub.getSubmissionRef();
   }
 
-  private void triggerProcessSubmissionJob(String subRef) {
-    JobDetail detail = JobBuilder.newJob(ImmediateProcessJob.class).build();
+  private void triggerProcessSubmissionJob(String submissionRef) {
+    JobDetail detail = JobBuilder.newJob(ProcessImmediateJob.class).build();
     JobDataMap dataMap = detail.getJobDataMap();
-    dataMap.put(Scheduler.SUBMISSION_SERVICE_NAME, submissionService);
-    dataMap.put(Scheduler.OGEL_SERVICE_NAME, ogelService);
-    dataMap.put(Scheduler.CLIENT_CALLBACK_SERVICE_NAME, callbackService);
-    dataMap.put(Scheduler.SUBMISSION_REF, subRef);
+    dataMap.put(Scheduler.JOB_PROCESS_SERVICE_NAME, jobProcessService);
+    dataMap.put(Scheduler.SUBMISSION_REF, submissionRef);
     Trigger trigger = TriggerBuilder.newTrigger()
-        .withIdentity(TriggerKey.triggerKey("SubmissionProcessJobTrigger-" + subRef))
+        .withIdentity(TriggerKey.triggerKey("SubmissionProcessJobTrigger-" + submissionRef))
         .startNow().build();
     try {
       scheduler.scheduleJob(detail, trigger);

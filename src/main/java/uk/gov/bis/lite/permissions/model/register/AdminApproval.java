@@ -10,15 +10,6 @@ public class AdminApproval {
 
   private String adminUserId;
 
-  @Override
-  public boolean equals(Object o) {
-    if (o instanceof AdminApproval) {
-      AdminApproval admin = (AdminApproval) o;
-      return Objects.equals(adminUserId, admin.getAdminUserId());
-    }
-    return false;
-  }
-
   String getJoinedInstanceStateData() {
     return adminUserId != null ? adminUserId : "";
   }

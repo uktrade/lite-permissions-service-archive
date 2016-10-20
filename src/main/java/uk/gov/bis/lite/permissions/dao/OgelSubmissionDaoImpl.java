@@ -39,6 +39,14 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
 
   @Override
   @Transaction
+  public List<OgelSubmission> getScheduled() {
+    try (final Handle handle = jdbi.open()) {
+      return attach(handle).getScheduled();
+    }
+  }
+
+  @Override
+  @Transaction
   public List<OgelSubmission> getScheduledByStatus(String status) {
     try (final Handle handle = jdbi.open()) {
       return attach(handle).getScheduledByStatus(status);
@@ -86,6 +94,8 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
           sub.getStatus().name(),
           sub.isRoleUpdated(),
           sub.isCalledBack(),
+          sub.getFirstFail(),
+          sub.getLastFailMessage(),
           sub.getId());
     }
   }

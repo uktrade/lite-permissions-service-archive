@@ -11,7 +11,8 @@ import java.util.List;
 public interface OgelSubmissionInterface {
 
   @SqlUpdate("UPDATE LOCAL_OGEL_SUBMISSION SET CUSTOMER_REF = :customerRef, SITE_REF = :siteRef, SPIRE_REF = :spireRef, " +
-      "MODE = :mode, STATUS = :status, ROLE_UPDATED = :roleUpdated, CALLED_BACK = :calledBack WHERE id = :id")
+      "MODE = :mode, STATUS = :status, ROLE_UPDATED = :roleUpdated, CALLED_BACK = :calledBack, FIRST_FAIL = :firstFail, " +
+      " LAST_FAIL_MESSAGE = :lastFailMessage WHERE id = :id")
   void update(@Bind("customerRef") String customerRef,
               @Bind("siteRef") String siteRef,
               @Bind("spireRef") String spireRef,
@@ -19,6 +20,8 @@ public interface OgelSubmissionInterface {
               @Bind("status") String status,
               @Bind("roleUpdated") Boolean roleUpdated,
               @Bind("calledBack") Boolean calledBack,
+              @Bind("firstFail") String firstFail,
+              @Bind("lastFailMessage") String lastFailMessage,
               @Bind("id") int id);
 
   @SqlUpdate("INSERT INTO LOCAL_OGEL_SUBMISSION (USER_ID, OGEL_TYPE, SUBMISSION_REF, CUSTOMER_REF, SITE_REF, SPIRE_REF, " +
@@ -39,11 +42,15 @@ public interface OgelSubmissionInterface {
               @Bind("roleUpdated") Boolean roleUpdated);
 
 
+  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE MODE = 'SCHEDULED' AND !(STATUS = 'SUCCESS' || STATUS = 'ERROR')")
+  @Mapper(OgelSubmissionMapper.class)
+  List<OgelSubmission> getScheduled();
+
   @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE STATUS = :status AND MODE = 'SCHEDULED'")
   @Mapper(OgelSubmissionMapper.class)
   List<OgelSubmission> getScheduledByStatus(@Bind("status") String status);
 
-  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE (STATUS = 'SUCCESS' || STATUS = 'FAILURE') " +
+  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE (STATUS = 'SUCCESS' || STATUS = 'ERROR') " +
       "  AND MODE = 'SCHEDULED' AND (CALLBACK_URL IS NOT NULL AND CALLBACK_URL != '') AND CALLED_BACK = 0")
   @Mapper(OgelSubmissionMapper.class)
   List<OgelSubmission> getScheduledCallbacks();

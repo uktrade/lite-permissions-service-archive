@@ -9,7 +9,6 @@ import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.spireclient.ClientCreateOgelApp;
 import uk.gov.bis.lite.permissions.spireclient.ClientUnmarshaller;
 
-import java.util.List;
 import java.util.Optional;
 
 import javax.xml.soap.SOAPMessage;
@@ -33,23 +32,26 @@ public class OgelService {
     this.clientUnmarshaller = clientUnmarshaller;
   }
 
-  public boolean immediateCreate(String subRef) {
-    LOGGER.info("immediateCreate [" + subRef + "]");
+  public boolean createOgel(String submissionRef) {
+    LOGGER.info("createOgel [" + submissionRef + "]");
     boolean created = false;
-    OgelSubmission sub = submissionDao.findBySubmissionRef(subRef);
-    if (sub != null && sub.isImmediate() && sub.canCreateOgel()) {
-      created = doCreateOgel(sub);
-    } else {
-      LOGGER.warn("Unexpected OgelSubmission state");
+    OgelSubmission sub = submissionDao.findBySubmissionRef(submissionRef);
+    if (sub != null) {
+      if(sub.canCreateOgel()) {
+        created = doCreateOgel(sub);
+      } else {
+        LOGGER.warn("Cannot create Ogel - OgelSubmission state is not complete");
+      }
     }
     return created;
   }
 
+  /*
   public void processScheduledCreate() {
     List<OgelSubmission> subs = submissionDao.getScheduledByStatus(OgelSubmission.Status.READY.name());
     LOGGER.info("Found READY [" + subs.size() + "]");
     subs.forEach(this::doCreateOgel);
-  }
+  }*/
 
   private boolean doCreateOgel(OgelSubmission sub) {
     SOAPMessage message = clientCreateOgelApp.createOgelApp(

@@ -10,6 +10,8 @@ public interface OgelSubmissionDao {
 
   void create(OgelSubmission sub);
 
+  List<OgelSubmission> getScheduled();
+
   List<OgelSubmission> getScheduledByStatus(String status);
 
   List<OgelSubmission> getScheduledCallbacks();

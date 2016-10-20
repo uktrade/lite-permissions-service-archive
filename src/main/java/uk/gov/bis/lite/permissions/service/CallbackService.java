@@ -9,8 +9,6 @@ import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.model.callback.CallbackItem;
 
-import java.util.List;
-
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
@@ -21,7 +19,7 @@ public class CallbackService {
   private static final Logger LOGGER = LoggerFactory.getLogger(CallbackService.class);
 
   private static final String CALLBACK_SUCCESS = "SUCCESS";
-  private static final String CALLBACK_FAILED = "FAILED";
+  private static final String CALLBACK_ERROR = "ERROR";
 
   private final ObjectMapper objectMapper;
   private final Client httpClient;
@@ -49,11 +47,12 @@ public class CallbackService {
     }
   }
 
+  /*
   public void completeScheduledCallbacks() {
     List<OgelSubmission> subs = submissionDao.getScheduledCallbacks();
     LOGGER.info("CALLBACKS [" + subs.size() + "]");
     subs.stream().map(OgelSubmission::getSubmissionRef).forEach(this::completeCallback);
-  }
+  }*/
 
   private CallbackItem getCallbackItem(OgelSubmission sub) {
     CallbackItem item = new CallbackItem();
@@ -62,9 +61,9 @@ public class CallbackService {
       item.setStatus(CALLBACK_SUCCESS);
       item.setRegistrationReference(sub.getSpireRef());
     }
-    if (sub.isFailure()) {
+    if (sub.isError()) {
       item.setRequestId(sub.getSubmissionRef());
-      item.setStatus(CALLBACK_FAILED);
+      item.setStatus(CALLBACK_ERROR);
       item.setFailReason(sub.getFailedReason());
     }
     return item;

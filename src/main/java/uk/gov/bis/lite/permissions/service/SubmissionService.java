@@ -44,11 +44,11 @@ public class SubmissionService {
     }
   }
 
-  public boolean immediatePrepare(String subRef) {
-    LOGGER.info("immediatePrepare [" + subRef + "]");
+  public boolean prepareSubmission(String submissionRef) {
+    LOGGER.info("prepareSubmission [" + submissionRef + "]");
     boolean allCreated = true;
-    OgelSubmission sub = submissionDao.findBySubmissionRef(subRef);
-    if (sub != null && sub.isImmediate()) {
+    OgelSubmission sub = submissionDao.findBySubmissionRef(submissionRef);
+    if (sub != null) {
       // Create Customer if needed
       if (sub.needsCustomer()) {
         if (!doCreateCustomer(sub)) {
@@ -67,8 +67,6 @@ public class SubmissionService {
           allCreated = false;
         }
       }
-    } else {
-      LOGGER.warn("Unexpected OgelSubmission state");
     }
     return allCreated;
   }

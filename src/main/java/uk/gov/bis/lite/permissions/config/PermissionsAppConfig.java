@@ -23,6 +23,9 @@ public class PermissionsAppConfig extends Configuration {
   private String customerServiceUserRolePath;
 
   @NotEmpty
+  private String maxFailRetryWindowMinutes;
+
+  @NotEmpty
   @JsonProperty
   private String spireCreateOgelAppUrl;
 
@@ -35,13 +38,7 @@ public class PermissionsAppConfig extends Configuration {
   private String soapPassword;
 
   @NotEmpty
-  private String scheduledPrepareJobCron;
-
-  @NotEmpty
-  private String scheduledCreateJobCron;
-
-  @NotEmpty
-  private String scheduledCallbackJobCron;
+  private String processScheduledJobCron;
 
   @Valid
   @NotNull
@@ -87,18 +84,6 @@ public class PermissionsAppConfig extends Configuration {
     return soapPassword;
   }
 
-  public String getScheduledPrepareJobCron() {
-    return scheduledPrepareJobCron;
-  }
-
-  public String getScheduledCreateJobCron() {
-    return scheduledCreateJobCron;
-  }
-
-  public String getScheduledCallbackJobCron() {
-    return scheduledCallbackJobCron;
-  }
-
   public DataSourceFactory getDatabase() {
     return database;
   }
@@ -109,5 +94,13 @@ public class PermissionsAppConfig extends Configuration {
 
   public String getAdminPassword() {
     return adminPassword;
+  }
+
+  public String getMaxFailRetryWindowMinutes() {
+    return maxFailRetryWindowMinutes;
+  }
+
+  public String getProcessScheduledJobCron() {
+    return processScheduledJobCron;
   }
 }

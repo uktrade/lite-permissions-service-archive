@@ -71,6 +71,12 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
   }
 
   @Provides
+  @javax.inject.Named("maxFailRetryWindowMinutes")
+  int provideMaxFailRetryWindowMinutes(PermissionsAppConfig config) {
+    return Integer.parseInt(config.getMaxFailRetryWindowMinutes());
+  }
+
+  @Provides
   @javax.inject.Named("spireCreateOgelAppUrl")
   String provideSpireCreateOgelAppUrl(PermissionsAppConfig config) {
     return config.getSpireCreateOgelAppUrl();

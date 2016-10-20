@@ -1,7 +1,6 @@
-# scheduledPrepareJobCron: 0 0,5,10,15,20,25,30,35,40,45,50,55 * * * ? # every 5 minutes
-scheduledPrepareJobCron: 0/10 * * * * ?  # every 10 seconds
-scheduledCreateJobCron: 0/20 * * * * ?  # every 20 seconds
-scheduledCallbackJobCron: 0/20 * * * * ?  # every 20 seconds
+# processScheduledJobCron: 0 0,5,10,15,20,25,30,35,40,45,50,55 * * * ? # every 5 minutes
+# processScheduledJobCron: 0/20 * * * * ?  # every 20 seconds
+processScheduledJobCron: 0/10 * * * * ?  # every 10 seconds
 
 # soapUserName: bisdev.api@test.com
 # soapPassword: dev
@@ -15,6 +14,8 @@ customerServiceUrl: http://localhost:8095
 customerServiceCustomerPath: /create-customer
 customerServiceSitePath: /create-site
 customerServiceUserRolePath: /userRole
+
+maxFailRetryWindowMinutes: 2
 
 server:
   type: default

@@ -3,8 +3,6 @@ package uk.gov.bis.lite.permissions.model.register;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import uk.gov.bis.lite.permissions.util.Util;
 
-import java.util.Objects;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Customer {
 
@@ -34,27 +32,6 @@ public class Customer {
         Util.info("eoriNumberValidated", eoriNumberValidated) +
         Util.info("website", website);
     return info + (registeredAddress != null ? registeredAddress.getInfo() : "");
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (o instanceof Customer) {
-      Customer customer = (Customer) o;
-      return Objects.equals(customerName, customer.getCustomerName())
-          && Objects.equals(customerType, customer.getCustomerType())
-          && Objects.equals(chNumber, customer.getChNumber())
-          && Objects.equals(chNumberValidated, customer.isChNumberValidated())
-          && Objects.equals(eoriNumber, customer.getEoriNumber())
-          && Objects.equals(eoriNumberValidated, customer.isEoriNumberValidated())
-          && Objects.equals(website, customer.getWebsite())
-          && Objects.equals(registeredAddress, customer.getRegisteredAddress());
-    }
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(customerName, customerType, chNumber, chNumberValidated, eoriNumber, eoriNumberValidated, website, registeredAddress);
   }
 
   /**

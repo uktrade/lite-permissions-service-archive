@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.bis.lite.permissions.util.Util;
 
-import java.util.Objects;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Site {
 
@@ -31,22 +29,6 @@ public class Site {
       valid = isValid(siteName, address);
     }
     return valid;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (o instanceof Site) {
-      Site site = (Site) o;
-      return Objects.equals(useCustomerAddress, site.isUseCustomerAddress())
-          && Objects.equals(siteName, site.getSiteName())
-          && Objects.equals(address, site.getAddress());
-    }
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(useCustomerAddress, siteName, address);
   }
 
   public String getInfo() {

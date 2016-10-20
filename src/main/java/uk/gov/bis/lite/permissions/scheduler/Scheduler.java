@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
 import uk.gov.bis.lite.permissions.service.CallbackService;
+import uk.gov.bis.lite.permissions.service.JobProcessService;
 import uk.gov.bis.lite.permissions.service.OgelService;
 import uk.gov.bis.lite.permissions.service.SubmissionService;
 
@@ -26,6 +27,9 @@ public class Scheduler implements Managed {
   private final SubmissionService submissionService;
   private final OgelService ogelService;
   private final CallbackService callbackService;
+  private JobProcessService jobProcessService;
+
+  public static final String JOB_PROCESS_SERVICE_NAME = "jobProcessService";
 
   public static final String SUBMISSION_SERVICE_NAME = "submissionService";
   public static final String OGEL_SERVICE_NAME = "ogelService";
@@ -34,54 +38,31 @@ public class Scheduler implements Managed {
 
   @Inject
   public Scheduler(org.quartz.Scheduler scheduler, PermissionsAppConfig config, SubmissionService submissionService,
-                   OgelService ogelService, CallbackService callbackService) {
+                   OgelService ogelService, CallbackService callbackService, JobProcessService jobProcessService) {
     this.scheduler = scheduler;
     this.config = config;
     this.submissionService = submissionService;
     this.ogelService = ogelService;
     this.callbackService = callbackService;
+    this.jobProcessService = jobProcessService;
   }
 
   @Override
   public void start() throws Exception {
     LOGGER.info("Scheduler start...");
 
-    // Set up OgelSubmission prepare job
-    JobKey prepareKey = JobKey.jobKey("ScheduledPrepareJob");
-    JobDetail prepareDetail = newJob(ScheduledPrepareJob.class).withIdentity(prepareKey).build();
-    prepareDetail.getJobDataMap().put(SUBMISSION_SERVICE_NAME, submissionService);
-    CronTrigger prepareTrigger = newTrigger()
-        .withIdentity(TriggerKey.triggerKey("ScheduledPrepareJobTrigger"))
-        .withSchedule(cronSchedule(config.getScheduledPrepareJobCron()))
+    // Set up ProcessScheduledJob
+    JobKey key = JobKey.jobKey("ProcessScheduledJob");
+    JobDetail detail = newJob(ProcessScheduledJob.class).withIdentity(key).build();
+    detail.getJobDataMap().put(JOB_PROCESS_SERVICE_NAME, jobProcessService);
+    CronTrigger trigger = newTrigger()
+        .withIdentity(TriggerKey.triggerKey("ProcessScheduledJobTrigger"))
+        .withSchedule(cronSchedule(config.getProcessScheduledJobCron()))
         .build();
 
-    // Set up Ogel create job
-    JobKey createKey = JobKey.jobKey("ScheduledCreateJob");
-    JobDetail createDetail = newJob(ScheduledCreateJob.class).withIdentity(createKey).build();
-    createDetail.getJobDataMap().put(OGEL_SERVICE_NAME, ogelService);
-    CronTrigger createTrigger = newTrigger()
-        .withIdentity(TriggerKey.triggerKey("ScheduledCreateTrigger"))
-        .withSchedule(cronSchedule(config.getScheduledCreateJobCron()))
-        .build();
-
-    // Set up Callback job
-    JobKey callbackKey = JobKey.jobKey("ScheduledCallbackJob");
-    JobDetail callbackDetail = newJob(ScheduledCallbackJob.class).withIdentity(callbackKey).build();
-    callbackDetail.getJobDataMap().put(CLIENT_CALLBACK_SERVICE_NAME, callbackService);
-    CronTrigger callbackTrigger = newTrigger()
-        .withIdentity(TriggerKey.triggerKey("ScheduledCallbackJobTrigger"))
-        .withSchedule(cronSchedule(config.getScheduledCallbackJobCron()))
-        .build();
-
-    scheduler.scheduleJob(prepareDetail, prepareTrigger);
-    scheduler.scheduleJob(createDetail, createTrigger);
-    scheduler.scheduleJob(callbackDetail, callbackTrigger);
-
+    scheduler.scheduleJob(detail, trigger);
     scheduler.start();
-
-    scheduler.triggerJob(prepareKey);
-    scheduler.triggerJob(createKey);
-    scheduler.triggerJob(callbackKey);
+    scheduler.triggerJob(key);
   }
 
   @Override
