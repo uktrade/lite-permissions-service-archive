@@ -7,11 +7,11 @@ import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
-import uk.gov.bis.lite.permissions.model.customer.AddressItem;
-import uk.gov.bis.lite.permissions.model.customer.CustomerItem;
+import uk.gov.bis.lite.permissions.spire.model.AddressItem;
+import uk.gov.bis.lite.permissions.spire.model.CustomerItem;
 import uk.gov.bis.lite.permissions.model.customer.ResponseItem;
-import uk.gov.bis.lite.permissions.model.customer.SiteItem;
-import uk.gov.bis.lite.permissions.model.customer.UserRoleItem;
+import uk.gov.bis.lite.permissions.spire.model.SiteItem;
+import uk.gov.bis.lite.permissions.spire.model.UserRoleItem;
 import uk.gov.bis.lite.permissions.model.register.Address;
 import uk.gov.bis.lite.permissions.model.register.AdminApproval;
 import uk.gov.bis.lite.permissions.model.register.Customer;
@@ -39,13 +39,13 @@ public class CustomerService {
   private static final String ROLE_TYPE_SUBMITTER = "SUBMITTER";
   private static final String ROLE_TYPE_PREPARER = "PREPARER";
 
-  private final FailService failService;
-  private final ObjectMapper mapper;
-  private final String customerServiceUrl;
-  private final String customerPath;
-  private final String sitePath;
-  private final String userRolePath;
-  private final Client httpClient;
+  private FailService failService;
+  private ObjectMapper mapper;
+  private String customerServiceUrl;
+  private String customerPath;
+  private String sitePath;
+  private String userRolePath;
+  private Client httpClient;
 
   @Inject
   public CustomerService(Client httpClient, FailService failService,

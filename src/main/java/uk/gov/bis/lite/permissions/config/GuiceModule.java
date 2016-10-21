@@ -17,12 +17,21 @@ import org.skife.jdbi.v2.DBI;
 import ru.vyarus.dropwizard.guice.module.support.ConfigurationAwareModule;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDaoImpl;
+import uk.gov.bis.lite.permissions.spire.SpireService;
 
 import javax.ws.rs.client.Client;
 
 public class GuiceModule extends AbstractModule implements ConfigurationAwareModule<PermissionsAppConfig> {
 
   private PermissionsAppConfig config;
+
+  @Provides
+  @Singleton
+  SpireService provideSpireService(Environment environment, PermissionsAppConfig config) {
+    SpireService service = new SpireService();
+    service.init(config.getSpireUserName(), config.getSpirePassword(), config.getSpireUrl(), config.getSpireEndpoints());
+    return service;
+  }
 
   @Provides
   @Singleton
@@ -71,9 +80,9 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
   }
 
   @Provides
-  @javax.inject.Named("maxFailRetryWindowMinutes")
-  int provideMaxFailRetryWindowMinutes(PermissionsAppConfig config) {
-    return Integer.parseInt(config.getMaxFailRetryWindowMinutes());
+  @javax.inject.Named("maxMinutesRetryAfterFail")
+  int provideMaxMinutesRetryAfterFail(PermissionsAppConfig config) {
+    return Integer.parseInt(config.getMaxMinutesRetryAfterFail());
   }
 
   @Provides

@@ -57,7 +57,7 @@ public class RegisterService {
 
     submissionDao.create(sub);
 
-    // Trigger job to process submission
+    // Trigger ProcessImmediateJob to process this submission
     triggerProcessSubmissionJob(sub.getSubmissionRef());
 
     return sub.getSubmissionRef();

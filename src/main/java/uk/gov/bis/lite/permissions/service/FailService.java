@@ -18,7 +18,7 @@ public class FailService {
   private static final Logger LOGGER = LoggerFactory.getLogger(FailService.class);
 
   private OgelSubmissionDao submissionDao;
-  private int windowMinutes;
+  private int maxMinutesRetryAfterFail;
 
   /**
    * CUSTOMER     -
@@ -31,31 +31,33 @@ public class FailService {
   }
 
   @Inject
-  public FailService(OgelSubmissionDao submissionDao, @Named("maxFailRetryWindowMinutes") int windowMinutes) {
+  public FailService(OgelSubmissionDao submissionDao,
+                     @Named("maxMinutesRetryAfterFail") int maxMinutesRetryAfterFail) {
     this.submissionDao = submissionDao;
-    this.windowMinutes = windowMinutes;
+    this.maxMinutesRetryAfterFail = maxMinutesRetryAfterFail;
   }
 
-  public void fail(String subRef, String message, Origin origin) {
-    OgelSubmission sub = submissionDao.findBySubmissionRef(subRef);
+  public void fail(String submissionRef, String message, Origin origin) {
+    OgelSubmission sub = submissionDao.findBySubmissionRef(submissionRef);
     if(!sub.hasCompleted()) {
       doFailUpdate(sub, message, origin);
     }
   }
 
   private void doFailUpdate(OgelSubmission sub, String message, Origin origin) {
-    String originMessage = "[" + origin.name() + "] - " + message;
-    LOGGER.warn("OgelSubmission [" + sub.getSubmissionRef() + "]" + originMessage);
-    // If subsequent 'fail' and more than 'windowMinutes' in the past, we stop submission, set Status to ERROR
-    if(sub.hasFail()) {
-      LOGGER.info("hasFail");
-      if(sub.getFirstFailDateTime().isBefore(LocalDateTime.now().minus(windowMinutes, MINUTES))) {
-        LOGGER.info("updateStatusToError");
+    String originMessage = "[" + origin.name() + "][" + message + "]";
+    LOGGER.warn("Submission process failure [" + sub.getSubmissionRef() + "]" + originMessage);
+
+    // Set first fail, or check to update status to ERROR
+    if(!sub.hasFail()) {
+      sub.setFirstFailDateTime();
+    } else {
+      if(sub.getFirstFailDateTime().isBefore(LocalDateTime.now().minus(maxMinutesRetryAfterFail, MINUTES))) {
+        LOGGER.info("Terminal failure setting status to ERROR [" + sub.getSubmissionRef() + "]");
         sub.updateStatusToError();
       }
-    } else {
-      sub.setFirstFailDateTime();
     }
+
     sub.setLastFailMessage(originMessage);
     submissionDao.update(sub);
   }

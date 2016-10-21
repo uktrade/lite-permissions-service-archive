@@ -23,7 +23,7 @@ public class PermissionsAppConfig extends Configuration {
   private String customerServiceUserRolePath;
 
   @NotEmpty
-  private String maxFailRetryWindowMinutes;
+  private String maxMinutesRetryAfterFail;
 
   @NotEmpty
   @JsonProperty
@@ -39,6 +39,22 @@ public class PermissionsAppConfig extends Configuration {
 
   @NotEmpty
   private String processScheduledJobCron;
+
+  @NotEmpty
+  @JsonProperty
+  private String spireUserName;
+
+  @NotEmpty
+  @JsonProperty
+  private String spirePassword;
+
+  @NotEmpty
+  @JsonProperty
+  private String spireUrl;
+
+  @NotEmpty
+  @JsonProperty
+  private String spireEndpoints;
 
   @Valid
   @NotNull
@@ -96,11 +112,27 @@ public class PermissionsAppConfig extends Configuration {
     return adminPassword;
   }
 
-  public String getMaxFailRetryWindowMinutes() {
-    return maxFailRetryWindowMinutes;
+  public String getMaxMinutesRetryAfterFail() {
+    return maxMinutesRetryAfterFail;
   }
 
   public String getProcessScheduledJobCron() {
     return processScheduledJobCron;
+  }
+
+  public String getSpireUserName() {
+    return spireUserName;
+  }
+
+  public String getSpirePassword() {
+    return spirePassword;
+  }
+
+  public String getSpireUrl() {
+    return spireUrl;
+  }
+
+  public String getSpireEndpoints() {
+    return spireEndpoints;
   }
 }

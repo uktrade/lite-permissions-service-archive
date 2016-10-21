@@ -1,6 +1,5 @@
 package uk.gov.bis.lite.permissions.service;
 
-
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
@@ -33,30 +32,34 @@ public class JobProcessService {
 
   /**
    * Process OgelSubmission through all stages - set Mode to SCHEDULED if process cannot be completed
-   * This method is called by ProcessImmediateJob
+   * (This method is called by ProcessImmediateJob)
    */
   public void processImmediate(String submissionRef) {
     LOGGER.info("IMMEDIATE [" + submissionRef + "]");
-    processOgelSubmission(submissionRef);
-    submissionService.checkToResetMode(submissionRef); // Revise mode if necessary
+
+    // Attempt to process this OgelSubmission immediately
+    doProcessOgelSubmission(submissionRef);
+
+    // Update MODE if necessary
+    submissionService.updateModeIfNotCompleted(submissionRef);
   }
 
   /**
    * Find scheduled OgelSubmissions and attempt to process each through all stages.
-   * This method is called by ProcessScheduledJob
+   * (This method is called by ProcessScheduledJob)
    */
   public void processScheduled() {
-    List<OgelSubmission> subs = submissionDao.getScheduledByStatus(OgelSubmission.Status.CUSTOMER.name());
+    List<OgelSubmission> subs = submissionDao.getScheduled();
     LOGGER.info("SCHEDULED [" + subs.size() + "]");
-    subs.stream().map(OgelSubmission::getSubmissionRef).forEach(this::processOgelSubmission);
+    subs.stream().map(OgelSubmission::getSubmissionRef).forEach(this::doProcessOgelSubmission);
   }
 
-  private void processOgelSubmission(String submissionRef) {
+  private void doProcessOgelSubmission(String submissionRef) {
     boolean prepareOk = submissionService.prepareSubmission(submissionRef);
     if (prepareOk) {
       boolean createOk = ogelService.createOgel(submissionRef);
       if (createOk) {
-        LOGGER.info("submissionRef [" + submissionRef + "] Create Ogel completed successfully.");
+        LOGGER.info("OgelSubmission completed successfully [" + submissionRef + "]");
         callbackService.completeCallback(submissionRef);
       }
     }

@@ -18,11 +18,11 @@ public class CallbackService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CallbackService.class);
 
-  private static final String CALLBACK_SUCCESS = "SUCCESS";
-  private static final String CALLBACK_ERROR = "ERROR";
+  private static String CALLBACK_SUCCESS = "SUCCESS";
+  private static String CALLBACK_ERROR = "ERROR";
 
-  private final ObjectMapper objectMapper;
-  private final Client httpClient;
+  private ObjectMapper objectMapper;
+  private Client httpClient;
   private OgelSubmissionDao submissionDao;
 
   @Inject
@@ -32,27 +32,20 @@ public class CallbackService {
     this.submissionDao = submissionDao;
   }
 
-  public void completeCallback(String subRef) {
-    OgelSubmission sub = submissionDao.findBySubmissionRef(subRef);
+  public void completeCallback(String submissionRef) {
+    OgelSubmission sub = submissionDao.findBySubmissionRef(submissionRef);
     if (sub != null && sub.hasCompleted()) {
       if (doCallback(sub.getCallbackUrl(), getCallbackItem(sub))) {
         sub.setCalledBack(true);
         submissionDao.update(sub);
-        LOGGER.info("CALLBACK completed [" + subRef + "]");
+        LOGGER.info("CALLBACK completed [" + submissionRef + "]");
       } else {
-        LOGGER.info("CALLBACK failed to complete [" + subRef + "]");
+        LOGGER.info("CALLBACK failed to complete [" + submissionRef + "]");
       }
     } else {
       LOGGER.warn("OgelSubmission has not completed its processing. Postponing callback");
     }
   }
-
-  /*
-  public void completeScheduledCallbacks() {
-    List<OgelSubmission> subs = submissionDao.getScheduledCallbacks();
-    LOGGER.info("CALLBACKS [" + subs.size() + "]");
-    subs.stream().map(OgelSubmission::getSubmissionRef).forEach(this::completeCallback);
-  }*/
 
   private CallbackItem getCallbackItem(OgelSubmission sub) {
     CallbackItem item = new CallbackItem();

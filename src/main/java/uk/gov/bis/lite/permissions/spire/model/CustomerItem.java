@@ -1,4 +1,4 @@
-package uk.gov.bis.lite.permissions.model.customer;
+package uk.gov.bis.lite.permissions.spire.model;
 
 public class CustomerItem {
 

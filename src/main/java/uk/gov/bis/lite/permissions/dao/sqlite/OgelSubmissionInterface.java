@@ -42,7 +42,7 @@ public interface OgelSubmissionInterface {
               @Bind("roleUpdated") Boolean roleUpdated);
 
 
-  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE MODE = 'SCHEDULED' AND !(STATUS = 'SUCCESS' || STATUS = 'ERROR')")
+  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE MODE = 'SCHEDULED' AND STATUS != 'SUCCESS' AND STATUS != 'ERROR'")
   @Mapper(OgelSubmissionMapper.class)
   List<OgelSubmission> getScheduled();
 

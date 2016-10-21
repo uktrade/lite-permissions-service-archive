@@ -1,4 +1,6 @@
-package uk.gov.bis.lite.permissions.model.customer;
+package uk.gov.bis.lite.permissions.spire.model;
+
+import uk.gov.bis.lite.permissions.spire.model.AddressItem;
 
 public class SiteItem {
 

@@ -32,18 +32,8 @@ public class SubmissionService {
   }
 
   /**
-   * If OgelSubmission has not completed processing, set submission mode to SCHEDULED
+   * Attempts to create Customer, Site and do Role Update (if needed)
    */
-  public void checkToResetMode(String subRef) {
-    LOGGER.info("checkToResetMode [" + subRef + "]");
-    OgelSubmission sub = submissionDao.findBySubmissionRef(subRef);
-    if (!sub.hasCompleted()) {
-      sub.changeToScheduledMode();
-      sub.updateStatus();
-      submissionDao.update(sub);
-    }
-  }
-
   public boolean prepareSubmission(String submissionRef) {
     LOGGER.info("prepareSubmission [" + submissionRef + "]");
     boolean allCreated = true;
@@ -71,24 +61,17 @@ public class SubmissionService {
     return allCreated;
   }
 
-  public void processScheduled(OgelSubmission.Status status) {
-    if (status.equals(OgelSubmission.Status.CUSTOMER)) {
-      doScheduledCreateCustomers();
-    } else if (status.equals(OgelSubmission.Status.SITE)) {
-      doScheduledCreateSites();
-    } else if (status.equals(OgelSubmission.Status.USER_ROLE)) {
-      doScheduledUserRoleUpdates();
-    }
-  }
-
   /**
-   * For each OgelSubmission we need to create a Customer on Spire
-   * and then update the OgelSubmission status
+   * If OgelSubmission has not completed processing, set MODE to 'SCHEDULED'
    */
-  private void doScheduledCreateCustomers() {
-    List<OgelSubmission> subs = submissionDao.getScheduledByStatus(OgelSubmission.Status.CUSTOMER.name());
-    LOGGER.info("CUSTOMERS [" + subs.size() + "]");
-    subs.forEach(this::doCreateCustomer);
+  public void updateModeIfNotCompleted(String submissionRef) {
+    OgelSubmission sub = submissionDao.findBySubmissionRef(submissionRef);
+    if (!sub.hasCompleted()) {
+      LOGGER.info("Updating MODE to SCHEDULED for: [" + submissionRef + "]");
+      sub.changeToScheduledMode();
+      sub.updateStatus();
+      submissionDao.update(sub);
+    }
   }
 
   private boolean doCreateCustomer(OgelSubmission sub) {
@@ -103,16 +86,6 @@ public class SubmissionService {
     return created;
   }
 
-  /**
-   * For each OgelSubmission we need to create a Site on Spire
-   * and then update the OgelSubmission status
-   */
-  private void doScheduledCreateSites() {
-    List<OgelSubmission> subs = submissionDao.getScheduledByStatus(OgelSubmission.Status.SITE.name());
-    LOGGER.info("SITES [" + subs.size() + "]");
-    subs.forEach(this::doCreateSite);
-  }
-
   private boolean doCreateSite(OgelSubmission sub) {
     Optional<String> siteRef = customerService.createSite(sub);
     boolean created = siteRef.isPresent();
@@ -123,16 +96,6 @@ public class SubmissionService {
       LOGGER.info("Site created. Updated record: " + siteRef.get());
     }
     return created;
-  }
-
-  /**
-   * For each OgelSubmission we update site access permissions and
-   * then set the OgelSubmission status to READY
-   */
-  private void doScheduledUserRoleUpdates() {
-    List<OgelSubmission> subs = submissionDao.getScheduledByStatus(OgelSubmission.Status.USER_ROLE.name());
-    LOGGER.info("USER_ROLES [" + subs.size() + "]");
-    subs.forEach(this::doUserRoleUpdate);
   }
 
   private boolean doUserRoleUpdate(OgelSubmission sub) {

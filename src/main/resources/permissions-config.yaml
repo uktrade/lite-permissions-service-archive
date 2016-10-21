@@ -15,7 +15,12 @@ customerServiceCustomerPath: /create-customer
 customerServiceSitePath: /create-site
 customerServiceUserRolePath: /userRole
 
-maxFailRetryWindowMinutes: 2
+spireUserName: bisuat.api@test.com
+spirePassword: sp1reUAT
+spireUrl: https://www.spiretest.trade.gov.uk/spireuat/fox/ispire/
+spireEndpoints: SPIRE_CREATE_OGEL_APP
+
+maxMinutesRetryAfterFail: 1
 
 server:
   type: default

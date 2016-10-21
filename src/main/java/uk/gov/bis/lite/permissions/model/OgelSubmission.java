@@ -33,9 +33,7 @@ public class OgelSubmission {
   private boolean roleUpdate;
   private boolean roleUpdated;
 
-  // Format for dates like: 2016-10-20 13:00
   private static DateTimeFormatter ogelSubmissionDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-  //private static DateTimeFormatter ogelSubmissionDateFormatter = DateTimeFormatter.ofPattern("YYYY-MM-DD HH:MM:SS.SSS");
 
   /**
    * IMMEDIATE      - submission is being processed immediately, through all stages
@@ -52,7 +50,7 @@ public class OgelSubmission {
    * USER_ROLE  - we need to update user role permissions
    * READY      - this OgelSubmission is now setUp and we can create the Ogel via Spire
    * SUCCESS    - Ogel has been created on Spire, OgelSubmission updated with SpireRef, processing submission complete
-   * ERROR    - Ogel has not been created on Spire, terminal error, processing submission complete
+   * ERROR      - Ogel has not been created on Spire, terminal error, processing submission complete
    */
   public enum Status {
     CREATED, CUSTOMER, SITE, USER_ROLE, READY, SUCCESS, ERROR;

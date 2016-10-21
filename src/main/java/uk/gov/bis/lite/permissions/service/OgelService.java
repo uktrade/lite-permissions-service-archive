@@ -6,33 +6,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
-import uk.gov.bis.lite.permissions.spireclient.ClientCreateOgelApp;
-import uk.gov.bis.lite.permissions.spireclient.ClientUnmarshaller;
+import uk.gov.bis.lite.permissions.spire.SpireRefResponse;
+import uk.gov.bis.lite.permissions.spire.SpireService;
+import uk.gov.bis.lite.permissions.spire.model.OgelAppItem;
+import uk.gov.bis.lite.permissions.util.Util;
 
-import java.util.Optional;
-
-import javax.xml.soap.SOAPMessage;
+import javax.ws.rs.core.Response;
 
 @Singleton
 public class OgelService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(OgelService.class);
 
-  private ClientCreateOgelApp clientCreateOgelApp;
+  private SpireService spireService;
+  private FailService failService;
   private OgelSubmissionDao submissionDao;
-  private ClientUnmarshaller clientUnmarshaller;
-
-  private static final String CLS_RESPONSE_ELEMENT_NAME = "SPIRE_REF";
-  private static final String CLS_SAR_XPATH_EXPRESSION = "//*[local-name()='RESPONSE']";
 
   @Inject
-  public OgelService(ClientCreateOgelApp clientCreateOgelApp, ClientUnmarshaller clientUnmarshaller, OgelSubmissionDao submissionDao) {
-    this.clientCreateOgelApp = clientCreateOgelApp;
+  public OgelService(SpireService spireService, FailService failService, OgelSubmissionDao submissionDao) {
+    this.spireService = spireService;
+    this.failService = failService;
     this.submissionDao = submissionDao;
-    this.clientUnmarshaller = clientUnmarshaller;
   }
 
-  public boolean createOgel(String submissionRef) {
+  boolean createOgel(String submissionRef) {
     LOGGER.info("createOgel [" + submissionRef + "]");
     boolean created = false;
     OgelSubmission sub = submissionDao.findBySubmissionRef(submissionRef);
@@ -46,30 +43,32 @@ public class OgelService {
     return created;
   }
 
-  /*
-  public void processScheduledCreate() {
-    List<OgelSubmission> subs = submissionDao.getScheduledByStatus(OgelSubmission.Status.READY.name());
-    LOGGER.info("Found READY [" + subs.size() + "]");
-    subs.forEach(this::doCreateOgel);
-  }*/
-
   private boolean doCreateOgel(OgelSubmission sub) {
-    SOAPMessage message = clientCreateOgelApp.createOgelApp(
-        sub.getUserId(),
-        sub.getCustomerRef(),
-        sub.getSiteRef(),
-        sub.getOgelType());
-
-    Optional<String> result = clientUnmarshaller.getResponse(message, CLS_RESPONSE_ELEMENT_NAME, CLS_SAR_XPATH_EXPRESSION);
-    boolean created = result.isPresent();
+    OgelAppItem item = getOgelAppItem(sub);
+    SpireRefResponse spireRefResponse = spireService.createOgelApp(item);
+    boolean created = spireRefResponse.hasRef();
     if (created) {
-      String spireRef = result.get();
+      String spireRef = spireRefResponse.getRef();
       sub.setSpireRef(spireRef);
       sub.updateStatusToSuccess();
       submissionDao.update(sub);
     } else {
-      LOGGER.warn("Unable to complete Ogel Registration for: " + sub.getSubmissionRef());
+      LOGGER.warn("Create Ogel Error [" + sub.getSubmissionRef() + "]");
+      failService.fail(sub.getSubmissionRef(), spireRefResponse.getErrorMessage(), FailService.Origin.OGEL_CREATE);
     }
     return created;
+  }
+
+  private OgelAppItem getOgelAppItem(OgelSubmission sub) {
+    OgelAppItem item = new OgelAppItem();
+    item.setUserId(sub.getUserId());
+    item.setSarRef(sub.getCustomerRef());
+    item.setSiteRef(sub.getSiteRef());
+    item.setOgelType(sub.getOgelType());
+    return item;
+  }
+
+  private void notifyFail(OgelSubmission sub, Response response, FailService.Origin origin) {
+    failService.fail(sub.getSubmissionRef(), Util.getInfo(response), origin);
   }
 }
