@@ -1,5 +1,7 @@
 package uk.gov.bis.lite.permissions.util;
 
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Optional;
@@ -12,24 +14,9 @@ public class Util {
     return StringUtils.isBlank(arg);
   }
 
-  public static boolean getRandomBoolean() {
-    return Math.random() < 0.5;
-  }
-
   public static String generateHashFromString(String message) {
-    String hash = "hash";
-    try {
-      java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
-      byte[] array = md.digest(message.getBytes());
-      StringBuffer sb = new StringBuffer();
-      for (byte anArray : array) {
-        sb.append(Integer.toHexString((anArray & 0xFF) | 0x100).substring(1, 3));
-      }
-      hash = sb.toString();
-    } catch (java.security.NoSuchAlgorithmException e) {
-      // ignore
-    }
-    return hash;
+    byte[] resultByte = DigestUtils.md5(message);
+    return new String(Hex.encodeHex(resultByte));
   }
 
   public static String getInfo(Exception e) {
@@ -57,17 +44,6 @@ public class Util {
     return " [" + name + "|" + Optional.ofNullable(arg).map(Object::toString).orElse("null") + "] ";
   }
 
-  public static boolean allNotBlank(String... args) {
-    boolean allNotBlank = true;
-    for (String arg : args) {
-      if (StringUtils.isBlank(arg)) {
-        allNotBlank = false;
-        break;
-      }
-    }
-    return allNotBlank;
-  }
-
   public static String joinDelimited(String delimited, String... args) {
     return StringUtils.join(args, delimited);
   }
@@ -82,13 +58,5 @@ public class Util {
       all = all + arg.toString();
     }
     return all;
-  }
-
-  public static String getOptString(String info, boolean add) {
-    String result = "";
-    if (add) {
-      result = info;
-    }
-    return result;
   }
 }

@@ -1,6 +1,7 @@
 package uk.gov.bis.lite.permissions.model.register;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.bis.lite.permissions.util.Util;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -25,8 +26,16 @@ public class Address {
     return Util.joinDelimited("", line1, line2, town, county, postcode, country);
   }
 
-  public boolean isFullAddress() {
-    return Util.allNotBlank(line1, line2, town, county, postcode, country);
+  /**
+   * At least one part of address must be not null to be valid
+   */
+  public boolean isValid() {
+    boolean valid = false;
+    if(!StringUtils.isBlank(line1) || !StringUtils.isBlank(line2) || !StringUtils.isBlank(town)
+        || !StringUtils.isBlank(county) || !StringUtils.isBlank(postcode) || !StringUtils.isBlank(country)) {
+      valid = true;
+    }
+    return valid;
   }
 
   public String getInfo() {

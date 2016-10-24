@@ -20,7 +20,7 @@ public class Site {
       if (customer != null) {
         Address customerAddress = customer.getRegisteredAddress();
         if (customerAddress != null) {
-          if (customerAddress.isFullAddress()) {
+          if (customerAddress.isValid()) {
             return true;
           }
         }
@@ -47,7 +47,7 @@ public class Site {
 
   private boolean isValid(String siteName, Address address) {
     if (!StringUtils.isBlank(siteName) && address != null) {
-      if (address.isFullAddress()) {
+      if (address.isValid()) {
         return true;
       }
     }

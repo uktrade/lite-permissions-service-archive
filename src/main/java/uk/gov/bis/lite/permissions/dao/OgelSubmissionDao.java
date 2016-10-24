@@ -12,7 +12,7 @@ public interface OgelSubmissionDao {
 
   List<OgelSubmission> getScheduled();
 
-  List<OgelSubmission> getScheduledByStatus(String status);
+  List<OgelSubmission> getScheduledByStatus(OgelSubmission.Status status);
 
   List<OgelSubmission> getScheduledCallbacks();
 

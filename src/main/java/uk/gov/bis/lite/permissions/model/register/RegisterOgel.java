@@ -52,9 +52,10 @@ public class RegisterOgel {
   }
 
   public String getValidityInfo() {
-    String info = Util.getOptString("Fields are mandatory: userId, ogelType. ", !mandatoryFieldsOk());
-    info = info + Util.getOptString("Must have existing Customer or new Customer fields. ", !customerFieldsOk());
-    info = info + Util.getOptString("Must have existing Site or new Site fields. ", !siteFieldsOk());
+    String info = !mandatoryFieldsOk() ? "Fields are mandatory: userId, ogelType. " : "";
+    String customerCheck = !customerFieldsOk() ? "Must have existing Customer or new Customer fields. " : "";
+    String siteCheck = !siteFieldsOk() ? "Must have existing Site or new Site fields. " : "";
+    info = info + customerCheck + siteCheck;
     if (newSite != null) {
       if (!newSite.isValid(newCustomer)) {
         info = info + "New Site must have full address";

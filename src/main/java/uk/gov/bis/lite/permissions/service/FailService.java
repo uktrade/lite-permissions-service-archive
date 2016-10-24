@@ -46,7 +46,7 @@ public class FailService {
 
   private void doFailUpdate(OgelSubmission sub, String message, Origin origin) {
     String originMessage = "[" + origin.name() + "][" + message + "]";
-    LOGGER.warn("Submission process failure [" + sub.getSubmissionRef() + "]" + originMessage);
+    LOGGER.error("Ogel Submission process failure [" + sub.getSubmissionRef() + "]" + originMessage);
 
     // Set first fail, or check to update status to ERROR
     if(!sub.hasFail()) {
