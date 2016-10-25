@@ -1,5 +1,8 @@
 package uk.gov.bis.lite.permissions.model.callback;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CallbackItem {
 
   private String requestId;

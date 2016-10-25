@@ -17,7 +17,7 @@ import org.skife.jdbi.v2.DBI;
 import ru.vyarus.dropwizard.guice.module.support.ConfigurationAwareModule;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDaoImpl;
-import uk.gov.bis.lite.permissions.spire.SpireService;
+import uk.gov.bis.lite.spireclient.SpireClientService;
 
 import javax.ws.rs.client.Client;
 
@@ -27,9 +27,10 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
 
   @Provides
   @Singleton
-  SpireService provideSpireService(Environment environment, PermissionsAppConfig config) {
-    SpireService service = new SpireService();
-    service.init(config.getSpireUserName(), config.getSpirePassword(), config.getSpireUrl(), config.getSpireEndpoints());
+  SpireClientService provideSpireService(Environment environment, PermissionsAppConfig config) {
+    SpireClientService service = new SpireClientService();
+    service.init(config.getSpireServiceUserName(), config.getSpireServicePassword(),
+        config.getSpireServiceUrl(), config.getSpireServiceActiveEndpoints());
     return service;
   }
 
@@ -83,25 +84,6 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
   @javax.inject.Named("maxMinutesRetryAfterFail")
   int provideMaxMinutesRetryAfterFail(PermissionsAppConfig config) {
     return Integer.parseInt(config.getMaxMinutesRetryAfterFail());
-  }
-
-  @Provides
-  @javax.inject.Named("spireCreateOgelAppUrl")
-  String provideSpireCreateOgelAppUrl(PermissionsAppConfig config) {
-    return config.getSpireCreateOgelAppUrl();
-  }
-
-
-  @Provides
-  @javax.inject.Named("soapUserName")
-  public String provideSpireSiteClientUserName(PermissionsAppConfig config) {
-    return config.getSoapUserName();
-  }
-
-  @Provides
-  @javax.inject.Named("soapPassword")
-  public String provideSpireSiteClientPassword(PermissionsAppConfig config) {
-    return config.getSoapPassword();
   }
 
   @Provides

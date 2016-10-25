@@ -1,6 +1,4 @@
-package uk.gov.bis.lite.permissions.spire.model;
-
-import uk.gov.bis.lite.permissions.model.register.Address;
+package uk.gov.bis.lite.spireclient.items;
 
 public class AddressItem {
 
@@ -10,15 +8,6 @@ public class AddressItem {
   private String county;
   private String postcode;
   private String country;
-
-  public void init(Address address) {
-    this.line1 = address.getLine1();
-    this.line2 = address.getLine2();
-    this.town = address.getTown();
-    this.county = address.getCounty();
-    this.postcode = address.getPostcode();
-    this.country = address.getCountry();
-  }
 
   public String getLine1() {
     return line1;

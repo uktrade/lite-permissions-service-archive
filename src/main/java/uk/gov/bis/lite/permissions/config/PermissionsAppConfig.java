@@ -11,6 +11,9 @@ import javax.validation.constraints.NotNull;
 public class PermissionsAppConfig extends Configuration {
 
   @NotEmpty
+  private String processScheduledJobCron;
+
+  @NotEmpty
   private String customerServiceUrl;
 
   @NotEmpty
@@ -23,38 +26,23 @@ public class PermissionsAppConfig extends Configuration {
   private String customerServiceUserRolePath;
 
   @NotEmpty
+  @JsonProperty
+  private String spireServiceUserName;
+
+  @NotEmpty
+  @JsonProperty
+  private String spireServicePassword;
+
+  @NotEmpty
+  @JsonProperty
+  private String spireServiceUrl;
+
+  @NotEmpty
+  @JsonProperty
+  private String spireServiceActiveEndpoints;
+
+  @NotEmpty
   private String maxMinutesRetryAfterFail;
-
-  @NotEmpty
-  @JsonProperty
-  private String spireCreateOgelAppUrl;
-
-  @NotEmpty
-  @JsonProperty
-  private String soapUserName;
-
-  @NotEmpty
-  @JsonProperty
-  private String soapPassword;
-
-  @NotEmpty
-  private String processScheduledJobCron;
-
-  @NotEmpty
-  @JsonProperty
-  private String spireUserName;
-
-  @NotEmpty
-  @JsonProperty
-  private String spirePassword;
-
-  @NotEmpty
-  @JsonProperty
-  private String spireUrl;
-
-  @NotEmpty
-  @JsonProperty
-  private String spireEndpoints;
 
   @Valid
   @NotNull
@@ -71,6 +59,9 @@ public class PermissionsAppConfig extends Configuration {
     return database;
   }
 
+  public String getProcessScheduledJobCron() {
+    return processScheduledJobCron;
+  }
 
   public String getCustomerServiceUrl() {
     return customerServiceUrl;
@@ -88,16 +79,24 @@ public class PermissionsAppConfig extends Configuration {
     return customerServiceUserRolePath;
   }
 
-  public String getSpireCreateOgelAppUrl() {
-    return spireCreateOgelAppUrl;
+  public String getSpireServiceUserName() {
+    return spireServiceUserName;
   }
 
-  public String getSoapUserName() {
-    return soapUserName;
+  public String getSpireServicePassword() {
+    return spireServicePassword;
   }
 
-  public String getSoapPassword() {
-    return soapPassword;
+  public String getSpireServiceUrl() {
+    return spireServiceUrl;
+  }
+
+  public String getSpireServiceActiveEndpoints() {
+    return spireServiceActiveEndpoints;
+  }
+
+  public String getMaxMinutesRetryAfterFail() {
+    return maxMinutesRetryAfterFail;
   }
 
   public DataSourceFactory getDatabase() {
@@ -110,29 +109,5 @@ public class PermissionsAppConfig extends Configuration {
 
   public String getAdminPassword() {
     return adminPassword;
-  }
-
-  public String getMaxMinutesRetryAfterFail() {
-    return maxMinutesRetryAfterFail;
-  }
-
-  public String getProcessScheduledJobCron() {
-    return processScheduledJobCron;
-  }
-
-  public String getSpireUserName() {
-    return spireUserName;
-  }
-
-  public String getSpirePassword() {
-    return spirePassword;
-  }
-
-  public String getSpireUrl() {
-    return spireUrl;
-  }
-
-  public String getSpireEndpoints() {
-    return spireEndpoints;
   }
 }

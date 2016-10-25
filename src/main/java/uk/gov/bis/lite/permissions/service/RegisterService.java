@@ -26,20 +26,15 @@ public class RegisterService {
 
   private OgelSubmissionDao submissionDao;
   private org.quartz.Scheduler scheduler;
-  private SubmissionService submissionService;
-  private OgelService ogelService;
-  private CallbackService callbackService;
   private JobProcessService jobProcessService;
+  private ObjectMapper mapper;
 
   @Inject
-  public RegisterService(OgelSubmissionDao submissionDao, org.quartz.Scheduler scheduler, SubmissionService submissionService,
-                         OgelService ogelService, CallbackService callbackService, JobProcessService jobProcessService) {
+  public RegisterService(OgelSubmissionDao submissionDao, org.quartz.Scheduler scheduler, JobProcessService jobProcessService) {
     this.submissionDao = submissionDao;
     this.scheduler = scheduler;
-    this.submissionService = submissionService;
-    this.ogelService = ogelService;
-    this.callbackService = callbackService;
     this.jobProcessService = jobProcessService;
+    this.mapper = new ObjectMapper();
   }
 
   /**
@@ -79,7 +74,6 @@ public class RegisterService {
   }
 
   private OgelSubmission getOgelSubmission(RegisterOgel reg) {
-    ObjectMapper mapper = new ObjectMapper();
     OgelSubmission sub = new OgelSubmission(reg.getUserId(), reg.getOgelType());
     sub.setCustomerRef(reg.getExistingCustomer());
     sub.setSiteRef(reg.getExistingSite());
@@ -87,7 +81,7 @@ public class RegisterService {
     sub.setRoleUpdate(reg.isRoleUpdateRequired());
     sub.setCalledBack(false);
     try {
-      sub.setJson(mapper.writeValueAsString(reg).replaceAll("\\s{2,}", " ").trim()); // remove excessive whitespace
+      sub.setJson(mapper.writeValueAsString(reg));
     } catch (JsonProcessingException e) {
       LOGGER.error("JsonProcessingException", e);
     }

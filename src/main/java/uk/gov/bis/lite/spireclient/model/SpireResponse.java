@@ -1,14 +1,21 @@
-package uk.gov.bis.lite.permissions.spire;
+package uk.gov.bis.lite.spireclient.model;
 
-public class SpireRefResponse {
+public class SpireResponse {
 
   private String ref;
   private String errorMessage;
 
-  public static SpireRefResponse error(String message){
-    SpireRefResponse response = new SpireRefResponse();
+  public static SpireResponse error(String message){
+    SpireResponse response = new SpireResponse();
     response.setErrorMessage(message);
     return response;
+  }
+
+  public String getInfo() {
+    String refInfo = ref == null ? "ref is null" : ref;
+    String errorMessageInfo = errorMessage == null ? "errorMessage is null" : errorMessage;
+
+    return refInfo + " - " + errorMessageInfo;
   }
 
   public boolean hasError() {

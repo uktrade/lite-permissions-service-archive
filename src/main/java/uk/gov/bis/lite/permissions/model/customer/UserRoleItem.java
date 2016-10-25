@@ -1,4 +1,4 @@
-package uk.gov.bis.lite.permissions.spire.model;
+package uk.gov.bis.lite.permissions.model.customer;
 
 public class UserRoleItem {
 

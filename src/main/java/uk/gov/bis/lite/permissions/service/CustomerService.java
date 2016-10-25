@@ -7,17 +7,16 @@ import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
-import uk.gov.bis.lite.permissions.spire.model.AddressItem;
-import uk.gov.bis.lite.permissions.spire.model.CustomerItem;
+import uk.gov.bis.lite.permissions.model.customer.AddressItem;
+import uk.gov.bis.lite.permissions.model.customer.CustomerItem;
 import uk.gov.bis.lite.permissions.model.customer.ResponseItem;
-import uk.gov.bis.lite.permissions.spire.model.SiteItem;
-import uk.gov.bis.lite.permissions.spire.model.UserRoleItem;
+import uk.gov.bis.lite.permissions.model.customer.SiteItem;
+import uk.gov.bis.lite.permissions.model.customer.UserRoleItem;
 import uk.gov.bis.lite.permissions.model.register.Address;
 import uk.gov.bis.lite.permissions.model.register.AdminApproval;
 import uk.gov.bis.lite.permissions.model.register.Customer;
 import uk.gov.bis.lite.permissions.model.register.RegisterOgel;
 import uk.gov.bis.lite.permissions.model.register.Site;
-import uk.gov.bis.lite.permissions.util.Util;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -73,10 +72,10 @@ public class CustomerService {
       if (isOk(response)) {
         return Optional.of(mapper.readValue(response.readEntity(String.class), ResponseItem.class).getResponse());
       } else {
-        notifyFail(sub, response, FailService.Origin.CUSTOMER);
+        failService.fail(sub, response, FailService.Origin.CUSTOMER);
       }
     } catch (IOException | ProcessingException e) {
-      notifyFail(sub, e, FailService.Origin.CUSTOMER);
+      failService.fail(sub, e, FailService.Origin.CUSTOMER);
     }
     return Optional.empty();
   }
@@ -93,10 +92,10 @@ public class CustomerService {
       if (isOk(response)) {
         return Optional.of(mapper.readValue(response.readEntity(String.class), ResponseItem.class).getResponse());
       } else {
-        notifyFail(sub, response, FailService.Origin.SITE);
+        failService.fail(sub, response, FailService.Origin.SITE);
       }
     } catch (IOException | ProcessingException e) {
-      notifyFail(sub, e, FailService.Origin.SITE);
+      failService.fail(sub, e, FailService.Origin.SITE);
     }
     return Optional.empty();
   }
@@ -112,10 +111,10 @@ public class CustomerService {
       if (isOk(response)) {
         return Optional.of(mapper.readValue(response.readEntity(String.class), ResponseItem.class).getResponse());
       } else {
-        notifyFail(sub, response, FailService.Origin.USER_ROLE);
+        failService.fail(sub, response, FailService.Origin.USER_ROLE);
       }
     } catch (IOException e) {
-      notifyFail(sub, e, FailService.Origin.USER_ROLE);
+      failService.fail(sub, e, FailService.Origin.USER_ROLE);
     }
     return Optional.empty();
   }
@@ -139,7 +138,12 @@ public class CustomerService {
 
   private AddressItem getAddressItem(Address address) {
     AddressItem item = new AddressItem();
-    item.init(address);
+    item.setLine1(address.getLine1());
+    item.setLine2(address.getLine2());
+    item.setTown(address.getTown());
+    item.setCounty(address.getCounty());
+    item.setPostcode(address.getPostcode());
+    item.setCountry(address.getCountry());
     return item;
   }
 
@@ -177,11 +181,4 @@ public class CustomerService {
     return response != null && (response.getStatus() == Response.Status.OK.getStatusCode());
   }
 
-  private void notifyFail(OgelSubmission sub, Response response, FailService.Origin origin) {
-    failService.fail(sub.getSubmissionRef(), Util.getInfo(response), origin);
-  }
-
-  private void notifyFail(OgelSubmission sub, Exception exception, FailService.Origin origin) {
-    failService.fail(sub.getSubmissionRef(), Util.getInfo(exception), origin);
-  }
 }

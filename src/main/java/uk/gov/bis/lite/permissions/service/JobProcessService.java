@@ -49,19 +49,43 @@ public class JobProcessService {
    * (This method is called by ProcessScheduledJob)
    */
   public void processScheduled() {
-    List<OgelSubmission> subs = submissionDao.getScheduled();
-    LOGGER.info("SCHEDULED [" + subs.size() + "]");
-    subs.stream().map(OgelSubmission::getSubmissionRef).forEach(this::doProcessOgelSubmission);
+    List<OgelSubmission> subs1 = submissionDao.getScheduled();
+    List<OgelSubmission> subs2 = submissionDao.getScheduledCallbacks();
+    LOGGER.info("SCHEDULED [" + subs2.size() + "]");
+    subs2.stream().map(OgelSubmission::getSubmissionRef).forEach(this::doProcessOgelSubmission);
   }
 
+  /**
+   * Attempts to complete all OgelSubmission stages
+   * Delegate services responsible for updating OgelSubmission status, and reporting failures
+   */
   private void doProcessOgelSubmission(String submissionRef) {
-    boolean prepareOk = submissionService.prepareSubmission(submissionRef);
-    if (prepareOk) {
-      boolean createOk = ogelService.createOgel(submissionRef);
-      if (createOk) {
-        LOGGER.info("OgelSubmission completed successfully [" + submissionRef + "]");
-        callbackService.completeCallback(submissionRef);
+
+    OgelSubmission sub = submissionDao.findBySubmissionRef(submissionRef);
+
+    // Ensure we have Customer, Site and correct Role
+    boolean preparedCustomer = submissionService.prepareCustomer(sub);
+
+    boolean preparedSite = false;
+    if(preparedCustomer) {
+      preparedSite = submissionService.prepareSite(sub);
+    }
+
+    boolean preparedRoleUpdate = false;
+    if(preparedSite) {
+      preparedRoleUpdate = submissionService.prepareRoleUpdate(sub);
+    }
+
+    // Create Ogel
+    if (preparedCustomer && preparedSite && preparedRoleUpdate) {
+      if(!sub.isOgelCreated()) {
+        ogelService.createOgel(sub);
       }
+    }
+
+    // Complete Callback
+    if(sub.hasCompleted()) {
+      callbackService.completeCallback(sub);
     }
   }
 }

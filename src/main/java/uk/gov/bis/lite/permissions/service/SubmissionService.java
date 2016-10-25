@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
-import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -31,40 +30,40 @@ public class SubmissionService {
     return submissionDao.findRecentBySubmissionRef(subRef) != null;
   }
 
-  /**
-   * Attempts to create Customer, Site and do Role Update (if needed)
-   */
-  public boolean prepareSubmission(String submissionRef) {
-    LOGGER.info("prepareSubmission [" + submissionRef + "]");
-    boolean allCreated = true;
-    OgelSubmission sub = submissionDao.findBySubmissionRef(submissionRef);
-    if (sub != null) {
-      // Create Customer if needed
-      if (sub.needsCustomer()) {
-        if (!doCreateCustomer(sub)) {
-          allCreated = false;
-        }
-      }
-      // Create Site if needed
-      if (sub.needsSite() && allCreated) {
-        if (!doCreateSite(sub)) {
-          allCreated = false;
-        }
-      }
-      // Update User Role if needed
-      if (sub.isRoleUpdate() && allCreated) {
-        if (!doUserRoleUpdate(sub)) {
-          allCreated = false;
-        }
+  boolean prepareCustomer(OgelSubmission sub) {
+    boolean prepared = true;
+    if (sub.needsCustomer()) {
+      if (!doCreateCustomer(sub)) {
+        prepared = false;
       }
     }
-    return allCreated;
+    return prepared;
+  }
+
+  boolean prepareSite(OgelSubmission sub) {
+    boolean prepared = true;
+    if (sub.needsSite()) {
+      if (!doCreateSite(sub)) {
+        prepared = false;
+      }
+    }
+    return prepared;
+  }
+
+  boolean prepareRoleUpdate(OgelSubmission sub) {
+    boolean prepared = true;
+    if (sub.isRoleUpdate() && !sub.isRoleUpdated()) {
+      if (!doUserRoleUpdate(sub)) {
+        prepared = false;
+      }
+    }
+    return prepared;
   }
 
   /**
    * If OgelSubmission has not completed processing, set MODE to 'SCHEDULED'
    */
-  public void updateModeIfNotCompleted(String submissionRef) {
+  void updateModeIfNotCompleted(String submissionRef) {
     OgelSubmission sub = submissionDao.findBySubmissionRef(submissionRef);
     if (!sub.hasCompleted()) {
       LOGGER.info("Updating MODE to SCHEDULED for: [" + submissionRef + "]");

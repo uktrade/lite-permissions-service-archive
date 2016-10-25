@@ -1,4 +1,4 @@
-package uk.gov.bis.lite.permissions.spire;
+package uk.gov.bis.lite.spireclient.spire;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,9 +17,9 @@ import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
-public class SpireServiceClient  {
+public class Client {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(SpireServiceClient.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(Client.class);
 
   private String url;
   private String username;
@@ -30,17 +30,41 @@ public class SpireServiceClient  {
   private boolean logRequest = true;
   private boolean logResponse = true;
 
-  SpireServiceClient(String url, String username, String password) {
+  public Client(String url, String username, String password) {
     this.url = url;
     this.username = username;
     this.password = password;
   }
 
-  SOAPMessage initRequest(String namespace, String childName) {
+  public SOAPMessage initRequest(String namespace, String childName) {
     return doGetRequest(namespace, childName, false);
   }
 
-  SOAPMessage executeRequest(SOAPMessage request, String target) {
+  public void addChild(SOAPMessage message, String childName, String childText) {
+    try {
+      SOAPElement parent = (SOAPElement) message.getSOAPPart().getEnvelope().getBody().getChildElements().next();
+      SOAPElement child = parent.addChildElement(childName);
+      child.addTextNode(childText);
+      message.saveChanges();
+    } catch (SOAPException e) {
+      throw new RuntimeException("An error occurred adding child element", e);
+    }
+  }
+
+  public void addChildList(SOAPMessage message, String listName, String elementName, String childName, String childText) {
+    try {
+      SOAPElement parent = (SOAPElement) message.getSOAPPart().getEnvelope().getBody().getChildElements().next();
+      SOAPElement list = parent.addChildElement(listName);
+      SOAPElement element = list.addChildElement(elementName);
+      SOAPElement child = element.addChildElement(childName);
+      child.addTextNode(childText);
+      message.saveChanges();
+    } catch (SOAPException e) {
+      throw new RuntimeException("An error occurred adding child element", e);
+    }
+  }
+
+  public SOAPMessage executeRequest(SOAPMessage request, String target) {
     if (logRequest) {
       log("request", request);
     }
@@ -51,6 +75,9 @@ public class SpireServiceClient  {
     return response;
   }
 
+  /**
+   * private methods
+   */
   private SOAPMessage doGetRequest(String namespace, String childName, boolean includeSpir) {
     try {
       SOAPMessage message = MessageFactory.newInstance().createMessage();
@@ -92,34 +119,9 @@ public class SpireServiceClient  {
     }
   }
 
-  void addChild(SOAPMessage message, String childName, String childText) {
-    try {
-      SOAPElement parent = (SOAPElement) message.getSOAPPart().getEnvelope().getBody().getChildElements().next();
-      SOAPElement child = parent.addChildElement(childName);
-      child.addTextNode(childText);
-      message.saveChanges();
-    } catch (SOAPException e) {
-      throw new RuntimeException("An error occurred adding child element", e);
-    }
-  }
-
-  void addChildList(SOAPMessage message, String listName, String elementName, String childName, String childText) {
-    try {
-      SOAPElement parent = (SOAPElement) message.getSOAPPart().getEnvelope().getBody().getChildElements().next();
-      SOAPElement list = parent.addChildElement(listName);
-      SOAPElement element = list.addChildElement(elementName);
-      SOAPElement child = element.addChildElement(childName);
-      child.addTextNode(childText);
-      message.saveChanges();
-    } catch (SOAPException e) {
-      throw new RuntimeException("An error occurred adding child element", e);
-    }
-  }
-
-  SOAPMessage getSpirRequest(String namespace, String childName) {
+  private SOAPMessage getSpirRequest(String namespace, String childName) {
     return doGetRequest(namespace, childName, true);
   }
-
 
   private void addNamespace(SOAPMessage message, String namespace) {
     try {
@@ -144,7 +146,7 @@ public class SpireServiceClient  {
     try {
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
       message.writeTo(byteArrayOutputStream);
-      LOGGER.warn(type + ": " + byteArrayOutputStream.toString());
+      LOGGER.info(type + ": " + byteArrayOutputStream.toString());
     } catch (IOException | SOAPException e) {
       LOGGER.error("error", e);
     }

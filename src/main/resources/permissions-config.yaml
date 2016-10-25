@@ -6,19 +6,19 @@ processScheduledJobCron: 0/10 * * * * ?  # every 10 seconds
 # soapPassword: dev
 # spireCreateOgelAppUrl: https://spiredevalpha.fivium.co.uk/spirefox4dev/fox/ispire/SPIRE_CREATE_OGEL_APP
 
-soapUserName: bisuat.api@test.com
-soapPassword: sp1reUAT
-spireCreateOgelAppUrl: https://www.spiretest.trade.gov.uk/spireuat/fox/ispire/SPIRE_CREATE_OGEL_APP
+# soapUserName: bisuat.api@test.com
+# soapPassword: sp1reUAT
+# spireCreateOgelAppUrl: https://www.spiretest.trade.gov.uk/spireuat/fox/ispire/SPIRE_CREATE_OGEL_APP
 
 customerServiceUrl: http://localhost:8095
 customerServiceCustomerPath: /create-customer
 customerServiceSitePath: /create-site
 customerServiceUserRolePath: /userRole
 
-spireUserName: bisuat.api@test.com
-spirePassword: sp1reUAT
-spireUrl: https://www.spiretest.trade.gov.uk/spireuat/fox/ispire/
-spireEndpoints: SPIRE_CREATE_OGEL_APP
+spireServiceUserName: bisuat.api@test.com
+spireServicePassword: sp1reUAT
+spireServiceUrl: https://www.spiretest.trade.gov.uk/spireuat/fox/ispire/
+spireServiceActiveEndpoints: CREATE_OGEL_APP, CREATE_LITE_SAR
 
 maxMinutesRetryAfterFail: 1
 

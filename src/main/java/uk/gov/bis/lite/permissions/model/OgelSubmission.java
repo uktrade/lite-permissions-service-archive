@@ -35,6 +35,12 @@ public class OgelSubmission {
 
   private static DateTimeFormatter ogelSubmissionDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
+  // Callback fail reason codes
+  private String USER_LACKS_SITE_PRIVILEGES = "USER_LACKS_SITE_PRIVILEGES";
+  private String SITE_ALREADY_REGISTERED = "SITE_ALREADY_REGISTERED";
+  private String BLACKLISTED = "BLACKLISTED";
+  private String SOAP_FAULT = "soap:Fault";
+
   /**
    * IMMEDIATE      - submission is being processed immediately, through all stages
    * SCHEDULED      - submission is to processed by scheduled jobs
@@ -49,8 +55,8 @@ public class OgelSubmission {
    * SITE       - we need to create a Site and populate siteId with resulting siteRef
    * USER_ROLE  - we need to update user role permissions
    * READY      - this OgelSubmission is now setUp and we can create the Ogel via Spire
-   * SUCCESS    - Ogel has been created on Spire, OgelSubmission updated with SpireRef, processing submission complete
-   * ERROR      - Ogel has not been created on Spire, terminal error, processing submission complete
+   * SUCCESS    - Callback has been completed, processing submission complete
+   * ERROR      - Unresolved repeating error, processing submission terminated
    */
   public enum Status {
     CREATED, CUSTOMER, SITE, USER_ROLE, READY, SUCCESS, ERROR;
@@ -67,28 +73,32 @@ public class OgelSubmission {
     this.status = Status.CREATED;
   }
 
-  public boolean isImmediate() {
+  public boolean isModeScheduled() {
+    return mode.equals(OgelSubmission.Mode.SCHEDULED);
+  }
+
+  public boolean isModeImmediate() {
     return mode.equals(OgelSubmission.Mode.IMMEDIATE);
   }
 
-  public boolean hasCompleted() {
-    return isSuccess() || isError();
-  }
-
-  public boolean isSuccess() {
+  public boolean isStatusSuccess() {
     return status.equals(Status.SUCCESS);
   }
 
-  public boolean isError() {
+  public boolean isStatusError() {
     return status.equals(Status.ERROR);
   }
 
-  public boolean isScheduled() {
-    return mode.equals(OgelSubmission.Mode.SCHEDULED);
+  public boolean hasCompleted() {
+    return isStatusSuccess() || isStatusError();
   }
 
   public boolean canCreateOgel() {
     return !needsCustomer() && !needsSite() && !needsRoleUpdate();
+  }
+
+  public boolean isOgelCreated() {
+    return status.equals(Status.SUCCESS);
   }
 
   public boolean hasFail() {
@@ -120,16 +130,36 @@ public class OgelSubmission {
     status = Status.ERROR;
   }
 
-  public String getFailedReason() {
-    String reason = " Unable to create Ogel";
-    if (needsCustomer()) {
-      reason = " Unable to create Customer for Ogel";
-    } else if (needsSite()) {
-      reason = " Unable to create Site for Ogel";
-    } else if (needsRoleUpdate()) {
-      reason = " Unable to do role update for Ogel";
+  public String getCallbackFailMessage() {
+    return getFailPoint() + findFailReason();
+  }
+
+  private String findFailReason() {
+    String reason = "";
+    if(lastFailMessage != null) {
+      if (lastFailMessage.contains(USER_LACKS_SITE_PRIVILEGES)) {
+        reason = USER_LACKS_SITE_PRIVILEGES;
+      } else if (lastFailMessage.contains(SITE_ALREADY_REGISTERED)) {
+        reason = SITE_ALREADY_REGISTERED;
+      } else if (lastFailMessage.contains(BLACKLISTED)) {
+        reason = BLACKLISTED;
+      } else if (lastFailMessage.contains(SOAP_FAULT)) {
+        reason = SOAP_FAULT;
+      }
     }
     return reason;
+  }
+
+  private String getFailPoint() {
+    String point = " Unable to create Ogel: ";
+    if (needsCustomer()) {
+      point = " Unable to create Customer: ";
+    } else if (needsSite()) {
+      point = " Unable to create Site: ";
+    } else if (needsRoleUpdate()) {
+      point = " Unable to do role update: ";
+    }
+    return point;
   }
 
   /**
