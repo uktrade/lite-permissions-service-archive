@@ -55,7 +55,7 @@ public class OgelSubmission {
    * SITE       - we need to create a Site and populate siteId with resulting siteRef
    * USER_ROLE  - we need to update user role permissions
    * READY      - this OgelSubmission is now setUp and we can create the Ogel via Spire
-   * SUCCESS    - Callback has been completed, processing submission complete
+   * SUCCESS    - Registration completed on Spire, OgelSubmission updated with Spire Ref, processing submission complete
    * ERROR      - Unresolved repeating error, processing submission terminated
    */
   public enum Status {
@@ -130,6 +130,36 @@ public class OgelSubmission {
     status = Status.ERROR;
   }
 
+  /**
+   * Sets appropriate Status value
+   * - only if current STATUS is not READY or if OgelSubmission has not completed
+   */
+  public void updateStatus() {
+    if (!status.equals(Status.READY) || !hasCompleted()) {
+      if (needsCustomer()) {
+        status = Status.CUSTOMER;
+      } else if (needsSite()) {
+        status = Status.SITE;
+      } else if (needsRoleUpdate()) {
+        status = Status.USER_ROLE;
+      } else {
+        status = Status.READY;
+      }
+    }
+  }
+
+  public boolean needsCustomer() {
+    return Util.isBlank(customerRef);
+  }
+
+  public boolean needsSite() {
+    return Util.isBlank(siteRef);
+  }
+
+  public boolean needsRoleUpdate() {
+    return roleUpdate && !roleUpdated;
+  }
+
   public String getCallbackFailMessage() {
     return getFailPoint() + findFailReason();
   }
@@ -160,36 +190,6 @@ public class OgelSubmission {
       point = " Unable to do role update: ";
     }
     return point;
-  }
-
-  /**
-   * Sets appropriate Status value
-   * - only if current STATUS is not READY or if OgelSubmission has not completed
-   */
-  public void updateStatus() {
-    if (!status.equals(Status.READY) || !hasCompleted()) {
-      if (needsCustomer()) {
-        status = Status.CUSTOMER;
-      } else if (needsSite()) {
-        status = Status.SITE;
-      } else if (needsRoleUpdate()) {
-        status = Status.USER_ROLE;
-      } else {
-        status = Status.READY;
-      }
-    }
-  }
-
-  public boolean needsCustomer() {
-    return Util.isBlank(customerRef);
-  }
-
-  public boolean needsSite() {
-    return Util.isBlank(siteRef);
-  }
-
-  public boolean needsRoleUpdate() {
-    return roleUpdate && !roleUpdated;
   }
 
   public RegisterOgel getRegisterOgelFromJson() {
