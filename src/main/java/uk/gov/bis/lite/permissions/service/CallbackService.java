@@ -21,8 +21,6 @@ public class CallbackService {
   private static String CALLBACK_STATUS_SUCCESS = "SUCCESS";
   private static String CALLBACK_STATUS_FAILED = "FAILED";
 
-
-
   private Client httpClient;
   private OgelSubmissionDao submissionDao;
   private FailService failService;
@@ -74,8 +72,6 @@ public class CallbackService {
     Response response = httpClient.target(url).request().post(Entity.json(item));
     return response;
   }
-
-
 
   private boolean isOk(Response response) {
     return response != null && (response.getStatus() == Response.Status.OK.getStatusCode());

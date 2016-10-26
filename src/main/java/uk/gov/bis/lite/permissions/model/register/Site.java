@@ -39,8 +39,8 @@ public class Site {
   }
 
   String getJoinedInstanceStateData() {
-    String strings = Util.joinAll(siteName);
-    String booleans = Util.joinAll(useCustomerAddress);
+    String strings = StringUtils.join(siteName);
+    String booleans = StringUtils.join(useCustomerAddress);
     String add = address != null ? address.getAddressData() : "";
     return strings + booleans + add;
   }

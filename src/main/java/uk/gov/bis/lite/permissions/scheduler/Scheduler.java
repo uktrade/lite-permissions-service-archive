@@ -13,10 +13,7 @@ import org.quartz.TriggerKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
-import uk.gov.bis.lite.permissions.service.CallbackService;
 import uk.gov.bis.lite.permissions.service.JobProcessService;
-import uk.gov.bis.lite.permissions.service.OgelService;
-import uk.gov.bis.lite.permissions.service.SubmissionService;
 
 public class Scheduler implements Managed {
 
@@ -24,26 +21,16 @@ public class Scheduler implements Managed {
 
   private final org.quartz.Scheduler scheduler;
   private final PermissionsAppConfig config;
-  private final SubmissionService submissionService;
-  private final OgelService ogelService;
-  private final CallbackService callbackService;
   private JobProcessService jobProcessService;
 
   public static final String JOB_PROCESS_SERVICE_NAME = "jobProcessService";
 
-  public static final String SUBMISSION_SERVICE_NAME = "submissionService";
-  public static final String OGEL_SERVICE_NAME = "ogelService";
-  public static final String CLIENT_CALLBACK_SERVICE_NAME = "callbackService";
   public static final String SUBMISSION_REF = "SUBMISSION_REF";
 
   @Inject
-  public Scheduler(org.quartz.Scheduler scheduler, PermissionsAppConfig config, SubmissionService submissionService,
-                   OgelService ogelService, CallbackService callbackService, JobProcessService jobProcessService) {
+  public Scheduler(org.quartz.Scheduler scheduler, PermissionsAppConfig config, JobProcessService jobProcessService) {
     this.scheduler = scheduler;
     this.config = config;
-    this.submissionService = submissionService;
-    this.ogelService = ogelService;
-    this.callbackService = callbackService;
     this.jobProcessService = jobProcessService;
   }
 

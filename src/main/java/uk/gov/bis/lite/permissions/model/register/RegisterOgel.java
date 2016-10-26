@@ -84,7 +84,7 @@ public class RegisterOgel {
    * Private methods
    */
   private String getJoinedInstanceStateData() {
-    String strings = Util.joinAll(userId, ogelType, existingCustomer, existingSite);
+    String strings = StringUtils.join(userId, ogelType, existingCustomer, existingSite);
     String customer = newCustomer != null ? newCustomer.getJoinedInstanceStateData() : "";
     String site = newSite != null ? newSite.getJoinedInstanceStateData() : "";
     String admin = adminApproval != null ? adminApproval.getJoinedInstanceStateData() : "";

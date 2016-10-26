@@ -38,15 +38,4 @@ public class Util {
     return StringUtils.join(args, delimited);
   }
 
-  public static String joinAll(String... args) {
-    return StringUtils.join(args);
-  }
-
-  public static String joinAll(boolean... args) {
-    String all = "";
-    for (Boolean arg : args) {
-      all = all + arg.toString();
-    }
-    return all;
-  }
 }

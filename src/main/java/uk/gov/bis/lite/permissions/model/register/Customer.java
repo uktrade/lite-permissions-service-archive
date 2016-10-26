@@ -1,6 +1,7 @@
 package uk.gov.bis.lite.permissions.model.register;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.bis.lite.permissions.util.Util;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -16,8 +17,8 @@ public class Customer {
   private Address registeredAddress;
 
   String getJoinedInstanceStateData() {
-    String strings = Util.joinAll(customerName, customerType, chNumber, eoriNumber, website);
-    String booleans = Util.joinAll(chNumberValidated, eoriNumberValidated);
+    String strings = StringUtils.join(customerName, customerType, chNumber, eoriNumber, website);
+    String booleans = StringUtils.join(chNumberValidated, eoriNumberValidated);
     String address = registeredAddress != null ? registeredAddress.getAddressData() : "";
     return strings + booleans + address;
   }
