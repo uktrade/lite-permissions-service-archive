@@ -1,5 +1,4 @@
-package uk.gov.bis.lite.spireclient.spire;
-
+package uk.gov.bis.lite.spire.exception;
 
 import io.dropwizard.jersey.errors.ErrorMessage;
 

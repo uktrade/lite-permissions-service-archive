@@ -17,7 +17,8 @@ import org.skife.jdbi.v2.DBI;
 import ru.vyarus.dropwizard.guice.module.support.ConfigurationAwareModule;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDaoImpl;
-import uk.gov.bis.lite.spireclient.SpireClientService;
+import uk.gov.bis.lite.spire.SpireClient;
+import uk.gov.bis.lite.spire.SpireUnmarshaller;
 
 import javax.ws.rs.client.Client;
 
@@ -27,11 +28,16 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
 
   @Provides
   @Singleton
-  SpireClientService provideSpireService(Environment environment, PermissionsAppConfig config) {
-    SpireClientService service = new SpireClientService();
-    service.init(config.getSpireServiceUserName(), config.getSpireServicePassword(),
-        config.getSpireServiceUrl(), config.getSpireServiceActiveEndpoints());
-    return service;
+  SpireClient provideSpireClient(Environment environment, PermissionsAppConfig config) {
+    SpireClient client = new SpireClient();
+    client.init(config.getSpireClientUserName(), config.getSpireClientPassword(), config.getSpireClientUrl());
+    return client;
+  }
+
+  @Provides
+  @Singleton
+  SpireUnmarshaller provideSpireUnmarshaller(Environment environment, PermissionsAppConfig config) {
+    return new SpireUnmarshaller();
   }
 
   @Provides
@@ -49,11 +55,6 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
     builder.setApacheHttpClientBuilder(clientBuilder);
 
     return builder.build("jerseyClient");
-  }
-
-  @Override
-  protected void configure() {
-    bind(OgelSubmissionDao.class).to(OgelSubmissionDaoImpl.class);
   }
 
   @Provides
@@ -78,6 +79,11 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
   @javax.inject.Named("customerServiceUserRolePath")
   String provideCustomerServiceUserRolePath(PermissionsAppConfig config) {
     return config.getCustomerServiceUserRolePath();
+  }
+
+  @Override
+  protected void configure() {
+    bind(OgelSubmissionDao.class).to(OgelSubmissionDaoImpl.class);
   }
 
   @Provides

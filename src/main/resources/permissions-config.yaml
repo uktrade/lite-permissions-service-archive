@@ -2,23 +2,14 @@
 # processScheduledJobCron: 0/20 * * * * ?  # every 20 seconds
 processScheduledJobCron: 0/10 * * * * ?  # every 10 seconds
 
-# soapUserName: bisdev.api@test.com
-# soapPassword: dev
-# spireCreateOgelAppUrl: https://spiredevalpha.fivium.co.uk/spirefox4dev/fox/ispire/SPIRE_CREATE_OGEL_APP
-
-# soapUserName: bisuat.api@test.com
-# soapPassword: sp1reUAT
-# spireCreateOgelAppUrl: https://www.spiretest.trade.gov.uk/spireuat/fox/ispire/SPIRE_CREATE_OGEL_APP
+spireClientUserName: bisuat.api@test.com
+spireClientPassword: sp1reUAT
+spireClientUrl: https://www.spiretest.trade.gov.uk/spireuat/fox/ispire/
 
 customerServiceUrl: http://localhost:8095
 customerServiceCustomerPath: /create-customer
 customerServiceSitePath: /create-site
 customerServiceUserRolePath: /userRole
-
-spireServiceUserName: bisuat.api@test.com
-spireServicePassword: sp1reUAT
-spireServiceUrl: https://www.spiretest.trade.gov.uk/spireuat/fox/ispire/
-spireServiceActiveEndpoints: CREATE_OGEL_APP, CREATE_LITE_SAR
 
 maxMinutesRetryAfterFail: 1
 

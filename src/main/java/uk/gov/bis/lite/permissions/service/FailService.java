@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.util.Util;
-import uk.gov.bis.lite.spireclient.model.SpireResponse;
 
 import java.time.LocalDateTime;
 
@@ -38,8 +37,8 @@ class FailService {
     this.maxMinutesRetryAfterFail = maxMinutesRetryAfterFail;
   }
 
-  void fail(OgelSubmission sub, SpireResponse response, FailService.Origin origin) {
-    fail(sub.getSubmissionRef(), getSpireResponseInfo(response), origin);
+  void fail(OgelSubmission sub, String info, FailService.Origin origin) {
+    fail(sub.getSubmissionRef(), info, origin);
   }
 
   void fail(OgelSubmission sub, Response response, FailService.Origin origin) {
@@ -47,7 +46,6 @@ class FailService {
   }
 
   void fail(OgelSubmission sub, Exception exception, FailService.Origin origin) {
-    // Throwables.getStackTraceAsString(e)
     fail(sub.getSubmissionRef(), Util.getInfo(exception), origin);
   }
 
@@ -74,14 +72,6 @@ class FailService {
 
     sub.setLastFailMessage(originMessage);
     submissionDao.update(sub);
-  }
-
-  private static String getSpireResponseInfo(SpireResponse response) {
-    String info = "SpireResponse is null";
-    if(response != null) {
-      info = "Message [" + response.getErrorMessage() + "]";
-    }
-    return info;
   }
 
   private static String getResponseInfo(Response response) {

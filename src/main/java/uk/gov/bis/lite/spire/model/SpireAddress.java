@@ -1,6 +1,7 @@
-package uk.gov.bis.lite.spireclient.items;
+package uk.gov.bis.lite.spire.model;
 
-public class AddressItem {
+
+public class SpireAddress {
 
   private String line1;
   private String line2;
@@ -56,5 +57,4 @@ public class AddressItem {
   public void setCountry(String country) {
     this.country = country;
   }
-
 }
