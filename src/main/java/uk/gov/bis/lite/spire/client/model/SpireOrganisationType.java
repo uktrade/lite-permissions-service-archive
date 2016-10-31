@@ -1,4 +1,4 @@
-package uk.gov.bis.lite.spire.model;
+package uk.gov.bis.lite.spire.client.model;
 
 public enum SpireOrganisationType {
 

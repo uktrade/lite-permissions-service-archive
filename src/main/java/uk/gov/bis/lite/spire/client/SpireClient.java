@@ -1,7 +1,12 @@
-package uk.gov.bis.lite.spire;
+package uk.gov.bis.lite.spire.client;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.bis.lite.spire.client.model.SpireRequest;
+import uk.gov.bis.lite.spire.client.model.SpireResponse;
+import uk.gov.bis.lite.spire.client.parser.ParserUtil;
+import uk.gov.bis.lite.spire.client.parser.SpireParser;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -16,73 +21,61 @@ import javax.xml.soap.SOAPConnectionFactory;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
-public class SpireClient {
+public class SpireClient<T> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpireClient.class);
 
+  private SpireParser<T> parser;
+  private String nameSpace;
+  private String requestChildName;
+  private boolean useSpirePrefix;
   private String username;
   private String password;
   private String url;
 
-  private String SPIR_PREFIX = "spir";
-  private String NAMESPACE_URI = "http://www.fivium.co.uk/fox/webservices/ispire/";
-
-  public enum Endpoint {
-    CREATE_OGEL_APP, CREATE_LITE_SAR, CREATE_SITE_FOR_SAR, EDIT_USER_ROLES, COMPANY_SITES, COMPANIES;
+  public SpireClient(SpireParser<T> parser) {
+    this.parser = parser;
   }
 
-  public void init(String username, String password, String url) {
+  public T getResult(SpireRequest request) {
+    SpireResponse spireResponse = getSpireResponse(request, nameSpace);
+
+    // Check for SoapResponse Errors - throws SpireException if found
+    ParserUtil.checkForErrors(spireResponse.getMessage());
+
+    return parser.getResult(spireResponse);
+  }
+
+  public void setConfig(String nameSpace, String requestChildName, boolean useSpirePrefix) {
+    this.nameSpace = nameSpace;
+    this.requestChildName = requestChildName;
+    this.useSpirePrefix = useSpirePrefix;
+  }
+
+  public void setSpireConfig(String username, String password, String url) {
     this.username = username;
     this.password = password;
     this.url = url;
   }
 
-  public SpireRequest createRequest(Endpoint endpoint) {
-    SpireRequest request = new SpireRequest(endpoint);
-    switch (endpoint) {
-      case CREATE_SITE_FOR_SAR:
-        request.setEndpointTarget(SpireName.CSFS_NAME_SPACE);
-        request.setSoapMessage(doGetSoapRequest(SpireName.CSFS_NAME_SPACE, SpireName.CSFS_REQUEST_CHILD, false));
-        break;
-      case CREATE_LITE_SAR:
-        request.setEndpointTarget(SpireName.CLS_NAME_SPACE);
-        request.setSoapMessage(doGetSoapRequest(SpireName.CLS_NAME_SPACE, SpireName.CLS_REQUEST_CHILD, false));
-        break;
-      case EDIT_USER_ROLES:
-        request.setEndpointTarget(SpireName.EUR_NAME_SPACE);
-        request.setSoapMessage(doGetSoapRequest(SpireName.EUR_NAME_SPACE, SpireName.EUR_REQUEST_CHILD, false));
-        break;
-      case CREATE_OGEL_APP:
-        request.setEndpointTarget(SpireName.COA_NAME_SPACE);
-        request.setSoapMessage(doGetSoapRequest(SpireName.COA_NAME_SPACE, SpireName.COA_REQUEST_CHILD, false));
-        break;
-      case COMPANY_SITES:
-        request.setEndpointTarget(SpireName.COMPANY_SITES_NAME_SPACE);
-        request.setSoapMessage(doGetSoapRequest(SpireName.COMPANY_SITES_NAME_SPACE, SpireName.COMPANY_SITES_REQUEST_CHILD, true));
-        break;
-      case COMPANIES:
-        request.setEndpointTarget(SpireName.COMPANIES_NAME_SPACE);
-        request.setSoapMessage(doGetSoapRequest(SpireName.COMPANIES_NAME_SPACE, SpireName.COMPANIES_REQUEST_CHILD, true));
-        break;
-      default:
-    }
-    return request;
+  public SpireRequest createRequest() {
+    return new SpireRequest(createRequestSoapMessage(nameSpace, requestChildName, useSpirePrefix));
   }
 
-  public SpireResponse sendRequest(SpireRequest request) {
+  private SpireResponse getSpireResponse(SpireRequest request, String urlSuffix) {
     logSoapMessage("request", request.getSoapMessage());
-    SOAPMessage response = doExecuteRequest(request);
+    SOAPMessage response = doExecuteRequest(request, urlSuffix);
     logSoapMessage("response", response);
-    return new SpireResponse(response, request.getEndpoint());
+    return new SpireResponse(response);
   }
 
-  private SOAPMessage doGetSoapRequest(String namespace, String childName, boolean withSpirPrefix) {
+  private SOAPMessage createRequestSoapMessage(String namespace, String childName, boolean withSpirPrefix) {
     try {
       SOAPMessage message = MessageFactory.newInstance().createMessage();
       addNamespace(message, namespace);
       SOAPBody soapBody = message.getSOAPPart().getEnvelope().getBody();
       if (withSpirPrefix) {
-        soapBody.addChildElement(childName, SPIR_PREFIX);
+        soapBody.addChildElement(childName, SpireName.SPIR_PREFIX);
       } else {
         soapBody.addChildElement(childName);
       }
@@ -96,7 +89,9 @@ public class SpireClient {
 
   private void addNamespace(SOAPMessage message, String namespace) {
     try {
-      message.getSOAPPart().getEnvelope().addNamespaceDeclaration(SPIR_PREFIX, NAMESPACE_URI + namespace);
+      message.getSOAPPart().getEnvelope().addNamespaceDeclaration(
+          SpireName.SPIR_PREFIX,
+          SpireName.NAMESPACE_URI + namespace);
     } catch (SOAPException e) {
       e.printStackTrace();
     }
@@ -112,11 +107,11 @@ public class SpireClient {
     }
   }
 
-  private SOAPMessage doExecuteRequest(SpireRequest request) {
+  private SOAPMessage doExecuteRequest(SpireRequest request, String urlSuffix) {
     SOAPConnection conn = null;
     try {
       conn = SOAPConnectionFactory.newInstance().createConnection();
-      return conn.call(request.getSoapMessage(), url + request.getEndpointTarget());
+      return conn.call(request.getSoapMessage(), url + urlSuffix);
     } catch (SOAPException e) {
       throw new RuntimeException("Error occurred establishing connection with SOAP client", e);
     } finally {

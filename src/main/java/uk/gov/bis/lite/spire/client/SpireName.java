@@ -1,40 +1,13 @@
-package uk.gov.bis.lite.spire;
+package uk.gov.bis.lite.spire.client;
 
 public interface SpireName {
+
+  String NAMESPACE_URI = "http://www.fivium.co.uk/fox/webservices/ispire/";
+  String SPIR_PREFIX = "spir";
 
   String VERSION_1_0 = "1.0";
   String VERSION_1_1 = "1.1";
   String SAR_XPATH_EXP = "//*[local-name()='RESPONSE']";
-
-  // CREATE_OGEL_APP (COA)
-  String COA_NAME_SPACE = "SPIRE_CREATE_OGEL_APP";
-  String COA_REQUEST_CHILD = "OGEL_DETAILS";
-  String COA_RESPONSE_ELEMENT = "SPIRE_REF";
-
-  // CREATE_LITE_SAR (CLS)
-  String CLS_NAME_SPACE = "SPIRE_CREATE_LITE_SAR";
-  String CLS_REQUEST_CHILD = "SAR_DETAILS";
-  String CLS_RESPONSE_ELEMENT = "SAR_REF";
-
-  // CREATE_SITE_FOR_SAR (CSFS)
-  String CSFS_NAME_SPACE = "SPIRE_CREATE_SITE_FOR_SAR";
-  String CSFS_REQUEST_CHILD = "SITE_DETAILS";
-  String CSFS_RESPONSE_ELEMENT = "SITE_REF";
-
-  // EDIT_USER_ROLES (EUR)
-  String EUR_NAME_SPACE = "SPIRE_EDIT_USER_ROLES";
-  String EUR_REQUEST_CHILD = "USER_DETAILS";
-  String EUR_RESPONSE_ELEMENT = "RESULT";
-
-  // SPIRE_COMPANY_SITES
-  String COMPANY_SITES_NAME_SPACE = "SPIRE_COMPANY_SITES";
-  String COMPANY_SITES_REQUEST_CHILD = "getSites";
-  String COMPANY_SITES_RESPONSE_LIST = "//COMPANY_SITE_LIST";
-
-  // SPIRE_COMPANIES
-  String COMPANIES_NAME_SPACE = "SPIRE_COMPANIES";
-  String COMPANIES_REQUEST_CHILD = "getCompanies";
-  String COMPANIES_RESPONSE_LIST = "//COMPANIES_LIST";
 
   String VERSION_NO = "VERSION_NO";
   String CUSTOMER_NAME = "CUSTOMER_NAME";

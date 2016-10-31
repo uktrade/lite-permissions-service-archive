@@ -17,8 +17,8 @@ import org.skife.jdbi.v2.DBI;
 import ru.vyarus.dropwizard.guice.module.support.ConfigurationAwareModule;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDaoImpl;
-import uk.gov.bis.lite.spire.SpireClient;
-import uk.gov.bis.lite.spire.SpireUnmarshaller;
+import uk.gov.bis.lite.spire.client.SpireClient;
+import uk.gov.bis.lite.spire.client.parser.SingleResponseParser;
 
 import javax.ws.rs.client.Client;
 
@@ -28,17 +28,14 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
 
   @Provides
   @Singleton
-  SpireClient provideSpireClient(Environment environment, PermissionsAppConfig config) {
-    SpireClient client = new SpireClient();
-    client.init(config.getSpireClientUserName(), config.getSpireClientPassword(), config.getSpireClientUrl());
+  @Named("SpireCreateOgelAppClient")
+  SpireClient provideSpireCreateOgelAppClient(Environment env, PermissionsAppConfig config) {
+    SpireClient<String> client = new SpireClient<>(new SingleResponseParser("SPIRE_REF"));
+    client.setSpireConfig(config.getSpireClientUserName(), config.getSpireClientPassword(), config.getSpireClientUrl());
+    client.setConfig("SPIRE_CREATE_OGEL_APP", "OGEL_DETAILS", false);
     return client;
   }
 
-  @Provides
-  @Singleton
-  SpireUnmarshaller provideSpireUnmarshaller(Environment environment, PermissionsAppConfig config) {
-    return new SpireUnmarshaller();
-  }
 
   @Provides
   @Singleton

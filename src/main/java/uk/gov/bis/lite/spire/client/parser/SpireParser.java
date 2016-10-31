@@ -1,5 +1,4 @@
-package uk.gov.bis.lite.spire.unmarshaller;
-
+package uk.gov.bis.lite.spire.client.parser;
 
 import com.google.common.base.Throwables;
 import org.apache.commons.lang3.StringUtils;
@@ -10,7 +9,8 @@ import org.w3c.dom.Comment;
 import org.w3c.dom.EntityReference;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import uk.gov.bis.lite.spire.exception.SpireException;
+import uk.gov.bis.lite.spire.client.exception.SpireException;
+import uk.gov.bis.lite.spire.client.model.SpireResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +26,14 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-public class SpireParser {
+public abstract class SpireParser<T> {
 
   protected static final Logger LOGGER = LoggerFactory.getLogger(SpireParser.class);
 
   private static final String ERROR = "ERROR";
   private static final String XPATH_EXP_RESPONSE = "//*[local-name()='RESPONSE']";
+
+  public abstract T getResult(SpireResponse spireResponse);
 
   protected void checkForErrors(SOAPMessage message) {
     throwResponseErrorSpireException(message);
@@ -62,7 +64,7 @@ public class SpireParser {
     return nodeList;
   }
 
-  protected String reduce(NodeList nodes, String nodeName) {
+  String reduce(NodeList nodes, String nodeName) {
     return list(nodes).stream()
         .filter(node -> node.getNodeType() == Node.ELEMENT_NODE)
         .filter(node -> node.getNodeName().equals(nodeName))

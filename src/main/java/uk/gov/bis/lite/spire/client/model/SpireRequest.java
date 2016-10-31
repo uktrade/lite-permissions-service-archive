@@ -1,5 +1,4 @@
-package uk.gov.bis.lite.spire;
-
+package uk.gov.bis.lite.spire.client.model;
 
 import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
@@ -7,17 +6,10 @@ import javax.xml.soap.SOAPMessage;
 
 public class SpireRequest {
 
-  private String endpointTarget;
-  private SpireClient.Endpoint endpoint;
-
   private SOAPMessage message;
   private SOAPElement parent;
 
-  public SpireRequest(SpireClient.Endpoint endpoint) {
-    this.endpoint = endpoint;
-  }
-
-  public void setSoapMessage(SOAPMessage message) {
+  public SpireRequest(SOAPMessage message) {
     this.message = message;
     try {
       this.parent = (SOAPElement) message.getSOAPPart().getEnvelope().getBody().getChildElements().next();
@@ -25,6 +17,16 @@ public class SpireRequest {
       e.printStackTrace();
     }
   }
+
+  /*
+  public void setSoapMessage(SOAPMessage message) {
+    this.message = message;
+    try {
+      this.parent = (SOAPElement) message.getSOAPPart().getEnvelope().getBody().getChildElements().next();
+    } catch (SOAPException e) {
+      e.printStackTrace();
+    }
+  }*/
 
   public void addChild(String childName, String childText) {
     try {
@@ -48,23 +50,8 @@ public class SpireRequest {
     }
   }
 
-  public SpireClient.Endpoint getEndpoint() {
-    return endpoint;
-  }
-
-  public void setEndpoint(SpireClient.Endpoint endpoint) {
-    this.endpoint = endpoint;
-  }
-
   public SOAPMessage getSoapMessage() {
     return message;
   }
 
-  public String getEndpointTarget() {
-    return endpointTarget;
-  }
-
-  public void setEndpointTarget(String endpointTarget) {
-    this.endpointTarget = endpointTarget;
-  }
 }
