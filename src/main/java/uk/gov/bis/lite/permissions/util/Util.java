@@ -20,7 +20,7 @@ public class Util {
   public static String getInfo(Exception e) {
     String info = e.getClass().getCanonicalName();
     String message = e.getMessage();
-    if(message != null) {
+    if (message != null) {
       info = info + " [" + message + "]";
     }
     return info;

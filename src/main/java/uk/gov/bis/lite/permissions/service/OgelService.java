@@ -30,9 +30,9 @@ public class OgelService {
 
   boolean createOgel(OgelSubmission sub) {
     boolean created = false;
-    if(!StringUtils.isBlank(sub.getSpireRef())) {
+    if (!StringUtils.isBlank(sub.getSpireRef())) {
       created = true; // we check whether we already have created this Ogel
-    } else if(sub.canCreateOgel()) {
+    } else if (sub.canCreateOgel()) {
       created = doCreateOgel(sub);
     } else {
       LOGGER.warn("Cannot create Ogel - OgelSubmission state is not complete");

@@ -18,7 +18,6 @@ import ru.vyarus.dropwizard.guice.module.support.ConfigurationAwareModule;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDaoImpl;
 import uk.gov.bis.lite.permissions.spire.SpireReferenceClient;
-import uk.gov.bis.lite.spire.client.SpireClient;
 import uk.gov.bis.lite.spire.client.parser.ReferenceParser;
 
 import javax.ws.rs.client.Client;

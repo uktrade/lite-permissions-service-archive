@@ -51,7 +51,7 @@ class FailService {
 
   void fail(String submissionRef, String message, Origin origin) {
     OgelSubmission sub = submissionDao.findBySubmissionRef(submissionRef);
-    if(!sub.hasCompleted()) {
+    if (!sub.hasCompleted()) {
       doFailUpdate(sub, message, origin);
     }
   }
@@ -61,10 +61,10 @@ class FailService {
     LOGGER.error("Ogel Submission process failure [" + sub.getSubmissionRef() + "]" + originMessage);
 
     // Set first fail, or check to update status to ERROR
-    if(!sub.hasFail()) {
+    if (!sub.hasFail()) {
       sub.setFirstFailDateTime();
     } else {
-      if(sub.getFirstFailDateTime().isBefore(LocalDateTime.now().minus(maxMinutesRetryAfterFail, MINUTES))) {
+      if (sub.getFirstFailDateTime().isBefore(LocalDateTime.now().minus(maxMinutesRetryAfterFail, MINUTES))) {
         LOGGER.info("Terminal failure setting status to ERROR [" + sub.getSubmissionRef() + "]");
         sub.updateStatusToError();
       }
@@ -76,7 +76,7 @@ class FailService {
 
   private static String getResponseInfo(Response response) {
     String info = "Response is null";
-    if(response != null) {
+    if (response != null) {
       info = "Status [" + response.getStatus() + " |" + response.readEntity(String.class) + "]";
     }
     return info;

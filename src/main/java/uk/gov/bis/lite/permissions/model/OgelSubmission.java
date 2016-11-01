@@ -107,10 +107,10 @@ public class OgelSubmission {
 
   public LocalDateTime getFirstFailDateTime() {
     LocalDateTime date = null;
-    if(!StringUtils.isBlank(firstFail)) {
+    if (!StringUtils.isBlank(firstFail)) {
       date = LocalDateTime.parse(firstFail, ogelSubmissionDateFormatter);
     }
-    return  date;
+    return date;
   }
 
   public void setFirstFailDateTime() {
@@ -166,7 +166,7 @@ public class OgelSubmission {
 
   private String findFailReason() {
     String reason = "";
-    if(lastFailMessage != null) {
+    if (lastFailMessage != null) {
       if (lastFailMessage.contains(USER_LACKS_SITE_PRIVILEGES)) {
         reason = USER_LACKS_SITE_PRIVILEGES;
       } else if (lastFailMessage.contains(SITE_ALREADY_REGISTERED)) {

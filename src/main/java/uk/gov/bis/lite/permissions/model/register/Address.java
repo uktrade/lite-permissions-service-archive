@@ -31,7 +31,7 @@ public class Address {
    */
   public boolean isValid() {
     boolean valid = false;
-    if(!StringUtils.isBlank(line1) || !StringUtils.isBlank(line2) || !StringUtils.isBlank(town)
+    if (!StringUtils.isBlank(line1) || !StringUtils.isBlank(line2) || !StringUtils.isBlank(town)
         || !StringUtils.isBlank(county) || !StringUtils.isBlank(postcode) || !StringUtils.isBlank(country)) {
       valid = true;
     }

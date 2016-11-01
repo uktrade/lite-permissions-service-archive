@@ -67,24 +67,24 @@ public class JobProcessService {
     boolean preparedCustomer = submissionService.prepareCustomer(sub);
 
     boolean preparedSite = false;
-    if(preparedCustomer) {
+    if (preparedCustomer) {
       preparedSite = submissionService.prepareSite(sub);
     }
 
     boolean preparedRoleUpdate = false;
-    if(preparedSite) {
+    if (preparedSite) {
       preparedRoleUpdate = submissionService.prepareRoleUpdate(sub);
     }
 
     // Create Ogel
     if (preparedCustomer && preparedSite && preparedRoleUpdate) {
-      if(!sub.isOgelCreated()) {
+      if (!sub.isOgelCreated()) {
         ogelService.createOgel(sub);
       }
     }
 
     // Complete Callback
-    if(sub.hasCompleted()) {
+    if (sub.hasCompleted()) {
       callbackService.completeCallback(sub);
     }
   }
