@@ -1,4 +1,4 @@
-package uk.gov.bis.lite.spire.client.model;
+package uk.gov.bis.lite.spire.client;
 
 import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
@@ -17,16 +17,6 @@ public class SpireRequest {
       e.printStackTrace();
     }
   }
-
-  /*
-  public void setSoapMessage(SOAPMessage message) {
-    this.message = message;
-    try {
-      this.parent = (SOAPElement) message.getSOAPPart().getEnvelope().getBody().getChildElements().next();
-    } catch (SOAPException e) {
-      e.printStackTrace();
-    }
-  }*/
 
   public void addChild(String childName, String childText) {
     try {

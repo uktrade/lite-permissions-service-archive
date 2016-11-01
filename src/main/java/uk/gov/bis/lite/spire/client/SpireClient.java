@@ -3,9 +3,6 @@ package uk.gov.bis.lite.spire.client;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.bis.lite.spire.client.model.SpireRequest;
-import uk.gov.bis.lite.spire.client.model.SpireResponse;
-import uk.gov.bis.lite.spire.client.parser.ParserUtil;
 import uk.gov.bis.lite.spire.client.parser.SpireParser;
 
 import java.io.ByteArrayOutputStream;
@@ -41,9 +38,9 @@ public class SpireClient<T> {
     SpireResponse spireResponse = getSpireResponse(request, nameSpace);
 
     // Check for SoapResponse Errors - throws SpireException if found
-    ParserUtil.checkForErrors(spireResponse.getMessage());
+    spireResponse.checkForErrors();
 
-    return parser.getResult(spireResponse);
+    return parser.parseResponse(spireResponse);
   }
 
   public void setConfig(String nameSpace, String requestChildName, boolean useSpirePrefix) {

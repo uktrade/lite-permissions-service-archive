@@ -2,31 +2,28 @@ package uk.gov.bis.lite.permissions.service;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
-import uk.gov.bis.lite.spire.client.SpireClient;
+import uk.gov.bis.lite.permissions.spire.SpireReferenceClient;
 import uk.gov.bis.lite.spire.client.SpireName;
+import uk.gov.bis.lite.spire.client.SpireRequest;
 import uk.gov.bis.lite.spire.client.exception.SpireException;
-import uk.gov.bis.lite.spire.client.model.SpireRequest;
 
 @Singleton
 public class OgelService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(OgelService.class);
 
-  private SpireClient createOgelAppClient;
-
+  private SpireReferenceClient createOgelAppReferenceClient;
   private FailService failService;
   private OgelSubmissionDao submissionDao;
 
   @Inject
-  public OgelService(@Named("SpireCreateOgelAppClient") SpireClient createOgelAppClient,
-                     FailService failService, OgelSubmissionDao submissionDao) {
-    this.createOgelAppClient = createOgelAppClient;
+  public OgelService(SpireReferenceClient createOgelAppReferenceClient, FailService failService, OgelSubmissionDao submissionDao) {
+    this.createOgelAppReferenceClient = createOgelAppReferenceClient;
     this.failService = failService;
     this.submissionDao = submissionDao;
   }
@@ -44,9 +41,7 @@ public class OgelService {
   }
 
   private boolean doCreateOgel(OgelSubmission sub) {
-
-    // Setup SpireRequest
-    SpireRequest request = createOgelAppClient.createRequest();
+    SpireRequest request = createOgelAppReferenceClient.createRequest();
     request.addChild(SpireName.VERSION_NO, SpireName.VERSION_1_0);
     request.addChild(SpireName.WUA_ID, sub.getUserId());
     request.addChild(SpireName.SAR_REF, sub.getCustomerRef());
@@ -56,7 +51,7 @@ public class OgelService {
     // Execute Spire Request
     boolean created = false;
     try {
-      String reference = (String) createOgelAppClient.getResult(request);
+      String reference = createOgelAppReferenceClient.getResult(request);
 
       if (!StringUtils.isBlank(reference)) {
         created = true;
