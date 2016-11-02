@@ -1,13 +1,10 @@
 package uk.gov.bis.lite.permissions;
 
-import ch.qos.logback.classic.AsyncAppender;
-import ch.qos.logback.classic.Logger;
 import io.dropwizard.Application;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.flywaydb.core.Flyway;
-import org.slf4j.LoggerFactory;
 import ru.vyarus.dropwizard.guice.GuiceBundle;
 import ru.vyarus.dropwizard.guice.module.installer.feature.ManagedInstaller;
 import ru.vyarus.dropwizard.guice.module.installer.feature.jersey.ResourceInstaller;
