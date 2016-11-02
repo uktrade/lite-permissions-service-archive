@@ -33,11 +33,6 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
   @Override
   public void run(PermissionsAppConfig config, Environment environment) throws Exception {
 
-    // Logback update
-    Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-    AsyncAppender appender = (AsyncAppender) root.getAppender("async-console-appender");
-    appender.setIncludeCallerData(true);
-
     // Perform/validate flyway migration on startup
     DataSourceFactory dataSourceFactory = config.getDataSourceFactory();
     Flyway flyway = new Flyway();
