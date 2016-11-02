@@ -18,6 +18,8 @@ import ru.vyarus.dropwizard.guice.module.support.ConfigurationAwareModule;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDaoImpl;
 import uk.gov.bis.lite.permissions.spire.SpireReferenceClient;
+import uk.gov.bis.lite.spire.client.SpireClientConfig;
+import uk.gov.bis.lite.spire.client.SpireRequestConfig;
 import uk.gov.bis.lite.spire.client.parser.ReferenceParser;
 
 import javax.ws.rs.client.Client;
@@ -29,10 +31,10 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
   @Provides
   @Singleton
   SpireReferenceClient provideSpireCreateOgelAppClient(Environment env, PermissionsAppConfig config) {
-    SpireReferenceClient client = new SpireReferenceClient(new ReferenceParser("SPIRE_REF"));
-    client.setSpireConfig(config.getSpireClientUserName(), config.getSpireClientPassword(), config.getSpireClientUrl());
-    client.setConfig("SPIRE_CREATE_OGEL_APP", "OGEL_DETAILS", false);
-    return client;
+    return new SpireReferenceClient(
+        new ReferenceParser("SPIRE_REF"),
+        new SpireClientConfig(config.getSpireClientUserName(), config.getSpireClientPassword(), config.getSpireClientUrl()),
+        new SpireRequestConfig("SPIRE_CREATE_OGEL_APP", "OGEL_DETAILS", false));
   }
 
   @Provides

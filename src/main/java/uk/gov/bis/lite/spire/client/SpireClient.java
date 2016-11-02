@@ -22,37 +22,35 @@ public class SpireClient<T> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpireClient.class);
 
-  private SpireParser<T> parser;
-  private String nameSpace;
-  private String requestChildName;
-  private boolean useSpirePrefix;
-  private String username;
-  private String password;
-  private String url;
+  private final String NAMESPACE_URI = "http://www.fivium.co.uk/fox/webservices/ispire/";
+  private final String SPIR_PREFIX = "spir";
 
-  public SpireClient(SpireParser<T> parser) {
+  private final SpireParser<T> parser;
+
+  private final String nameSpace;
+  private final String requestChildName;
+  private final boolean useSpirePrefix;
+  private final String username;
+  private final String password;
+  private final String url;
+
+  public SpireClient(SpireParser<T> parser, SpireClientConfig clientConfig, SpireRequestConfig requestConfig) {
     this.parser = parser;
+    this.username = clientConfig.getUsername();
+    this.password = clientConfig.getPassword();
+    this.url = clientConfig.getUrl();
+    this.nameSpace = requestConfig.getNameSpace();
+    this.requestChildName = requestConfig.getRequestChildName();
+    this.useSpirePrefix = requestConfig.isUseSpirePrefix();
   }
 
-  public T getResult(SpireRequest request) {
+  public T sendRequest(SpireRequest request) {
     SpireResponse spireResponse = getSpireResponse(request, nameSpace);
 
-    // Check for SoapResponse Errors - throws SpireException if found
+    // Check for SoapResponse Errors - throws SpireClientException if found
     spireResponse.checkForErrors();
 
     return parser.parseResponse(spireResponse);
-  }
-
-  public void setConfig(String nameSpace, String requestChildName, boolean useSpirePrefix) {
-    this.nameSpace = nameSpace;
-    this.requestChildName = requestChildName;
-    this.useSpirePrefix = useSpirePrefix;
-  }
-
-  public void setSpireConfig(String username, String password, String url) {
-    this.username = username;
-    this.password = password;
-    this.url = url;
   }
 
   public SpireRequest createRequest() {
@@ -69,39 +67,26 @@ public class SpireClient<T> {
   private SOAPMessage createRequestSoapMessage(String namespace, String childName, boolean withSpirPrefix) {
     try {
       SOAPMessage message = MessageFactory.newInstance().createMessage();
-      addNamespace(message, namespace);
+      message.getSOAPPart().getEnvelope().addNamespaceDeclaration(SPIR_PREFIX, NAMESPACE_URI + namespace);
+
       SOAPBody soapBody = message.getSOAPPart().getEnvelope().getBody();
       if (withSpirPrefix) {
-        soapBody.addChildElement(childName, SpireName.SPIR_PREFIX);
+        soapBody.addChildElement(childName, SPIR_PREFIX);
       } else {
         soapBody.addChildElement(childName);
       }
       addAuthorizationHeader(message);
       message.saveChanges();
       return message;
-    } catch (SOAPException e) {
+    } catch (SOAPException | UnsupportedEncodingException e) {
       throw new RuntimeException("Error occurred creating the SOAP request for retrieving Customer Information from Spire", e);
     }
   }
 
-  private void addNamespace(SOAPMessage message, String namespace) {
-    try {
-      message.getSOAPPart().getEnvelope().addNamespaceDeclaration(
-          SpireName.SPIR_PREFIX,
-          SpireName.NAMESPACE_URI + namespace);
-    } catch (SOAPException e) {
-      e.printStackTrace();
-    }
-  }
-
-  private void addAuthorizationHeader(SOAPMessage message) {
+  private void addAuthorizationHeader(SOAPMessage message) throws UnsupportedEncodingException {
     MimeHeaders headers = message.getMimeHeaders();
-    try {
-      String authorization = Base64.getEncoder().encodeToString((username + ":" + password).getBytes("utf-8"));
-      headers.addHeader("Authorization", "Basic " + authorization);
-    } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
-    }
+    String authorization = Base64.getEncoder().encodeToString((username + ":" + password).getBytes("utf-8"));
+    headers.addHeader("Authorization", "Basic " + authorization);
   }
 
   private SOAPMessage doExecuteRequest(SpireRequest request, String urlSuffix) {

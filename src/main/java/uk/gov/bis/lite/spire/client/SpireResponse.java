@@ -9,7 +9,7 @@ import org.w3c.dom.Comment;
 import org.w3c.dom.EntityReference;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import uk.gov.bis.lite.spire.client.exception.SpireException;
+import uk.gov.bis.lite.spire.client.exception.SpireClientException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,13 +38,14 @@ public class SpireResponse {
 
   private static final String ERROR = "ERROR";
   private static final String XPATH_EXP_RESPONSE = "//*[local-name()='RESPONSE']";
+
   private static XPath xpath = XPathFactory.newInstance().newXPath();
 
-  public SpireResponse(SOAPMessage message) {
+  SpireResponse(SOAPMessage message) {
     this.message = message;
   }
 
-  public void checkForErrors() {
+  void checkForErrors() {
     throwResponseErrorSpireException(message);
     throwSoapFaultSpireException(message);
   }
@@ -61,7 +62,7 @@ public class SpireResponse {
   private List<Node> getResponseElementNodes() {
     List<Node> nodes = null;
     try {
-      NodeList nodeList = (NodeList) xpath.evaluate(SpireName.SAR_XPATH_EXP, message.getSOAPBody(), XPathConstants.NODESET);
+      NodeList nodeList = (NodeList) xpath.evaluate(XPATH_EXP_RESPONSE, message.getSOAPBody(), XPathConstants.NODESET);
       if (nodeList != null && nodeList.item(0) != null) {
         nodes = list(nodeList.item(0).getChildNodes());
       }
@@ -78,6 +79,17 @@ public class SpireResponse {
       list(nodeList).stream().filter(Node::hasChildNodes).forEach(node -> {
         nodes.addAll(list(node.getChildNodes()));
       });
+    } catch (SOAPException | XPathExpressionException e) {
+      throw new RuntimeException("An error occurred while extracting the SOAP Response Body", e);
+    }
+    return nodes;
+  }
+
+  private List<Node> getBodyNodes(String xpathExpression) {
+    List<Node> nodes;
+    try {
+      NodeList nodeList = (NodeList) xpath.evaluate(xpathExpression, message.getSOAPBody(), XPathConstants.NODESET);
+      nodes = list(nodeList);
     } catch (SOAPException | XPathExpressionException e) {
       throw new RuntimeException("An error occurred while extracting the SOAP Response Body", e);
     }
@@ -146,16 +158,6 @@ public class SpireResponse {
     return reply.toString();
   }
 
-  private List<Node> getBodyNodes(String xpathExpression) {
-    List<Node> nodes;
-    try {
-      NodeList nodeList = (NodeList) xpath.evaluate(xpathExpression, message.getSOAPBody(), XPathConstants.NODESET);
-      nodes = list(nodeList);
-    } catch (SOAPException | XPathExpressionException e) {
-      throw new RuntimeException("An error occurred while extracting the SOAP Response Body", e);
-    }
-    return nodes;
-  }
 
   private static void throwSoapFaultSpireException(SOAPMessage message) {
     String faultString = "";
@@ -168,7 +170,7 @@ public class SpireResponse {
       e.printStackTrace();
     }
     if (!StringUtils.isBlank(faultString)) {
-      throw new SpireException("soap:Fault: [" + faultString + "]");
+      throw new SpireClientException("soap:Fault: [" + faultString + "]");
     }
   }
 
@@ -183,7 +185,7 @@ public class SpireResponse {
           NodeList nodes = first.getChildNodes();
           Node errorNode = (Node) XPathFactory.newInstance().newXPath().evaluate(ERROR, nodes, XPathConstants.NODE);
           if (errorNode != null) {
-            throw new SpireException("ERROR: [" + errorNode.getTextContent() + "]");
+            throw new SpireClientException("ERROR: [" + errorNode.getTextContent() + "]");
           }
         }
       }
