@@ -105,7 +105,12 @@ public class CustomerService {
    * Returns 'COMPLETE' if successful, notifies FailService if there is an error
    */
   Optional<String> updateUserRole(OgelSubmission sub) {
-    WebTarget target = httpClient.target(customerServiceUrl).path(userRolePath);
+
+    // Set path params
+    String path = userRolePath.replace("{userId}", sub.getUserId());
+    path = path.replace("{siteRef}", sub.getSiteRef());
+
+    WebTarget target = httpClient.target(customerServiceUrl).path(path);
     try {
       Response response = target.request().post(Entity.json(getUserRoleItem(sub)));
       if (isOk(response)) {
@@ -171,9 +176,7 @@ public class CustomerService {
     AdminApproval admin = reg.getAdminApproval();
     UserRoleItem item = new UserRoleItem();
     item.setRoleType(ROLE_TYPE_ADMIN); // hardcoded for now
-    item.setUserId(sub.getUserId());
     item.setAdminUserId(admin.getAdminUserId());
-    item.setSiteRef(sub.getSiteRef());
     return item;
   }
 

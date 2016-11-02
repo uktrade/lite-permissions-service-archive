@@ -2,18 +2,8 @@ package uk.gov.bis.lite.permissions.model.customer;
 
 public class UserRoleItem {
 
-  private String userId;
   private String adminUserId;
-  private String siteRef;
   private String roleType;
-
-  public String getUserId() {
-    return userId;
-  }
-
-  public void setUserId(String userId) {
-    this.userId = userId;
-  }
 
   public String getAdminUserId() {
     return adminUserId;
@@ -21,14 +11,6 @@ public class UserRoleItem {
 
   public void setAdminUserId(String adminUserId) {
     this.adminUserId = adminUserId;
-  }
-
-  public String getSiteRef() {
-    return siteRef;
-  }
-
-  public void setSiteRef(String siteRef) {
-    this.siteRef = siteRef;
   }
 
   public String getRoleType() {

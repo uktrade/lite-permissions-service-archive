@@ -9,7 +9,7 @@ spireClientUrl: https://www.spiretest.trade.gov.uk/spireuat/fox/ispire/
 customerServiceUrl: http://localhost:8095
 customerServiceCustomerPath: /create-customer
 customerServiceSitePath: /create-site
-customerServiceUserRolePath: /userRole
+customerServiceUserRolePath: /user-roles/user/{userId}/site/{siteRef}
 
 maxMinutesRetryAfterFail: 1
 
