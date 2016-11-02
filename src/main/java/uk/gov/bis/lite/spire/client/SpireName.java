@@ -22,6 +22,12 @@ public interface SpireName {
   String SITE_REF = "SITE_REF";
   String DIVISION = "DIVISION";
 
+  String FORENAME = "FORENAME";
+  String SURNAME = "SURNAME";
+  String FULL_NAME = "FULL_NAME";
+  String EMAIL_ADDRESS = "EMAIL_ADDRESS";
+  String ROLE_NAME = "ROLE_NAME";
+
   String COMPANY_NAME = "COMPANY_NAME";
   String APPLICANT_TYPE = "APPLICANT_TYPE";
   String OCCUPANCY_STATUS = "OCCUPANCY_STATUS";
