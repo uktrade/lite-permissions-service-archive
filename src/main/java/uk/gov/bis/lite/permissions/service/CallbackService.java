@@ -67,8 +67,8 @@ public class CallbackService {
   }
 
   private Response doCallback(String url, CallbackItem item) {
-    // TODO remove
-    url = "http://localhost:8123/callback"; // temp for development
+    // TODO remove once development is finished
+    // url = "http://localhost:8123/callback"; // temp for development
     Response response = httpClient.target(url).request().post(Entity.json(item));
     return response;
   }
