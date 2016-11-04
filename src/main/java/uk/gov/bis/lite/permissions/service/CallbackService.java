@@ -33,7 +33,7 @@ public class CallbackService {
   }
 
   void completeCallback(OgelSubmission sub) {
-    if (sub != null && sub.hasCompleted()) {
+    if (sub != null && sub.hasCompleted() && !sub.isCalledBack()) {
       try {
         Response response = doCallback(sub.getCallbackUrl(), getCallbackItem(sub));
         if (isOk(response)) {

@@ -72,12 +72,17 @@ class FailService {
     OgelSubmission sub = submissionDao.findBySubmissionRef(submissionRef);
     if (!sub.hasCompleted()) {
       doFailUpdate(sub, message, origin);
+    } else {
+      // When fail received for 'completed' submission, but before successful callback we log detail of fail
+      if(!sub.isCalledBack()) {
+        LOGGER.error(getSubmissionOriginMessage(submissionRef, message, origin.name()));
+      }
     }
   }
 
   private void doFailUpdate(OgelSubmission sub, String message, Origin origin) {
-    String originMessage = "[" + origin.name() + "][" + message + "]";
-    LOGGER.error("Ogel Submission process failure [" + sub.getSubmissionRef() + "]" + originMessage);
+    String failMessage = getSubmissionOriginMessage(sub.getSubmissionRef(), message, origin.name());
+    LOGGER.error(failMessage);
 
     // Set first fail, or check to update status to ERROR
     if (!sub.hasFail()) {
@@ -97,11 +102,11 @@ class FailService {
       sub.updateStatusToError();
     }
 
-    sub.setLastFailMessage(originMessage);
+    sub.setLastFailMessage(failMessage);
     submissionDao.update(sub);
   }
 
-  public static String getMatchedErrorFromMessage(String message) {
+  static String getMatchedErrorFromMessage(String message) {
     String matched = endProcessingMessages.stream().filter(message::contains).findFirst().orElse("UNKNOWN: " + message);
     if(matched.equals(LICENSE_ALREADY_EXISTS_VALUE)) {
       matched = LICENSE_ALREADY_EXISTS;
@@ -127,5 +132,8 @@ class FailService {
     return "RESPONSE FAIL: " + "Status[" + status + "] Body[" + body + "]";
   }
 
+  private String getSubmissionOriginMessage(String submissionRef, String message, String origin) {
+    return "Ogel Submission FAIL [" + submissionRef + "]" + "[" + origin + "][" + message + "]";
+  }
 
 }

@@ -83,7 +83,7 @@ public class JobProcessService {
     }
 
     // Complete Callback
-    if (sub.hasCompleted()) {
+    if (sub.hasCompleted() && !sub.isCalledBack()) {
       callbackService.completeCallback(sub);
     }
   }

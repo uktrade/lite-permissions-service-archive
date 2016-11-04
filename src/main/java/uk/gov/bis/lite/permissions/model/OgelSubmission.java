@@ -35,12 +35,6 @@ public class OgelSubmission {
 
   private static DateTimeFormatter ogelSubmissionDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-  // Callback fail reason codes
-  //private String USER_LACKS_SITE_PRIVILEGES = "USER_LACKS_SITE_PRIVILEGES";
- // private String SITE_ALREADY_REGISTERED = "SITE_ALREADY_REGISTERED";
- // private String BLACKLISTED = "BLACKLISTED";
- // private String SOAP_FAULT = "soap:Fault";
-
   /**
    * IMMEDIATE      - submission is being processed immediately, through all stages
    * SCHEDULED      - submission is to processed by scheduled jobs
@@ -135,7 +129,7 @@ public class OgelSubmission {
    * - only if current STATUS is not READY or if OgelSubmission has not completed
    */
   public void updateStatus() {
-    if (!status.equals(Status.READY) || !hasCompleted()) {
+    if (!status.equals(Status.READY) && !hasCompleted()) {
       if (needsCustomer()) {
         status = Status.CUSTOMER;
       } else if (needsSite()) {
@@ -158,39 +152,6 @@ public class OgelSubmission {
 
   public boolean needsRoleUpdate() {
     return roleUpdate && !roleUpdated;
-  }
-/*
- // public String getCallbackFailMessage() {
-    return getFailPoint() + findFailReason();
-  }
-
-
-  private String findFailReason() {
-    String reason = "";
-    if (lastFailMessage != null) {
-      if (lastFailMessage.contains(USER_LACKS_SITE_PRIVILEGES)) {
-        reason = USER_LACKS_SITE_PRIVILEGES;
-      } else if (lastFailMessage.contains(SITE_ALREADY_REGISTERED)) {
-        reason = SITE_ALREADY_REGISTERED;
-      } else if (lastFailMessage.contains(BLACKLISTED)) {
-        reason = BLACKLISTED;
-      } else if (lastFailMessage.contains(SOAP_FAULT)) {
-        reason = SOAP_FAULT;
-      }
-    }
-    return reason;
-  }*/
-
-  private String getFailPoint() {
-    String point = " Unable to create Ogel: ";
-    if (needsCustomer()) {
-      point = " Unable to create Customer: ";
-    } else if (needsSite()) {
-      point = " Unable to create Site: ";
-    } else if (needsRoleUpdate()) {
-      point = " Unable to do role update: ";
-    }
-    return point;
   }
 
   public RegisterOgel getRegisterOgelFromJson() {
