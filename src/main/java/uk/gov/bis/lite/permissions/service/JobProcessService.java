@@ -49,10 +49,9 @@ public class JobProcessService {
    * (This method is called by ProcessScheduledJob)
    */
   public void processScheduled() {
-    List<OgelSubmission> subs1 = submissionDao.getScheduled();
-    List<OgelSubmission> subs2 = submissionDao.getScheduledCallbacks();
-    LOGGER.info("SCHEDULED [" + subs2.size() + "]");
-    subs2.stream().map(OgelSubmission::getSubmissionRef).forEach(this::doProcessOgelSubmission);
+    List<OgelSubmission> subs = submissionDao.getScheduledCallbacks();
+    LOGGER.info("SCHEDULED [" + subs.size() + "]");
+    subs.stream().map(OgelSubmission::getSubmissionRef).forEach(this::doProcessOgelSubmission);
   }
 
   /**

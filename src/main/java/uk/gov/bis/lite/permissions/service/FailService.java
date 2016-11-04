@@ -12,6 +12,9 @@ import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.util.Util;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.ws.rs.core.Response;
 
@@ -22,6 +25,22 @@ class FailService {
 
   private OgelSubmissionDao submissionDao;
   private int maxMinutesRetryAfterFail;
+
+  private static String USER_LACKS_SITE_PRIVILEGES = "USER_LACKS_SITE_PRIVILEGES";
+  private static String USER_LACKS_PRIVILEGES = "USER_LACKS_PRIVILEGES";
+  private static String LICENSE_ALREADY_EXISTS_VALUE = "There is already a licence for OGEL ref";
+  private static String LICENSE_ALREADY_EXISTS = "LICENSE_ALREADY_EXISTS";
+  private static String SITE_ALREADY_REGISTERED = "SITE_ALREADY_REGISTERED";
+  private static String BLACKLISTED = "BLACKLISTED";
+  private static String SOAP_FAULT_VALUE = "soap:Fault";
+  private static String SOAP_FAULT = "SOAP_FAULT";
+  private static String CUSTOMER_NAME_ALREADY_EXISTS_VALUE = "Customer name already exists";
+  private static String CUSTOMER_NAME_ALREADY_EXISTS = "CUSTOMER_NAME_ALREADY_EXISTS";
+
+  private static final Set<String> endProcessingMessages = new HashSet<>(Arrays.asList(
+      new String[]{USER_LACKS_SITE_PRIVILEGES, USER_LACKS_PRIVILEGES, LICENSE_ALREADY_EXISTS_VALUE,
+          SITE_ALREADY_REGISTERED, BLACKLISTED, SOAP_FAULT_VALUE, CUSTOMER_NAME_ALREADY_EXISTS_VALUE}
+  ));
 
   /**
    * Origin of call to 'fail': CUSTOMER, SITE, USER_ROLE, OGEL_CREATE, CALLBACK
@@ -42,7 +61,7 @@ class FailService {
   }
 
   void fail(OgelSubmission sub, Response response, FailService.Origin origin) {
-    fail(sub.getSubmissionRef(), getResponseInfo(response), origin);
+    fail(sub.getSubmissionRef(), getResponseStatusAndBody(response), origin);
   }
 
   void fail(OgelSubmission sub, Exception exception, FailService.Origin origin) {
@@ -70,15 +89,43 @@ class FailService {
       }
     }
 
+    // We check error message using list of known errors which indicate that the OgelSubmission should stop
+    // processing, and we should initiate the callback for it
+    boolean endProcessing = endProcessingMessages.stream().anyMatch(message::contains);
+    if (endProcessing) {
+      LOGGER.info("Ending Processing[" + sub.getSubmissionRef() + "] Matched On[" + getMatchedErrorFromMessage(message) + "][");
+      sub.updateStatusToError();
+    }
+
     sub.setLastFailMessage(originMessage);
     submissionDao.update(sub);
   }
 
-  private static String getResponseInfo(Response response) {
-    String info = "Response is null";
-    if (response != null) {
-      info = "Status [" + response.getStatus() + " |" + response.readEntity(String.class) + "]";
+  public static String getMatchedErrorFromMessage(String message) {
+    String matched = endProcessingMessages.stream().filter(message::contains).findFirst().orElse("UNKNOWN: " + message);
+    if(matched.equals(LICENSE_ALREADY_EXISTS_VALUE)) {
+      matched = LICENSE_ALREADY_EXISTS;
     }
-    return info;
+    if(matched.equals(SOAP_FAULT_VALUE)) {
+      matched = SOAP_FAULT;
+    }
+    if(matched.equals(CUSTOMER_NAME_ALREADY_EXISTS_VALUE)) {
+      matched = CUSTOMER_NAME_ALREADY_EXISTS;
+    }
+    return matched;
   }
+
+  private static String getResponseStatusAndBody(Response response) {
+    String status = "-";
+    String body = "-";
+    if (response != null) {
+      status = "" + response.getStatus();
+      if (response.hasEntity()) {
+        body = response.readEntity(String.class);
+      }
+    }
+    return "RESPONSE FAIL: " + "Status[" + status + "] Body[" + body + "]";
+  }
+
+
 }

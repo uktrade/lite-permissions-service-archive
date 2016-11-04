@@ -36,10 +36,10 @@ public class OgelSubmission {
   private static DateTimeFormatter ogelSubmissionDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
   // Callback fail reason codes
-  private String USER_LACKS_SITE_PRIVILEGES = "USER_LACKS_SITE_PRIVILEGES";
-  private String SITE_ALREADY_REGISTERED = "SITE_ALREADY_REGISTERED";
-  private String BLACKLISTED = "BLACKLISTED";
-  private String SOAP_FAULT = "soap:Fault";
+  //private String USER_LACKS_SITE_PRIVILEGES = "USER_LACKS_SITE_PRIVILEGES";
+ // private String SITE_ALREADY_REGISTERED = "SITE_ALREADY_REGISTERED";
+ // private String BLACKLISTED = "BLACKLISTED";
+ // private String SOAP_FAULT = "soap:Fault";
 
   /**
    * IMMEDIATE      - submission is being processed immediately, through all stages
@@ -159,10 +159,11 @@ public class OgelSubmission {
   public boolean needsRoleUpdate() {
     return roleUpdate && !roleUpdated;
   }
-
-  public String getCallbackFailMessage() {
+/*
+ // public String getCallbackFailMessage() {
     return getFailPoint() + findFailReason();
   }
+
 
   private String findFailReason() {
     String reason = "";
@@ -178,7 +179,7 @@ public class OgelSubmission {
       }
     }
     return reason;
-  }
+  }*/
 
   private String getFailPoint() {
     String point = " Unable to create Ogel: ";

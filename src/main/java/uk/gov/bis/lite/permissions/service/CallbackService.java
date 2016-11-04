@@ -61,16 +61,16 @@ public class CallbackService {
     if (sub.isStatusError()) {
       item.setRequestId(sub.getSubmissionRef());
       item.setStatus(CALLBACK_STATUS_FAILED);
-      item.setFailReason(sub.getCallbackFailMessage());
+      item.setFailReason(FailService.getMatchedErrorFromMessage(sub.getLastFailMessage()));
     }
     return item;
   }
 
   private Response doCallback(String url, CallbackItem item) {
     // TODO remove once development is finished
-    // url = "http://localhost:8123/callback"; // temp for development
-    Response response = httpClient.target(url).request().post(Entity.json(item));
-    return response;
+    //url = "http://localhost:8123/callback"; // temp for development
+    LOGGER.info("Attempting callback [" + url + "] ...");
+    return httpClient.target(url).request().post(Entity.json(item));
   }
 
   private boolean isOk(Response response) {

@@ -65,7 +65,7 @@ public class SubmissionService {
    */
   void updateModeIfNotCompleted(String submissionRef) {
     OgelSubmission sub = submissionDao.findBySubmissionRef(submissionRef);
-    if (!sub.hasCompleted()) {
+    if (!sub.hasCompleted() || !sub.isCalledBack()) {
       LOGGER.info("Updating MODE to SCHEDULED for: [" + submissionRef + "]");
       sub.changeToScheduledMode();
       sub.updateStatus();
