@@ -32,6 +32,9 @@ public class PermissionsAppConfig extends Configuration {
   private String customerServiceCustomerPath;
 
   @NotEmpty
+  private String customerServiceCustomerNumberPath;
+
+  @NotEmpty
   private String customerServiceSitePath;
 
   @NotEmpty
@@ -73,6 +76,10 @@ public class PermissionsAppConfig extends Configuration {
 
   public String getCustomerServiceUrl() {
     return customerServiceUrl;
+  }
+
+  public String getCustomerServiceCustomerNumberPath() {
+    return customerServiceCustomerNumberPath;
   }
 
   public String getCustomerServiceCustomerPath() {

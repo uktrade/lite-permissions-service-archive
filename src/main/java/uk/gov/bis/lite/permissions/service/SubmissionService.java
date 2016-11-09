@@ -33,7 +33,7 @@ public class SubmissionService {
   boolean prepareCustomer(OgelSubmission sub) {
     boolean prepared = true;
     if (sub.needsCustomer()) {
-      if (!doCreateCustomer(sub)) {
+      if (!doGetOrCreateCustomer(sub)) {
         prepared = false;
       }
     }
@@ -73,14 +73,14 @@ public class SubmissionService {
     }
   }
 
-  private boolean doCreateCustomer(OgelSubmission sub) {
-    Optional<String> sarRef = customerService.createCustomer(sub);
+  private boolean doGetOrCreateCustomer(OgelSubmission sub) {
+    Optional<String> sarRef = customerService.getOrCreateCustomer(sub);
     boolean created = sarRef.isPresent();
     if (created) {
       sub.setCustomerRef(sarRef.get());
       sub.updateStatus();
       submissionDao.update(sub);
-      LOGGER.info("Customer created. Updated record: " + sarRef.get());
+      LOGGER.info("Updated record with created Customer sarRef: " + sarRef.get());
     }
     return created;
   }

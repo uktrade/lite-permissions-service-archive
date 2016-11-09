@@ -67,6 +67,12 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
   }
 
   @Provides
+  @javax.inject.Named("customerServiceCustomerNumberPath")
+  String provideCustomerServiceCustomerNumberPath(PermissionsAppConfig config) {
+    return config.getCustomerServiceCustomerNumberPath();
+  }
+
+  @Provides
   @javax.inject.Named("customerServiceSitePath")
   String provideCustomerServiceSitePath(PermissionsAppConfig config) {
     return config.getCustomerServiceSitePath();

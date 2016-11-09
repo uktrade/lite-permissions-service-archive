@@ -1,9 +1,11 @@
 package uk.gov.bis.lite.permissions.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
@@ -42,6 +44,7 @@ public class CustomerService {
   private ObjectMapper mapper;
   private String customerServiceUrl;
   private String customerPath;
+  private String customerNumberPath;
   private String sitePath;
   private String userRolePath;
   private Client httpClient;
@@ -50,36 +53,36 @@ public class CustomerService {
   public CustomerService(Client httpClient, FailService failService,
                          @Named("customerServiceUrl") String customerServiceUrl,
                          @Named("customerServiceCustomerPath") String customerPath,
+                         @Named("customerServiceCustomerNumberPath") String customerNumberPath,
                          @Named("customerServiceSitePath") String sitePath,
                          @Named("customerServiceUserRolePath") String userRolePath) {
     this.httpClient = httpClient;
     this.failService = failService;
     this.customerServiceUrl = customerServiceUrl;
     this.customerPath = customerPath;
+    this.customerNumberPath = customerNumberPath;
     this.sitePath = sitePath;
     this.userRolePath = userRolePath;
     this.mapper = new ObjectMapper();
   }
 
   /**
-   * Uses CustomerService to create Customer
-   * Returns sarRef if successful, notifies FailService if there is an error
+   * Get Customer using  companyNumber OR Use CustomerService to create Customer
+   * Returns sarRef if successful
+   * Notifies FailService if there is an error during create process
    */
-  Optional<String> createCustomer(OgelSubmission sub) {
-    WebTarget target = httpClient.target(customerServiceUrl).path(customerPath);
-    try {
-      Response response = target.request().post(Entity.json(getCustomerItem(sub)));
-      if (isOk(response)) {
-        return Optional.of(mapper.readValue(response.readEntity(String.class), ResponseItem.class).getResponse());
-      } else {
-        failService.fail(sub, response, FailService.Origin.CUSTOMER);
+  Optional<String> getOrCreateCustomer(OgelSubmission sub) {
+    // We first attempt to get Customer using the companyNumber
+    String companyNumber = getCustomerItem(sub).getCompaniesHouseNumber();
+    if(!StringUtils.isBlank(companyNumber)) {
+      Optional<String> customerId = getCustomerIdByCompanyNumber(companyNumber);
+      if(customerId.isPresent()) {
+        return customerId;
       }
-    } catch (IOException | ProcessingException e) {
-      failService.fail(sub, e, FailService.Origin.CUSTOMER);
     }
-    return Optional.empty();
+    // No Customer exists for companyNumber, so we attempt to create a new one
+    return createCustomer(sub);
   }
-
 
   /**
    * Uses CustomerService to create Site
@@ -120,6 +123,43 @@ public class CustomerService {
       }
     } catch (IOException e) {
       failService.fail(sub, e, FailService.Origin.USER_ROLE);
+    }
+    return Optional.empty();
+  }
+
+  /**
+   * Uses CustomerService to create Customer
+   * Returns sarRef if successful, notifies FailService if there is an error
+   */
+  private Optional<String> createCustomer(OgelSubmission sub) {
+    WebTarget target = httpClient.target(customerServiceUrl).path(customerPath);
+    try {
+      Response response = target.request().post(Entity.json(getCustomerItem(sub)));
+      if (isOk(response)) {
+        return Optional.of(mapper.readValue(response.readEntity(String.class), ResponseItem.class).getResponse());
+      } else {
+        failService.fail(sub, response, FailService.Origin.CUSTOMER);
+      }
+    } catch (IOException | ProcessingException e) {
+      failService.fail(sub, e, FailService.Origin.CUSTOMER);
+    }
+    return Optional.empty();
+  }
+
+  /**
+   * Uses CustomerService to get CustomerId from the companyNumber
+   */
+  private Optional<String> getCustomerIdByCompanyNumber(String companyNumber) {
+    WebTarget target = httpClient.target(customerServiceUrl).path(customerNumberPath.replace("{chNumber}", companyNumber));
+    try {
+      Response response = target.request().get();
+      if (isOk(response)) {
+        uk.gov.bis.lite.permissions.model.customer.Customer customer =
+            mapper.readValue(response.readEntity(String.class), uk.gov.bis.lite.permissions.model.customer.Customer.class);
+        return Optional.of(customer.getSarRef());
+      }
+    } catch (IOException | ProcessingException e) {
+      LOGGER.warn("Exception getCustomerIdByCompanyNumber: " + Throwables.getStackTraceAsString(e));
     }
     return Optional.empty();
   }
