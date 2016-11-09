@@ -26,22 +26,6 @@ class FailService {
   private OgelSubmissionDao submissionDao;
   private int maxMinutesRetryAfterFail;
 
-  private static String USER_LACKS_SITE_PRIVILEGES = "USER_LACKS_SITE_PRIVILEGES";
-  private static String USER_LACKS_PRIVILEGES = "USER_LACKS_PRIVILEGES";
-  private static String LICENSE_ALREADY_EXISTS_VALUE = "There is already a licence for OGEL ref";
-  private static String LICENSE_ALREADY_EXISTS = "LICENSE_ALREADY_EXISTS";
-  private static String SITE_ALREADY_REGISTERED = "SITE_ALREADY_REGISTERED";
-  private static String BLACKLISTED = "BLACKLISTED";
-  private static String SOAP_FAULT_VALUE = "soap:Fault";
-  private static String SOAP_FAULT = "SOAP_FAULT";
-  private static String CUSTOMER_NAME_ALREADY_EXISTS_VALUE = "Customer name already exists";
-  private static String CUSTOMER_NAME_ALREADY_EXISTS = "CUSTOMER_NAME_ALREADY_EXISTS";
-
-  private static final Set<String> endProcessingMessages = new HashSet<>(Arrays.asList(
-      new String[]{USER_LACKS_SITE_PRIVILEGES, USER_LACKS_PRIVILEGES, LICENSE_ALREADY_EXISTS_VALUE,
-          SITE_ALREADY_REGISTERED, BLACKLISTED, SOAP_FAULT_VALUE, CUSTOMER_NAME_ALREADY_EXISTS_VALUE}
-  ));
-
   /**
    * Origin of call to 'fail': CUSTOMER, SITE, USER_ROLE, OGEL_CREATE, CALLBACK
    */
@@ -54,6 +38,47 @@ class FailService {
                      @Named("maxMinutesRetryAfterFail") int maxMinutesRetryAfterFail) {
     this.submissionDao = submissionDao;
     this.maxMinutesRetryAfterFail = maxMinutesRetryAfterFail;
+  }
+
+  /**
+   * Enumeration of Callback fail reasons
+   */
+  private enum FailReason {
+
+    PERMISSION_DENIED, SITE_ALREADY_REGISTERED, BLACKLISTED, ENDPOINT_ERROR, UNCLASSIFIED_ERROR;
+
+    private static String TERM_USER_LACKS_SITE_PRIVILEGES = "USER_LACKS_SITE_PRIVILEGES";
+    private static String TERM_LACKS_PRIVILEGES = "USER_LACKS_PRIVILEGES";
+    private static String TERM_LICENSE_ALREADY_EXISTS = "There is already a licence for OGEL ref";
+    private static String TERM_SITE_ALREADY_REGISTERED = "SITE_ALREADY_REGISTERED";
+    private static String TERM_BLACKLISTED = "BLACKLISTED";
+    private static String TERM_SOAP_FAULT = "soap:Fault";
+    private static String TERM_CUSTOMER_NAME_ALREADY_EXISTS = "Customer name already exists";
+    private static String TERM_UNCLASSIFIED_ERROR = "UNCLASSIFIED_ERROR";
+
+    private static final Set<String> searchTerms = new HashSet<>(Arrays.asList(
+        new String[]{TERM_USER_LACKS_SITE_PRIVILEGES, TERM_LACKS_PRIVILEGES, TERM_LICENSE_ALREADY_EXISTS,
+            TERM_SITE_ALREADY_REGISTERED, TERM_BLACKLISTED, TERM_SOAP_FAULT, TERM_CUSTOMER_NAME_ALREADY_EXISTS, TERM_UNCLASSIFIED_ERROR}
+    ));
+
+    public static String getReasonFromMessage(String message) {
+      String reason = UNCLASSIFIED_ERROR.name();
+      String term = searchTerms.stream().filter(message::contains).findFirst().orElse(UNCLASSIFIED_ERROR.name());
+      if(term.equals(TERM_USER_LACKS_SITE_PRIVILEGES) || term.equals(TERM_LACKS_PRIVILEGES)) {
+        reason = PERMISSION_DENIED.name();
+      } else if(term.equals(TERM_SITE_ALREADY_REGISTERED)) {
+        reason = SITE_ALREADY_REGISTERED.name();
+      } else if(term.equals(TERM_BLACKLISTED)) {
+        reason = BLACKLISTED.name();
+      } else if(term.equals(TERM_SOAP_FAULT)) {
+        reason = ENDPOINT_ERROR.name();
+      }
+      return reason;
+    }
+
+    public static boolean hasFailTerm(String message) {
+      return searchTerms.stream().anyMatch(message::contains);
+    }
   }
 
   void fail(OgelSubmission sub, String info, FailService.Origin origin) {
@@ -96,8 +121,7 @@ class FailService {
 
     // We check error message using list of known errors which indicate that the OgelSubmission should stop
     // processing, and we should initiate the callback for it
-    boolean endProcessing = endProcessingMessages.stream().anyMatch(message::contains);
-    if (endProcessing) {
+    if (FailReason.hasFailTerm(message)) {
       LOGGER.info("Ending Processing[" + sub.getSubmissionRef() + "] Matched On[" + getMatchedErrorFromMessage(message) + "][");
       sub.updateStatusToError();
     }
@@ -107,17 +131,7 @@ class FailService {
   }
 
   static String getMatchedErrorFromMessage(String message) {
-    String matched = endProcessingMessages.stream().filter(message::contains).findFirst().orElse("UNKNOWN: " + message);
-    if(matched.equals(LICENSE_ALREADY_EXISTS_VALUE)) {
-      matched = LICENSE_ALREADY_EXISTS;
-    }
-    if(matched.equals(SOAP_FAULT_VALUE)) {
-      matched = SOAP_FAULT;
-    }
-    if(matched.equals(CUSTOMER_NAME_ALREADY_EXISTS_VALUE)) {
-      matched = CUSTOMER_NAME_ALREADY_EXISTS;
-    }
-    return matched;
+    return FailReason.getReasonFromMessage(message);
   }
 
   private static String getResponseStatusAndBody(Response response) {
