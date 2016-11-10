@@ -64,13 +64,13 @@ class FailService {
     public static String getReasonFromMessage(String message) {
       String reason = UNCLASSIFIED_ERROR.name();
       String term = searchTerms.stream().filter(message::contains).findFirst().orElse(UNCLASSIFIED_ERROR.name());
-      if(term.equals(TERM_USER_LACKS_SITE_PRIVILEGES) || term.equals(TERM_LACKS_PRIVILEGES)) {
+      if (term.equals(TERM_USER_LACKS_SITE_PRIVILEGES) || term.equals(TERM_LACKS_PRIVILEGES)) {
         reason = PERMISSION_DENIED.name();
-      } else if(term.equals(TERM_SITE_ALREADY_REGISTERED)) {
+      } else if (term.equals(TERM_SITE_ALREADY_REGISTERED)) {
         reason = SITE_ALREADY_REGISTERED.name();
-      } else if(term.equals(TERM_BLACKLISTED)) {
+      } else if (term.equals(TERM_BLACKLISTED)) {
         reason = BLACKLISTED.name();
-      } else if(term.equals(TERM_SOAP_FAULT)) {
+      } else if (term.equals(TERM_SOAP_FAULT)) {
         reason = ENDPOINT_ERROR.name();
       }
       return reason;
@@ -99,7 +99,7 @@ class FailService {
       doFailUpdate(sub, message, origin);
     } else {
       // When fail received for 'completed' submission, but before successful callback we log detail of fail
-      if(!sub.isCalledBack()) {
+      if (!sub.isCalledBack()) {
         LOGGER.error(getSubmissionOriginMessage(submissionRef, message, origin.name()));
       }
     }

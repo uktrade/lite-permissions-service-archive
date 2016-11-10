@@ -74,9 +74,9 @@ public class CustomerService {
   Optional<String> getOrCreateCustomer(OgelSubmission sub) {
     // We first attempt to get Customer using the companyNumber
     String companyNumber = getCustomerItem(sub).getCompaniesHouseNumber();
-    if(!StringUtils.isBlank(companyNumber)) {
+    if (!StringUtils.isBlank(companyNumber)) {
       Optional<String> customerId = getCustomerIdByCompanyNumber(companyNumber);
-      if(customerId.isPresent()) {
+      if (customerId.isPresent()) {
         return customerId;
       }
     }

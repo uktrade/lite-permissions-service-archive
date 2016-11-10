@@ -15,12 +15,12 @@ import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
 import org.skife.jdbi.v2.DBI;
 import ru.vyarus.dropwizard.guice.module.support.ConfigurationAwareModule;
-import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
-import uk.gov.bis.lite.permissions.dao.OgelSubmissionDaoImpl;
-import uk.gov.bis.lite.permissions.spire.SpireReferenceClient;
 import uk.gov.bis.lite.common.spire.client.SpireClientConfig;
 import uk.gov.bis.lite.common.spire.client.SpireRequestConfig;
 import uk.gov.bis.lite.common.spire.client.parser.ReferenceParser;
+import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
+import uk.gov.bis.lite.permissions.dao.OgelSubmissionDaoImpl;
+import uk.gov.bis.lite.permissions.spire.SpireReferenceClient;
 
 import javax.ws.rs.client.Client;
 

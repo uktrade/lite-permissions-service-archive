@@ -6,9 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.model.register.RegisterOgel;
 import uk.gov.bis.lite.permissions.service.RegisterService;
-import uk.gov.bis.lite.permissions.service.RegisterServiceImpl;
 import uk.gov.bis.lite.permissions.service.SubmissionService;
-import uk.gov.bis.lite.permissions.service.SubmissionServiceImpl;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;

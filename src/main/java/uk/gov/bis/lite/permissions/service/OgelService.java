@@ -5,11 +5,11 @@ import com.google.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.bis.lite.common.spire.client.SpireRequest;
+import uk.gov.bis.lite.common.spire.client.exception.SpireClientException;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.spire.SpireReferenceClient;
-import uk.gov.bis.lite.common.spire.client.SpireRequest;
-import uk.gov.bis.lite.common.spire.client.exception.SpireClientException;
 
 @Singleton
 public class OgelService {
