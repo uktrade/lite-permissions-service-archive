@@ -15,16 +15,14 @@ public class JobProcessService {
   private static final Logger LOGGER = LoggerFactory.getLogger(JobProcessService.class);
 
   private OgelSubmissionDao submissionDao;
-  private CustomerService customerService;
   private SubmissionService submissionService;
   private OgelService ogelService;
   private CallbackService callbackService;
 
   @Inject
-  public JobProcessService(OgelSubmissionDao submissionDao, CustomerService customerService,
-                           SubmissionService submissionService, OgelService ogelService, CallbackService callbackService) {
+  public JobProcessService(OgelSubmissionDao submissionDao, SubmissionService submissionService,
+                           OgelService ogelService, CallbackService callbackService) {
     this.submissionDao = submissionDao;
-    this.customerService = customerService;
     this.submissionService = submissionService;
     this.ogelService = ogelService;
     this.callbackService = callbackService;

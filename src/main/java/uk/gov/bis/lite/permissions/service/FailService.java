@@ -93,7 +93,7 @@ class FailService {
     fail(sub.getSubmissionRef(), Util.getInfo(exception), origin);
   }
 
-  void fail(String submissionRef, String message, Origin origin) {
+  private void fail(String submissionRef, String message, Origin origin) {
     OgelSubmission sub = submissionDao.findBySubmissionRef(submissionRef);
     if (!sub.hasCompleted()) {
       doFailUpdate(sub, message, origin);
