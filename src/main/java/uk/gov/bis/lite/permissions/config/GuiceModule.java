@@ -20,6 +20,10 @@ import uk.gov.bis.lite.common.spire.client.SpireRequestConfig;
 import uk.gov.bis.lite.common.spire.client.parser.ReferenceParser;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDaoImpl;
+import uk.gov.bis.lite.permissions.service.RegisterService;
+import uk.gov.bis.lite.permissions.service.RegisterServiceImpl;
+import uk.gov.bis.lite.permissions.service.SubmissionService;
+import uk.gov.bis.lite.permissions.service.SubmissionServiceImpl;
 import uk.gov.bis.lite.permissions.spire.SpireReferenceClient;
 
 import javax.ws.rs.client.Client;
@@ -54,6 +58,13 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
     return builder.build("jerseyClient");
   }
 
+  @Override
+  protected void configure() {
+    bind(OgelSubmissionDao.class).to(OgelSubmissionDaoImpl.class);
+    bind(RegisterService.class).to(RegisterServiceImpl.class);
+    bind(SubmissionService.class).to(SubmissionServiceImpl.class);
+  }
+
   @Provides
   @javax.inject.Named("customerServiceUrl")
   String provideCustomerServiceUrl(PermissionsAppConfig config) {
@@ -82,11 +93,6 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
   @javax.inject.Named("customerServiceUserRolePath")
   String provideCustomerServiceUserRolePath(PermissionsAppConfig config) {
     return config.getCustomerServiceUserRolePath();
-  }
-
-  @Override
-  protected void configure() {
-    bind(OgelSubmissionDao.class).to(OgelSubmissionDaoImpl.class);
   }
 
   @Provides
