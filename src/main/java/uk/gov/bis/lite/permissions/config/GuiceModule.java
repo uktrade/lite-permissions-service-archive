@@ -22,9 +22,13 @@ import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDaoImpl;
 import uk.gov.bis.lite.permissions.service.RegisterService;
 import uk.gov.bis.lite.permissions.service.RegisterServiceImpl;
+import uk.gov.bis.lite.permissions.service.RegistrationsService;
+import uk.gov.bis.lite.permissions.service.RegistrationsServiceImpl;
 import uk.gov.bis.lite.permissions.service.SubmissionService;
 import uk.gov.bis.lite.permissions.service.SubmissionServiceImpl;
+import uk.gov.bis.lite.permissions.spire.SpireOgelRegistrationClient;
 import uk.gov.bis.lite.permissions.spire.SpireReferenceClient;
+import uk.gov.bis.lite.permissions.spire.parsers.OgelRegistrationParser;
 
 import javax.ws.rs.client.Client;
 
@@ -39,6 +43,15 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
         new ReferenceParser("SPIRE_REF"),
         new SpireClientConfig(config.getSpireClientUserName(), config.getSpireClientPassword(), config.getSpireClientUrl()),
         new SpireRequestConfig("SPIRE_CREATE_OGEL_APP", "OGEL_DETAILS", false));
+  }
+
+  @Provides
+  @Singleton
+  SpireOgelRegistrationClient provideSpireOgelRegistrationClient(Environment env, PermissionsAppConfig config) {
+    return new SpireOgelRegistrationClient(
+        new OgelRegistrationParser(),
+        new SpireClientConfig(config.getSpireClientUserName(), config.getSpireClientPassword(), config.getSpireClientUrl()),
+        new SpireRequestConfig("SPIRE_OGEL_REGISTRATIONS", "getOgelRegs", true));
   }
 
   @Provides
@@ -63,6 +76,7 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
     bind(OgelSubmissionDao.class).to(OgelSubmissionDaoImpl.class);
     bind(RegisterService.class).to(RegisterServiceImpl.class);
     bind(SubmissionService.class).to(SubmissionServiceImpl.class);
+    bind(RegistrationsService.class).to(RegistrationsServiceImpl.class);
   }
 
   @Provides

@@ -1,6 +1,5 @@
 package uk.gov.bis.lite.permissions.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -20,7 +19,6 @@ import uk.gov.bis.lite.permissions.model.register.Customer;
 import uk.gov.bis.lite.permissions.model.register.RegisterOgel;
 import uk.gov.bis.lite.permissions.model.register.Site;
 
-import java.io.IOException;
 import java.util.Optional;
 
 import javax.ws.rs.ProcessingException;
@@ -41,7 +39,6 @@ public class CustomerService {
   private static final String ROLE_TYPE_PREPARER = "PREPARER";
 
   private FailService failService;
-  private ObjectMapper mapper;
   private String customerServiceUrl;
   private String customerPath;
   private String customerNumberPath;
@@ -63,7 +60,6 @@ public class CustomerService {
     this.customerNumberPath = customerNumberPath;
     this.sitePath = sitePath;
     this.userRolePath = userRolePath;
-    this.mapper = new ObjectMapper();
   }
 
   /**
@@ -93,11 +89,11 @@ public class CustomerService {
     try {
       Response response = target.request().post(Entity.json(getSiteItem(sub)));
       if (isOk(response)) {
-        return Optional.of(mapper.readValue(response.readEntity(String.class), ResponseItem.class).getResponse());
+        return Optional.of(response.readEntity(ResponseItem.class).getResponse());
       } else {
         failService.fail(sub, response, FailService.Origin.SITE);
       }
-    } catch (IOException | ProcessingException e) {
+    } catch (ProcessingException e) {
       failService.fail(sub, e, FailService.Origin.SITE);
     }
     return Optional.empty();
@@ -114,15 +110,12 @@ public class CustomerService {
     path = path.replace("{siteRef}", sub.getSiteRef());
 
     WebTarget target = httpClient.target(customerServiceUrl).path(path);
-    try {
-      Response response = target.request().post(Entity.json(getUserRoleItem(sub)));
-      if (isOk(response)) {
-        return Optional.of(mapper.readValue(response.readEntity(String.class), ResponseItem.class).getResponse());
-      } else {
-        failService.fail(sub, response, FailService.Origin.USER_ROLE);
-      }
-    } catch (IOException e) {
-      failService.fail(sub, e, FailService.Origin.USER_ROLE);
+    //try {
+    Response response = target.request().post(Entity.json(getUserRoleItem(sub)));
+    if (isOk(response)) {
+      return Optional.of(response.readEntity(ResponseItem.class).getResponse());
+    } else {
+      failService.fail(sub, response, FailService.Origin.USER_ROLE);
     }
     return Optional.empty();
   }
@@ -136,11 +129,11 @@ public class CustomerService {
     try {
       Response response = target.request().post(Entity.json(getCustomerItem(sub)));
       if (isOk(response)) {
-        return Optional.of(mapper.readValue(response.readEntity(String.class), ResponseItem.class).getResponse());
+        return Optional.of(response.readEntity(ResponseItem.class).getResponse());
       } else {
         failService.fail(sub, response, FailService.Origin.CUSTOMER);
       }
-    } catch (IOException | ProcessingException e) {
+    } catch (ProcessingException e) {
       failService.fail(sub, e, FailService.Origin.CUSTOMER);
     }
     return Optional.empty();
@@ -155,10 +148,10 @@ public class CustomerService {
       Response response = target.request().get();
       if (isOk(response)) {
         uk.gov.bis.lite.permissions.model.customer.Customer customer =
-            mapper.readValue(response.readEntity(String.class), uk.gov.bis.lite.permissions.model.customer.Customer.class);
+            response.readEntity(uk.gov.bis.lite.permissions.model.customer.Customer.class);
         return Optional.of(customer.getSarRef());
       }
-    } catch (IOException | ProcessingException e) {
+    } catch (ProcessingException e) {
       LOGGER.warn("Exception getCustomerIdByCompanyNumber: " + Throwables.getStackTraceAsString(e));
     }
     return Optional.empty();
