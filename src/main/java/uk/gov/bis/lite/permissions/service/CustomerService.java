@@ -40,26 +40,14 @@ public class CustomerService {
 
   private FailService failService;
   private String customerServiceUrl;
-  private String customerPath;
-  private String customerNumberPath;
-  private String createSitePath;
-  private String userRolePath;
   private Client httpClient;
 
   @Inject
   public CustomerService(Client httpClient, FailService failService,
-                         @Named("customerServiceUrl") String customerServiceUrl,
-                         @Named("customerServiceCustomerPath") String customerPath,
-                         @Named("customerServiceCustomerNumberPath") String customerNumberPath,
-                         @Named("customerServiceCreateSitePath") String createSitePath,
-                         @Named("customerServiceUserRolePath") String userRolePath) {
+                         @Named("customerServiceUrl") String customerServiceUrl) {
     this.httpClient = httpClient;
     this.failService = failService;
     this.customerServiceUrl = customerServiceUrl;
-    this.customerPath = customerPath;
-    this.customerNumberPath = customerNumberPath;
-    this.createSitePath = createSitePath;
-    this.userRolePath = userRolePath;
   }
 
   /**
@@ -86,13 +74,10 @@ public class CustomerService {
    */
   Optional<String> createSite(OgelSubmission sub) {
 
-    // Set path params
+    String createSitePath = "/customer-sites/{customerId}";
     String path = createSitePath.replace("{customerId}", sub.getCustomerRef());
 
     WebTarget target = httpClient.target(customerServiceUrl).queryParam("userId", sub.getUserId()).path(path);
-   // LOGGER.info("userId: " + sub.getUserId());
-    //target.queryParam("userId", sub.getUserId());
-
     try {
       Response response = target.request().post(Entity.json(getSiteItemIn(sub)));
       if (isOk(response)) {
@@ -112,12 +97,11 @@ public class CustomerService {
    */
   Optional<String> updateUserRole(OgelSubmission sub) {
 
-    // Set path params
+    String userRolePath = "/user-roles/user/{userId}/site/{siteRef}";
     String path = userRolePath.replace("{userId}", sub.getUserId());
     path = path.replace("{siteRef}", sub.getSiteRef());
 
     WebTarget target = httpClient.target(customerServiceUrl).path(path);
-
     Response response = target.request().post(Entity.json(getUserRoleItem(sub)));
     if (isOk(response)) {
       return Optional.of(response.readEntity(ResponseItem.class).getResponse());
@@ -132,7 +116,8 @@ public class CustomerService {
    * Returns sarRef if successful, notifies FailService if there is an error
    */
   private Optional<String> createCustomer(OgelSubmission sub) {
-    WebTarget target = httpClient.target(customerServiceUrl).path(customerPath);
+
+    WebTarget target = httpClient.target(customerServiceUrl).path("/create-customer");
     try {
       Response response = target.request().post(Entity.json(getCustomerItem(sub)));
       if (isOk(response)) {
@@ -150,7 +135,9 @@ public class CustomerService {
    * Uses CustomerService to get CustomerId from the companyNumber
    */
   private Optional<String> getCustomerIdByCompanyNumber(String companyNumber) {
-    WebTarget target = httpClient.target(customerServiceUrl).path(customerNumberPath.replace("{chNumber}", companyNumber));
+    String customerSearchByCompanyNumberPath = "/search-customers/registered-number/{chNumber}";
+    WebTarget target = httpClient.target(customerServiceUrl)
+        .path(customerSearchByCompanyNumberPath.replace("{chNumber}", companyNumber));
     try {
       Response response = target.request().get();
       if (isOk(response)) {
@@ -193,37 +180,16 @@ public class CustomerService {
   }
 
   private SiteIn getSiteItemIn(OgelSubmission sub) {
-
     RegisterOgel reg = sub.getRegisterOgelFromJson();
     Site site = reg.getNewSite();
     String siteName = site.getSiteName() != null ? site.getSiteName() : DEFAULT_SITE_NAME;
-
     Address address = site.isUseCustomerAddress() ? reg.getNewCustomer().getRegisteredAddress() : site.getAddress();
 
     SiteIn siteIn = new SiteIn();
     siteIn.setSiteName(siteName);
     siteIn.setAddress(getAddressItem(address));
-
-
     return siteIn;
   }
-
-  /*
-  private SiteItem getSiteItem(OgelSubmission sub) {
-    RegisterOgel reg = sub.getRegisterOgelFromJson();
-    Customer customer = reg.getNewCustomer();
-    Site site = reg.getNewSite();
-
-    Address address = site.isUseCustomerAddress() ? customer.getRegisteredAddress() : site.getAddress();
-    String siteName = site.getSiteName() != null ? site.getSiteName() : DEFAULT_SITE_NAME;
-
-    SiteItem item = new SiteItem();
-    item.setSiteName(siteName);
-    item.setUserId(sub.getUserId());
-    item.setSarRef(sub.getCustomerRef());
-    item.setAddressItem(getAddressItem(address));
-    return item;
-  }*/
 
   /**
    * Creates a UserRoleItem with an ADMIN roleType

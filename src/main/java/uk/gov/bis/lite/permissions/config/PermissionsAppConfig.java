@@ -29,18 +29,6 @@ public class PermissionsAppConfig extends Configuration {
   private String customerServiceUrl;
 
   @NotEmpty
-  private String customerServiceCustomerPath;
-
-  @NotEmpty
-  private String customerServiceCustomerNumberPath;
-
-  @NotEmpty
-  private String customerServiceCreateSitePath;
-
-  @NotEmpty
-  private String customerServiceUserRolePath;
-
-  @NotEmpty
   private String maxMinutesRetryAfterFail;
 
   @Valid
@@ -76,22 +64,6 @@ public class PermissionsAppConfig extends Configuration {
 
   public String getCustomerServiceUrl() {
     return customerServiceUrl;
-  }
-
-  public String getCustomerServiceCustomerNumberPath() {
-    return customerServiceCustomerNumberPath;
-  }
-
-  public String getCustomerServiceCustomerPath() {
-    return customerServiceCustomerPath;
-  }
-
-  public String getCustomerServiceCreateSitePath() {
-    return customerServiceCreateSitePath;
-  }
-
-  public String getCustomerServiceUserRolePath() {
-    return customerServiceUserRolePath;
   }
 
   public String getMaxMinutesRetryAfterFail() {

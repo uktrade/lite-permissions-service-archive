@@ -86,30 +86,6 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
   }
 
   @Provides
-  @javax.inject.Named("customerServiceCustomerPath")
-  String provideCustomerServiceCustomerPath(PermissionsAppConfig config) {
-    return config.getCustomerServiceCustomerPath();
-  }
-
-  @Provides
-  @javax.inject.Named("customerServiceCustomerNumberPath")
-  String provideCustomerServiceCustomerNumberPath(PermissionsAppConfig config) {
-    return config.getCustomerServiceCustomerNumberPath();
-  }
-
-  @Provides
-  @javax.inject.Named("customerServiceCreateSitePath")
-  String provideCustomerServiceCreateSitePath(PermissionsAppConfig config) {
-    return config.getCustomerServiceCreateSitePath();
-  }
-
-  @Provides
-  @javax.inject.Named("customerServiceUserRolePath")
-  String provideCustomerServiceUserRolePath(PermissionsAppConfig config) {
-    return config.getCustomerServiceUserRolePath();
-  }
-
-  @Provides
   @javax.inject.Named("maxMinutesRetryAfterFail")
   int provideMaxMinutesRetryAfterFail(PermissionsAppConfig config) {
     return Integer.parseInt(config.getMaxMinutesRetryAfterFail());
