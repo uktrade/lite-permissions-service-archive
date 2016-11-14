@@ -1,6 +1,8 @@
 plugins {
+  id 'java'
   id 'application'
   id 'org.flywaydb.flyway' version '4.0.1'
+  id 'com.github.johnrengelman.shadow' version '1.2.3'
 }
 
 group 'uk.gov.bis.lite'
@@ -12,7 +14,6 @@ mainClassName = "uk.gov.bis.lite.permissions.PermissionsApp"
 
 repositories {
   mavenCentral()
-  maven { url "http://dl.bintray.com/gov-uk-notify/maven" }
   maven { url "http://nexus.mgmt.int.licensing.service.trade.gov.uk/repository/maven-releases/" }
 }
 
@@ -47,6 +48,19 @@ flyway {
   url = 'jdbc:sqlite:localPermissions.db'
 }
 
-jar.enabled = false
+shadowJar {
+  classifier = ''
+  mergeServiceFiles()
+}
+
+jar {
+  manifest {
+    attributes 'Main-Class': mainClassName
+  }
+}
+
+build {
+  dependsOn shadowJar
+}
 
 run { args 'server', 'src/main/resources/permissions-config.yaml' }
