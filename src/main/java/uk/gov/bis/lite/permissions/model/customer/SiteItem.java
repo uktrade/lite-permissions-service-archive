@@ -1,5 +1,7 @@
 package uk.gov.bis.lite.permissions.model.customer;
 
+import uk.gov.bis.lite.common.item.AddressItem;
+
 public class SiteItem {
 
   private String userId;

@@ -40,7 +40,7 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
   @Singleton
   SpireReferenceClient provideSpireCreateOgelAppClient(Environment env, PermissionsAppConfig config) {
     return new SpireReferenceClient(
-        new ReferenceParser("SPIRE_REF"),
+        new ReferenceParser("REGISTRATION_REF"),
         new SpireClientConfig(config.getSpireClientUserName(), config.getSpireClientPassword(), config.getSpireClientUrl()),
         new SpireRequestConfig("SPIRE_CREATE_OGEL_APP", "OGEL_DETAILS", false));
   }
@@ -98,9 +98,9 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
   }
 
   @Provides
-  @javax.inject.Named("customerServiceSitePath")
-  String provideCustomerServiceSitePath(PermissionsAppConfig config) {
-    return config.getCustomerServiceSitePath();
+  @javax.inject.Named("customerServiceCreateSitePath")
+  String provideCustomerServiceCreateSitePath(PermissionsAppConfig config) {
+    return config.getCustomerServiceCreateSitePath();
   }
 
   @Provides

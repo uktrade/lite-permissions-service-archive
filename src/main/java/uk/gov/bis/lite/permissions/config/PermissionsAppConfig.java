@@ -35,7 +35,7 @@ public class PermissionsAppConfig extends Configuration {
   private String customerServiceCustomerNumberPath;
 
   @NotEmpty
-  private String customerServiceSitePath;
+  private String customerServiceCreateSitePath;
 
   @NotEmpty
   private String customerServiceUserRolePath;
@@ -86,8 +86,8 @@ public class PermissionsAppConfig extends Configuration {
     return customerServiceCustomerPath;
   }
 
-  public String getCustomerServiceSitePath() {
-    return customerServiceSitePath;
+  public String getCustomerServiceCreateSitePath() {
+    return customerServiceCreateSitePath;
   }
 
   public String getCustomerServiceUserRolePath() {

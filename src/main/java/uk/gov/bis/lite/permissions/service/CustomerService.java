@@ -7,12 +7,12 @@ import com.google.inject.name.Named;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.bis.lite.common.item.AddressItem;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
-import uk.gov.bis.lite.permissions.model.customer.AddressItem;
 import uk.gov.bis.lite.permissions.model.customer.CustomerItem;
 import uk.gov.bis.lite.permissions.model.customer.ResponseItem;
-import uk.gov.bis.lite.permissions.model.customer.SiteItem;
 import uk.gov.bis.lite.permissions.model.customer.UserRoleItem;
+import uk.gov.bis.lite.common.item.in.SiteIn;
 import uk.gov.bis.lite.permissions.model.register.Address;
 import uk.gov.bis.lite.permissions.model.register.AdminApproval;
 import uk.gov.bis.lite.permissions.model.register.Customer;
@@ -42,7 +42,7 @@ public class CustomerService {
   private String customerServiceUrl;
   private String customerPath;
   private String customerNumberPath;
-  private String sitePath;
+  private String createSitePath;
   private String userRolePath;
   private Client httpClient;
 
@@ -51,14 +51,14 @@ public class CustomerService {
                          @Named("customerServiceUrl") String customerServiceUrl,
                          @Named("customerServiceCustomerPath") String customerPath,
                          @Named("customerServiceCustomerNumberPath") String customerNumberPath,
-                         @Named("customerServiceSitePath") String sitePath,
+                         @Named("customerServiceCreateSitePath") String createSitePath,
                          @Named("customerServiceUserRolePath") String userRolePath) {
     this.httpClient = httpClient;
     this.failService = failService;
     this.customerServiceUrl = customerServiceUrl;
     this.customerPath = customerPath;
     this.customerNumberPath = customerNumberPath;
-    this.sitePath = sitePath;
+    this.createSitePath = createSitePath;
     this.userRolePath = userRolePath;
   }
 
@@ -85,9 +85,16 @@ public class CustomerService {
    * Returns siteRef if successful, notifies FailService if there is an error
    */
   Optional<String> createSite(OgelSubmission sub) {
-    WebTarget target = httpClient.target(customerServiceUrl).path(sitePath);
+
+    // Set path params
+    String path = createSitePath.replace("{customerId}", sub.getCustomerRef());
+
+    WebTarget target = httpClient.target(customerServiceUrl).queryParam("userId", sub.getUserId()).path(path);
+   // LOGGER.info("userId: " + sub.getUserId());
+    //target.queryParam("userId", sub.getUserId());
+
     try {
-      Response response = target.request().post(Entity.json(getSiteItem(sub)));
+      Response response = target.request().post(Entity.json(getSiteItemIn(sub)));
       if (isOk(response)) {
         return Optional.of(response.readEntity(ResponseItem.class).getResponse());
       } else {
@@ -110,7 +117,7 @@ public class CustomerService {
     path = path.replace("{siteRef}", sub.getSiteRef());
 
     WebTarget target = httpClient.target(customerServiceUrl).path(path);
-    //try {
+
     Response response = target.request().post(Entity.json(getUserRoleItem(sub)));
     if (isOk(response)) {
       return Optional.of(response.readEntity(ResponseItem.class).getResponse());
@@ -185,6 +192,23 @@ public class CustomerService {
     return item;
   }
 
+  private SiteIn getSiteItemIn(OgelSubmission sub) {
+
+    RegisterOgel reg = sub.getRegisterOgelFromJson();
+    Site site = reg.getNewSite();
+    String siteName = site.getSiteName() != null ? site.getSiteName() : DEFAULT_SITE_NAME;
+
+    Address address = site.isUseCustomerAddress() ? reg.getNewCustomer().getRegisteredAddress() : site.getAddress();
+
+    SiteIn siteIn = new SiteIn();
+    siteIn.setSiteName(siteName);
+    siteIn.setAddress(getAddressItem(address));
+
+
+    return siteIn;
+  }
+
+  /*
   private SiteItem getSiteItem(OgelSubmission sub) {
     RegisterOgel reg = sub.getRegisterOgelFromJson();
     Customer customer = reg.getNewCustomer();
@@ -199,7 +223,7 @@ public class CustomerService {
     item.setSarRef(sub.getCustomerRef());
     item.setAddressItem(getAddressItem(address));
     return item;
-  }
+  }*/
 
   /**
    * Creates a UserRoleItem with an ADMIN roleType
