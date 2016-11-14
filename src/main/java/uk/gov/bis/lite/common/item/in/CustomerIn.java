@@ -1,8 +1,11 @@
-package uk.gov.bis.lite.permissions.model.customer;
+package uk.gov.bis.lite.common.item.in;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import uk.gov.bis.lite.common.item.AddressItem;
 
-public class CustomerItem {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class CustomerIn {
 
   private String userId;
   private String customerName;
@@ -13,6 +16,16 @@ public class CustomerItem {
   private Boolean companiesHouseValidated;
   private String eoriNumber;
   private Boolean eoriValidated;
+
+  @JsonIgnore
+  public String getEoriValidatedStr() {
+    return eoriValidated == null ? "false" : eoriValidated ? "true" : "false";
+  }
+
+  @JsonIgnore
+  public String getCompaniesHouseValidatedStr() {
+    return companiesHouseValidated == null ? "false" : companiesHouseValidated ? "true" : "false";
+  }
 
   public String getUserId() {
     return userId;
@@ -86,5 +99,3 @@ public class CustomerItem {
     this.eoriValidated = eoriValidated;
   }
 }
-
-

@@ -1,8 +1,8 @@
-package uk.gov.bis.lite.permissions.model.customer;
+package uk.gov.bis.lite.common.item.out;
 
 import java.util.List;
 
-public class Customer {
+public class CustomerOut {
 
   private String sarRef;
   private String companyName;
@@ -14,6 +14,7 @@ public class Customer {
   private String applicantType;
   private String countryOfOriginCode;
   private List<String> websites;
+
 
   public String getSarRef() {
     return sarRef;

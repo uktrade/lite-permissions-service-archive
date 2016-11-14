@@ -1,6 +1,6 @@
-package uk.gov.bis.lite.permissions.model.customer;
+package uk.gov.bis.lite.common.item.out;
 
-public class ResponseItem {
+public class CustomerServiceOut {
 
   private String response;
 

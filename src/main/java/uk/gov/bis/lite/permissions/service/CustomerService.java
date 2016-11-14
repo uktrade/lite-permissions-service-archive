@@ -8,11 +8,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.common.item.AddressItem;
-import uk.gov.bis.lite.permissions.model.OgelSubmission;
-import uk.gov.bis.lite.permissions.model.customer.CustomerItem;
-import uk.gov.bis.lite.permissions.model.customer.ResponseItem;
-import uk.gov.bis.lite.permissions.model.customer.UserRoleItem;
+import uk.gov.bis.lite.common.item.in.CustomerIn;
 import uk.gov.bis.lite.common.item.in.SiteIn;
+import uk.gov.bis.lite.common.item.in.UserRoleIn;
+import uk.gov.bis.lite.common.item.out.CustomerOut;
+import uk.gov.bis.lite.common.item.out.CustomerServiceOut;
+import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.model.register.Address;
 import uk.gov.bis.lite.permissions.model.register.AdminApproval;
 import uk.gov.bis.lite.permissions.model.register.Customer;
@@ -81,7 +82,7 @@ public class CustomerService {
     try {
       Response response = target.request().post(Entity.json(getSiteItemIn(sub)));
       if (isOk(response)) {
-        return Optional.of(response.readEntity(ResponseItem.class).getResponse());
+        return Optional.of(response.readEntity(CustomerServiceOut.class).getResponse());
       } else {
         failService.fail(sub, response, FailService.Origin.SITE);
       }
@@ -104,7 +105,7 @@ public class CustomerService {
     WebTarget target = httpClient.target(customerServiceUrl).path(path);
     Response response = target.request().post(Entity.json(getUserRoleItem(sub)));
     if (isOk(response)) {
-      return Optional.of(response.readEntity(ResponseItem.class).getResponse());
+      return Optional.of(response.readEntity(CustomerServiceOut.class).getResponse());
     } else {
       failService.fail(sub, response, FailService.Origin.USER_ROLE);
     }
@@ -121,7 +122,7 @@ public class CustomerService {
     try {
       Response response = target.request().post(Entity.json(getCustomerItem(sub)));
       if (isOk(response)) {
-        return Optional.of(response.readEntity(ResponseItem.class).getResponse());
+        return Optional.of(response.readEntity(CustomerServiceOut.class).getResponse());
       } else {
         failService.fail(sub, response, FailService.Origin.CUSTOMER);
       }
@@ -141,8 +142,8 @@ public class CustomerService {
     try {
       Response response = target.request().get();
       if (isOk(response)) {
-        uk.gov.bis.lite.permissions.model.customer.Customer customer =
-            response.readEntity(uk.gov.bis.lite.permissions.model.customer.Customer.class);
+        CustomerOut customer =
+            response.readEntity(CustomerOut.class);
         return Optional.of(customer.getSarRef());
       }
     } catch (ProcessingException e) {
@@ -151,11 +152,11 @@ public class CustomerService {
     return Optional.empty();
   }
 
-  private CustomerItem getCustomerItem(OgelSubmission sub) {
+  private CustomerIn getCustomerItem(OgelSubmission sub) {
     RegisterOgel reg = sub.getRegisterOgelFromJson();
     Customer customer = reg.getNewCustomer();
     Address address = customer.getRegisteredAddress();
-    CustomerItem item = new CustomerItem();
+    CustomerIn item = new CustomerIn();
     item.setUserId(sub.getUserId());
     item.setCustomerName(customer.getCustomerName());
     item.setAddressItem(getAddressItem(address));
@@ -194,10 +195,10 @@ public class CustomerService {
   /**
    * Creates a UserRoleItem with an ADMIN roleType
    */
-  private UserRoleItem getUserRoleItem(OgelSubmission sub) {
+  private UserRoleIn getUserRoleItem(OgelSubmission sub) {
     RegisterOgel reg = sub.getRegisterOgelFromJson();
     AdminApproval admin = reg.getAdminApproval();
-    UserRoleItem item = new UserRoleItem();
+    UserRoleIn item = new UserRoleIn();
     item.setRoleType(ROLE_TYPE_ADMIN); // hardcoded for now
     item.setAdminUserId(admin.getAdminUserId());
     return item;
