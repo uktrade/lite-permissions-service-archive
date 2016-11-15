@@ -138,9 +138,8 @@ public class CustomerService {
     try {
       Response response = target.request().get();
       if (isOk(response)) {
-        CustomerOut customer =
-            response.readEntity(CustomerOut.class);
-        return Optional.of(customer.getSarRef());
+        CustomerOut customer = response.readEntity(CustomerOut.class);
+        return Optional.of(customer.getCustomerId());
       }
     } catch (ProcessingException e) {
       LOGGER.warn("Exception getCustomerIdByCompanyNumber: " + Throwables.getStackTraceAsString(e));
