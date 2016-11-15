@@ -7,12 +7,12 @@ import com.google.inject.name.Named;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.bis.lite.common.item.AddressItem;
-import uk.gov.bis.lite.common.item.in.CustomerIn;
-import uk.gov.bis.lite.common.item.in.SiteIn;
-import uk.gov.bis.lite.common.item.in.UserRoleIn;
-import uk.gov.bis.lite.common.item.out.CustomerOut;
-import uk.gov.bis.lite.common.item.out.CustomerServiceOut;
+import uk.gov.bis.lite.customer.api.item.AddressItem;
+import uk.gov.bis.lite.customer.api.item.in.CustomerIn;
+import uk.gov.bis.lite.customer.api.item.in.SiteIn;
+import uk.gov.bis.lite.customer.api.item.in.UserRoleIn;
+import uk.gov.bis.lite.customer.api.item.out.CustomerOut;
+import uk.gov.bis.lite.customer.api.item.out.CustomerServiceOut;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.model.register.Address;
 import uk.gov.bis.lite.permissions.model.register.AdminApproval;
@@ -34,10 +34,6 @@ public class CustomerService {
   private static final Logger LOGGER = LoggerFactory.getLogger(CustomerService.class);
 
   private static final String DEFAULT_SITE_NAME = "Main Site";
-
-  private static final String ROLE_TYPE_ADMIN = "ADMIN";
-  private static final String ROLE_TYPE_SUBMITTER = "SUBMITTER";
-  private static final String ROLE_TYPE_PREPARER = "PREPARER";
 
   private FailService failService;
   private String customerServiceUrl;
@@ -199,7 +195,7 @@ public class CustomerService {
     RegisterOgel reg = sub.getRegisterOgelFromJson();
     AdminApproval admin = reg.getAdminApproval();
     UserRoleIn item = new UserRoleIn();
-    item.setRoleType(ROLE_TYPE_ADMIN); // hardcoded for now
+    item.setRoleType(UserRoleIn.RoleType.ADMIN);
     item.setAdminUserId(admin.getAdminUserId());
     return item;
   }
