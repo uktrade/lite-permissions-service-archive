@@ -54,7 +54,7 @@ class CustomerService {
    */
   Optional<String> getOrCreateCustomer(OgelSubmission sub) {
     // We first attempt to get Customer using the companyNumber
-    String companyNumber = getCustomerItem(sub).getCompaniesHouseNumber();
+    String companyNumber = getCustomerParam(sub).getCompaniesHouseNumber();
     if (!StringUtils.isBlank(companyNumber)) {
       Optional<String> customerId = getCustomerIdByCompanyNumber(companyNumber);
       if (customerId.isPresent()) {
@@ -76,7 +76,7 @@ class CustomerService {
 
     WebTarget target = httpClient.target(customerServiceUrl).queryParam("userId", sub.getUserId()).path(path);
     try {
-      Response response = target.request().post(Entity.json(getSiteItemIn(sub)));
+      Response response = target.request().post(Entity.json(getSiteParam(sub)));
       if (isOk(response)) {
         return Optional.of(response.readEntity(SiteView.class).getSiteId());
       } else {
@@ -99,7 +99,7 @@ class CustomerService {
     path = path.replace("{siteRef}", sub.getSiteRef());
 
     WebTarget target = httpClient.target(customerServiceUrl).path(path);
-    Response response = target.request().post(Entity.json(getUserRoleItem(sub)));
+    Response response = target.request().post(Entity.json(getUserRoleParam(sub)));
     if (isOk(response)) {
       return true;
     } else {
@@ -116,7 +116,7 @@ class CustomerService {
 
     WebTarget target = httpClient.target(customerServiceUrl).path("/create-customer");
     try {
-      Response response = target.request().post(Entity.json(getCustomerItem(sub)));
+      Response response = target.request().post(Entity.json(getCustomerParam(sub)));
       if (isOk(response)) {
         return Optional.of(response.readEntity(CustomerView.class).getCustomerId());
       } else {
@@ -147,35 +147,35 @@ class CustomerService {
     return Optional.empty();
   }
 
-  private CustomerParam getCustomerItem(OgelSubmission sub) {
+  private CustomerParam getCustomerParam(OgelSubmission sub) {
     RegisterOgel reg = sub.getRegisterOgelFromJson();
     Customer customer = reg.getNewCustomer();
     Address address = customer.getRegisteredAddress();
-    CustomerParam item = new CustomerParam();
-    item.setUserId(sub.getUserId());
-    item.setCustomerName(customer.getCustomerName());
-    item.setAddressParam(getAddressParam(address));
-    item.setCompaniesHouseNumber(customer.getChNumber());
-    item.setCompaniesHouseValidated(customer.isChNumberValidated());
-    item.setCustomerType(customer.getCustomerType());
-    item.setEoriNumber(customer.getEoriNumber());
-    item.setEoriValidated(customer.isEoriNumberValidated());
-    item.setWebsite(customer.getWebsite());
-    return item;
+    CustomerParam param = new CustomerParam();
+    param.setUserId(sub.getUserId());
+    param.setCustomerName(customer.getCustomerName());
+    param.setAddressParam(getAddressParam(address));
+    param.setCompaniesHouseNumber(customer.getChNumber());
+    param.setCompaniesHouseValidated(customer.isChNumberValidated());
+    param.setCustomerType(customer.getCustomerType());
+    param.setEoriNumber(customer.getEoriNumber());
+    param.setEoriValidated(customer.isEoriNumberValidated());
+    param.setWebsite(customer.getWebsite());
+    return param;
   }
 
   private AddressParam getAddressParam(Address address) {
-    AddressParam item = new AddressParam();
-    item.setLine1(address.getLine1());
-    item.setLine2(address.getLine2());
-    item.setTown(address.getTown());
-    item.setCounty(address.getCounty());
-    item.setPostcode(address.getPostcode());
-    item.setCountry(address.getCountry());
-    return item;
+    AddressParam param = new AddressParam();
+    param.setLine1(address.getLine1());
+    param.setLine2(address.getLine2());
+    param.setTown(address.getTown());
+    param.setCounty(address.getCounty());
+    param.setPostcode(address.getPostcode());
+    param.setCountry(address.getCountry());
+    return param;
   }
 
-  private SiteParam getSiteItemIn(OgelSubmission sub) {
+  private SiteParam getSiteParam(OgelSubmission sub) {
     RegisterOgel reg = sub.getRegisterOgelFromJson();
     Site site = reg.getNewSite();
     String siteName = site.getSiteName() != null ? site.getSiteName() : DEFAULT_SITE_NAME;
@@ -188,15 +188,15 @@ class CustomerService {
   }
 
   /**
-   * Creates a UserRoleItem with an ADMIN roleType
+   * Creates a UserRoleParam with an ADMIN roleType
    */
-  private UserRoleParam getUserRoleItem(OgelSubmission sub) {
+  private UserRoleParam getUserRoleParam(OgelSubmission sub) {
     RegisterOgel reg = sub.getRegisterOgelFromJson();
     AdminApproval admin = reg.getAdminApproval();
-    UserRoleParam item = new UserRoleParam();
-    item.setRoleType(UserRoleParam.RoleType.ADMIN);
-    item.setAdminUserId(admin.getAdminUserId());
-    return item;
+    UserRoleParam param = new UserRoleParam();
+    param.setRoleType(UserRoleParam.RoleType.ADMIN);
+    param.setAdminUserId(admin.getAdminUserId());
+    return param;
   }
 
   private boolean isOk(Response response) {

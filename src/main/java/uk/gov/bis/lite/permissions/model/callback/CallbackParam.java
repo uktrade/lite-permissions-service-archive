@@ -3,7 +3,7 @@ package uk.gov.bis.lite.permissions.model.callback;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CallbackItem {
+public class CallbackParam {
 
   private String requestId;
   private String status;

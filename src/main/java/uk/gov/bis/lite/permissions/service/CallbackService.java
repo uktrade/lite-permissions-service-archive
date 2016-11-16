@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
-import uk.gov.bis.lite.permissions.model.callback.CallbackItem;
+import uk.gov.bis.lite.permissions.model.callback.CallbackParam;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
@@ -35,7 +35,7 @@ public class CallbackService {
   void completeCallback(OgelSubmission sub) {
     if (sub != null && sub.hasCompleted() && !sub.isCalledBack()) {
       try {
-        Response response = doCallback(sub.getCallbackUrl(), getCallbackItem(sub));
+        Response response = doCallback(sub.getCallbackUrl(), getCallbackParam(sub));
         if (isOk(response)) {
           sub.setCalledBack(true);
           submissionDao.update(sub);
@@ -51,26 +51,26 @@ public class CallbackService {
     }
   }
 
-  private CallbackItem getCallbackItem(OgelSubmission sub) {
-    CallbackItem item = new CallbackItem();
+  private CallbackParam getCallbackParam(OgelSubmission sub) {
+    CallbackParam param = new CallbackParam();
     if (sub.isStatusSuccess()) {
-      item.setRequestId(sub.getSubmissionRef());
-      item.setStatus(CALLBACK_STATUS_SUCCESS);
-      item.setRegistrationReference(sub.getSpireRef());
+      param.setRequestId(sub.getSubmissionRef());
+      param.setStatus(CALLBACK_STATUS_SUCCESS);
+      param.setRegistrationReference(sub.getSpireRef());
     }
     if (sub.isStatusError()) {
-      item.setRequestId(sub.getSubmissionRef());
-      item.setStatus(CALLBACK_STATUS_FAILED);
-      item.setFailReason(FailService.getMatchedErrorFromMessage(sub.getLastFailMessage()));
+      param.setRequestId(sub.getSubmissionRef());
+      param.setStatus(CALLBACK_STATUS_FAILED);
+      param.setFailReason(FailService.getMatchedErrorFromMessage(sub.getLastFailMessage()));
     }
-    return item;
+    return param;
   }
 
-  private Response doCallback(String url, CallbackItem item) {
+  private Response doCallback(String url, CallbackParam param) {
     // TODO remove once development is finished
-    //url = "http://localhost:8123/callback"; // temp for development
+    url = "http://localhost:8123/callback"; // temp for development
     LOGGER.info("Attempting callback [" + url + "] ...");
-    return httpClient.target(url).request().post(Entity.json(item));
+    return httpClient.target(url).request().post(Entity.json(param));
   }
 
   private boolean isOk(Response response) {
