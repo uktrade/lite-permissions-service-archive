@@ -17,9 +17,6 @@ public class SubmissionServiceImpl implements SubmissionService {
   private OgelSubmissionDao submissionDao;
   private CustomerService customerService;
 
-  private static final String USER_ROLE_UPDATE_STATUS_COMPLETE = "COMPLETE";
-  private static final String USER_ROLE_UPDATE_STATUS_ERROR = "Error";
-
   @Inject
   public SubmissionServiceImpl(OgelSubmissionDao submissionDao, CustomerService customerService) {
     this.submissionDao = submissionDao;
@@ -99,15 +96,14 @@ public class SubmissionServiceImpl implements SubmissionService {
   }
 
   private boolean doUserRoleUpdate(OgelSubmission sub) {
-    Optional<String> status = customerService.updateUserRole(sub);
-    boolean created = status.isPresent() && status.get().equals(USER_ROLE_UPDATE_STATUS_COMPLETE);
-    if (created) {
+    boolean updated = customerService.updateUserRole(sub);
+    if (updated) {
       sub.setRoleUpdated(true);
       sub.updateStatus();
       submissionDao.update(sub);
       LOGGER.info("User role updated. Updated OgelSubmission: " + sub.getUserId() + "/" + sub.getOgelType());
     }
-    return created;
+    return updated;
   }
 
 }

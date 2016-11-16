@@ -7,12 +7,12 @@ import com.google.inject.name.Named;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.bis.lite.customer.api.item.AddressItem;
-import uk.gov.bis.lite.customer.api.item.in.CustomerIn;
-import uk.gov.bis.lite.customer.api.item.in.SiteIn;
-import uk.gov.bis.lite.customer.api.item.in.UserRoleIn;
-import uk.gov.bis.lite.customer.api.item.out.CustomerOut;
-import uk.gov.bis.lite.customer.api.item.out.CustomerServiceOut;
+import uk.gov.bis.lite.customer.api.param.AddressParam;
+import uk.gov.bis.lite.customer.api.param.CustomerParam;
+import uk.gov.bis.lite.customer.api.param.SiteParam;
+import uk.gov.bis.lite.customer.api.param.UserRoleParam;
+import uk.gov.bis.lite.customer.api.view.CustomerView;
+import uk.gov.bis.lite.customer.api.view.SiteView;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.model.register.Address;
 import uk.gov.bis.lite.permissions.model.register.AdminApproval;
@@ -29,7 +29,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
 @Singleton
-public class CustomerService {
+class CustomerService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CustomerService.class);
 
@@ -78,7 +78,7 @@ public class CustomerService {
     try {
       Response response = target.request().post(Entity.json(getSiteItemIn(sub)));
       if (isOk(response)) {
-        return Optional.of(response.readEntity(CustomerServiceOut.class).getResponse());
+        return Optional.of(response.readEntity(SiteView.class).getSiteId());
       } else {
         failService.fail(sub, response, FailService.Origin.SITE);
       }
@@ -90,9 +90,9 @@ public class CustomerService {
 
   /**
    * Uses CustomerService to update a UserRole
-   * Returns 'COMPLETE' if successful, notifies FailService if there is an error
+   * Returns TRUE if successful, notifies FailService if there is an error
    */
-  Optional<String> updateUserRole(OgelSubmission sub) {
+  boolean updateUserRole(OgelSubmission sub) {
 
     String userRolePath = "/user-roles/user/{userId}/site/{siteRef}";
     String path = userRolePath.replace("{userId}", sub.getUserId());
@@ -101,11 +101,11 @@ public class CustomerService {
     WebTarget target = httpClient.target(customerServiceUrl).path(path);
     Response response = target.request().post(Entity.json(getUserRoleItem(sub)));
     if (isOk(response)) {
-      return Optional.of(response.readEntity(CustomerServiceOut.class).getResponse());
+      return true;
     } else {
       failService.fail(sub, response, FailService.Origin.USER_ROLE);
     }
-    return Optional.empty();
+    return false;
   }
 
   /**
@@ -118,7 +118,7 @@ public class CustomerService {
     try {
       Response response = target.request().post(Entity.json(getCustomerItem(sub)));
       if (isOk(response)) {
-        return Optional.of(response.readEntity(CustomerServiceOut.class).getResponse());
+        return Optional.of(response.readEntity(CustomerView.class).getCustomerId());
       } else {
         failService.fail(sub, response, FailService.Origin.CUSTOMER);
       }
@@ -138,7 +138,7 @@ public class CustomerService {
     try {
       Response response = target.request().get();
       if (isOk(response)) {
-        CustomerOut customer = response.readEntity(CustomerOut.class);
+        CustomerView customer = response.readEntity(CustomerView.class);
         return Optional.of(customer.getCustomerId());
       }
     } catch (ProcessingException e) {
@@ -147,14 +147,14 @@ public class CustomerService {
     return Optional.empty();
   }
 
-  private CustomerIn getCustomerItem(OgelSubmission sub) {
+  private CustomerParam getCustomerItem(OgelSubmission sub) {
     RegisterOgel reg = sub.getRegisterOgelFromJson();
     Customer customer = reg.getNewCustomer();
     Address address = customer.getRegisteredAddress();
-    CustomerIn item = new CustomerIn();
+    CustomerParam item = new CustomerParam();
     item.setUserId(sub.getUserId());
     item.setCustomerName(customer.getCustomerName());
-    item.setAddressItem(getAddressItem(address));
+    item.setAddressParam(getAddressParam(address));
     item.setCompaniesHouseNumber(customer.getChNumber());
     item.setCompaniesHouseValidated(customer.isChNumberValidated());
     item.setCustomerType(customer.getCustomerType());
@@ -164,8 +164,8 @@ public class CustomerService {
     return item;
   }
 
-  private AddressItem getAddressItem(Address address) {
-    AddressItem item = new AddressItem();
+  private AddressParam getAddressParam(Address address) {
+    AddressParam item = new AddressParam();
     item.setLine1(address.getLine1());
     item.setLine2(address.getLine2());
     item.setTown(address.getTown());
@@ -175,26 +175,26 @@ public class CustomerService {
     return item;
   }
 
-  private SiteIn getSiteItemIn(OgelSubmission sub) {
+  private SiteParam getSiteItemIn(OgelSubmission sub) {
     RegisterOgel reg = sub.getRegisterOgelFromJson();
     Site site = reg.getNewSite();
     String siteName = site.getSiteName() != null ? site.getSiteName() : DEFAULT_SITE_NAME;
     Address address = site.isUseCustomerAddress() ? reg.getNewCustomer().getRegisteredAddress() : site.getAddress();
 
-    SiteIn siteIn = new SiteIn();
-    siteIn.setSiteName(siteName);
-    siteIn.setAddress(getAddressItem(address));
-    return siteIn;
+    SiteParam siteParam = new SiteParam();
+    siteParam.setSiteName(siteName);
+    siteParam.setAddressParam(getAddressParam(address));
+    return siteParam;
   }
 
   /**
    * Creates a UserRoleItem with an ADMIN roleType
    */
-  private UserRoleIn getUserRoleItem(OgelSubmission sub) {
+  private UserRoleParam getUserRoleItem(OgelSubmission sub) {
     RegisterOgel reg = sub.getRegisterOgelFromJson();
     AdminApproval admin = reg.getAdminApproval();
-    UserRoleIn item = new UserRoleIn();
-    item.setRoleType(UserRoleIn.RoleType.ADMIN);
+    UserRoleParam item = new UserRoleParam();
+    item.setRoleType(UserRoleParam.RoleType.ADMIN);
     item.setAdminUserId(admin.getAdminUserId());
     return item;
   }
