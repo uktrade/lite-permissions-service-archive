@@ -1,4 +1,4 @@
-package uk.gov.bis.lite.permissions.model.register;
+package uk.gov.bis.lite.permissions.api;
 
 public class RegisterOgelResponse {
 

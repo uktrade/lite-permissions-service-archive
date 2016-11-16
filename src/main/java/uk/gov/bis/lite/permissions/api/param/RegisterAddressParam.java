@@ -1,11 +1,9 @@
-package uk.gov.bis.lite.permissions.model.register;
+package uk.gov.bis.lite.permissions.api.param;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.bis.lite.permissions.util.Util;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class Address {
+public class RegisterAddressParam {
 
   private String line1;
   private String line2;
@@ -14,22 +12,10 @@ public class Address {
   private String postcode;
   private String country;
 
-  public String getLiteAddress() {
-    return Util.joinDelimited(", ", line1, line2, town, county, postcode, country);
-  }
-
-  public String getSpireAddress() {
-    return Util.joinDelimited(", ", line1, line2, town, county, postcode, country);
-  }
-
-  public String getAddressData() {
-    return Util.joinDelimited("", line1, line2, town, county, postcode, country);
-  }
-
   /**
    * At least one part of address must be not null to be valid
    */
-  public boolean isValid() {
+  boolean valid() {
     boolean valid = false;
     if (!StringUtils.isBlank(line1) || !StringUtils.isBlank(line2) || !StringUtils.isBlank(town)
         || !StringUtils.isBlank(county) || !StringUtils.isBlank(postcode) || !StringUtils.isBlank(country)) {
@@ -38,14 +24,8 @@ public class Address {
     return valid;
   }
 
-  public String getInfo() {
-    return "Address " +
-        Util.info("line1", line1) +
-        Util.info("line2", line2) +
-        Util.info("town", town) +
-        Util.info("county", county) +
-        Util.info("postcode", postcode) +
-        Util.info("country", country);
+  String addressData() {
+    return Util.joinDelimited("", line1, line2, town, county, postcode, country);
   }
 
   public String getLine1() {

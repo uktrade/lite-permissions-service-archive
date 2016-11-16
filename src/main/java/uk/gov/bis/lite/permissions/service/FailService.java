@@ -53,7 +53,7 @@ class FailService {
     private static String TERM_SITE_ALREADY_REGISTERED = "SITE_ALREADY_REGISTERED";
     private static String TERM_BLACKLISTED = "BLACKLISTED";
     private static String TERM_SOAP_FAULT = "soap:Fault";
-    private static String TERM_CUSTOMER_NAME_ALREADY_EXISTS = "Customer name already exists";
+    private static String TERM_CUSTOMER_NAME_ALREADY_EXISTS = "CustomerParam1 name already exists";
     private static String TERM_UNCLASSIFIED_ERROR = "UNCLASSIFIED_ERROR";
 
     private static final Set<String> searchTerms = new HashSet<>(Arrays.asList(

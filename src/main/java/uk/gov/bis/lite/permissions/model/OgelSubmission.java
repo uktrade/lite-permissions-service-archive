@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.bis.lite.permissions.model.register.RegisterOgel;
+import uk.gov.bis.lite.permissions.api.param.RegisterParam;
 import uk.gov.bis.lite.permissions.util.Util;
 
 import java.io.IOException;
@@ -45,8 +45,8 @@ public class OgelSubmission {
 
   /**
    * CREATED    - initial status on creation
-   * CUSTOMER   - we need to create a Customer and populate customerId with resulting sarRef
-   * SITE       - we need to create a Site and populate siteId with resulting siteRef
+   * CUSTOMER   - we need to create a CustomerParam1 and populate customerId with resulting sarRef
+   * SITE       - we need to create a SiteParam1 and populate siteId with resulting siteRef
    * USER_ROLE  - we need to update user role permissions
    * READY      - this OgelSubmission is now setUp and we can create the Ogel via Spire
    * SUCCESS    - Registration completed on Spire, OgelSubmission updated with Spire Ref, processing submission complete
@@ -154,15 +154,15 @@ public class OgelSubmission {
     return roleUpdate && !roleUpdated;
   }
 
-  public RegisterOgel getRegisterOgelFromJson() {
-    RegisterOgel regOgel = null;
+  public RegisterParam getRegisterParamFromJson() {
+    RegisterParam param = null;
     ObjectMapper mapper = new ObjectMapper();
     try {
-      regOgel = mapper.readValue(this.getJson(), RegisterOgel.class);
+      param = mapper.readValue(this.getJson(), RegisterParam.class);
     } catch (IOException e) {
       e.printStackTrace();
     }
-    return regOgel;
+    return param;
   }
 
   public String getJson() {

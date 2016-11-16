@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.bis.lite.permissions.model.OgelRegistration;
+import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
 import uk.gov.bis.lite.permissions.service.RegistrationsService;
 
 import java.util.List;
@@ -33,9 +33,9 @@ public class OgelRegistrationResource {
   @GET
   @Produces({MediaType.APPLICATION_JSON})
   @Path("/ogel-registrations/user/{userId}")
-  public List<OgelRegistration> viewOgelRegistrations(@NotNull @PathParam("userId") String userId,
-                                                      @QueryParam("registrationReference") String registrationReference) {
-    List<OgelRegistration> results;
+  public List<OgelRegistrationView> viewOgelRegistrations(@NotNull @PathParam("userId") String userId,
+                                                          @QueryParam("registrationReference") String registrationReference) {
+    List<OgelRegistrationView> results;
 
     if (StringUtils.isBlank(registrationReference)) {
       results = registrationsService.getRegistrations(userId);

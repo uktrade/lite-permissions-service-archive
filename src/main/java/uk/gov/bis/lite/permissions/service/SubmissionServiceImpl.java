@@ -78,7 +78,7 @@ public class SubmissionServiceImpl implements SubmissionService {
       sub.setCustomerRef(sarRef.get());
       sub.updateStatus();
       submissionDao.update(sub);
-      LOGGER.info("Updated record with created Customer sarRef: " + sarRef.get());
+      LOGGER.info("Updated record with created CustomerParam1 sarRef: " + sarRef.get());
     }
     return created;
   }
@@ -90,7 +90,7 @@ public class SubmissionServiceImpl implements SubmissionService {
       sub.setSiteRef(siteRef.get());
       sub.updateStatus();
       submissionDao.update(sub);
-      LOGGER.info("Site created. Updated record: " + siteRef.get());
+      LOGGER.info("SiteParam1 created. Updated record: " + siteRef.get());
     }
     return created;
   }

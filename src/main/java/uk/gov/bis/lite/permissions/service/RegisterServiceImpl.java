@@ -13,11 +13,12 @@ import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.bis.lite.permissions.api.param.RegisterParam;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
-import uk.gov.bis.lite.permissions.model.register.RegisterOgel;
 import uk.gov.bis.lite.permissions.scheduler.ProcessImmediateJob;
 import uk.gov.bis.lite.permissions.scheduler.Scheduler;
+import uk.gov.bis.lite.permissions.util.Util;
 
 @Singleton
 public class RegisterServiceImpl implements RegisterService {
@@ -41,7 +42,7 @@ public class RegisterServiceImpl implements RegisterService {
    * Creates and persists OgelSubmission in IMMEDIATE mode
    * Triggers a ProcessImmediateJob job to process submission
    */
-  public String register(RegisterOgel reg, String callbackUrl) {
+  public String register(RegisterParam reg, String callbackUrl) {
     LOGGER.info("Creating OgelSubmission: " + reg.getUserId() + "/" + reg.getOgelType());
 
     // Create new OgelSubmission and persist
@@ -56,6 +57,22 @@ public class RegisterServiceImpl implements RegisterService {
     triggerProcessSubmissionJob(sub.getSubmissionRef());
 
     return sub.getSubmissionRef();
+  }
+
+  /**
+   * Gathers data, creates  hash
+   */
+  public String generateSubmissionReference(RegisterParam registerParam) {
+    String message = registerParam.joinedInstanceStateData().replaceAll("\\s+", "").toUpperCase();
+    return Util.generateHashFromString(message);
+  }
+
+  public boolean isValid(RegisterParam registerParam) {
+    return registerParam.valid();
+  }
+
+  public String validationInfo(RegisterParam registerParam) {
+    return registerParam.validationInfo();
   }
 
   private void triggerProcessSubmissionJob(String submissionRef) {
@@ -73,12 +90,12 @@ public class RegisterServiceImpl implements RegisterService {
     }
   }
 
-  private OgelSubmission getOgelSubmission(RegisterOgel reg) {
+  private OgelSubmission getOgelSubmission(RegisterParam reg) {
     OgelSubmission sub = new OgelSubmission(reg.getUserId(), reg.getOgelType());
     sub.setCustomerRef(reg.getExistingCustomer());
     sub.setSiteRef(reg.getExistingSite());
-    sub.setSubmissionRef(reg.generateSubmissionReference());
-    sub.setRoleUpdate(reg.isRoleUpdateRequired());
+    sub.setSubmissionRef(generateSubmissionReference(reg));
+    sub.setRoleUpdate(reg.roleUpdateRequired());
     sub.setCalledBack(false);
     try {
       sub.setJson(mapper.writeValueAsString(reg));

@@ -13,12 +13,9 @@ import uk.gov.bis.lite.customer.api.param.SiteParam;
 import uk.gov.bis.lite.customer.api.param.UserRoleParam;
 import uk.gov.bis.lite.customer.api.view.CustomerView;
 import uk.gov.bis.lite.customer.api.view.SiteView;
+import uk.gov.bis.lite.permissions.api.param.RegisterAddressParam;
+import uk.gov.bis.lite.permissions.api.param.RegisterParam;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
-import uk.gov.bis.lite.permissions.model.register.Address;
-import uk.gov.bis.lite.permissions.model.register.AdminApproval;
-import uk.gov.bis.lite.permissions.model.register.Customer;
-import uk.gov.bis.lite.permissions.model.register.RegisterOgel;
-import uk.gov.bis.lite.permissions.model.register.Site;
 
 import java.util.Optional;
 
@@ -148,42 +145,43 @@ class CustomerService {
   }
 
   private CustomerParam getCustomerParam(OgelSubmission sub) {
-    RegisterOgel reg = sub.getRegisterOgelFromJson();
-    Customer customer = reg.getNewCustomer();
-    Address address = customer.getRegisteredAddress();
-    CustomerParam param = new CustomerParam();
-    param.setUserId(sub.getUserId());
-    param.setCustomerName(customer.getCustomerName());
-    param.setAddressParam(getAddressParam(address));
-    param.setCompaniesHouseNumber(customer.getChNumber());
-    param.setCompaniesHouseValidated(customer.isChNumberValidated());
-    param.setCustomerType(customer.getCustomerType());
-    param.setEoriNumber(customer.getEoriNumber());
-    param.setEoriValidated(customer.isEoriNumberValidated());
-    param.setWebsite(customer.getWebsite());
-    return param;
+    RegisterParam regParam = sub.getRegisterParamFromJson();
+    RegisterParam.RegisterCustomerParam regCustomerParam = regParam.getNewCustomer();
+    RegisterAddressParam regAddressParam = regCustomerParam.getRegisteredAddress();
+
+    CustomerParam customerParam = new CustomerParam();
+    customerParam.setUserId(sub.getUserId());
+    customerParam.setCustomerName(regCustomerParam.getCustomerName());
+    customerParam.setAddressParam(getAddressParam(regAddressParam));
+    customerParam.setCompaniesHouseNumber(regCustomerParam.getChNumber());
+    customerParam.setCompaniesHouseValidated(regCustomerParam.isChNumberValidated());
+    customerParam.setCustomerType(regCustomerParam.getCustomerType());
+    customerParam.setEoriNumber(regCustomerParam.getEoriNumber());
+    customerParam.setEoriValidated(regCustomerParam.isEoriNumberValidated());
+    customerParam.setWebsite(regCustomerParam.getWebsite());
+    return customerParam;
   }
 
-  private AddressParam getAddressParam(Address address) {
-    AddressParam param = new AddressParam();
-    param.setLine1(address.getLine1());
-    param.setLine2(address.getLine2());
-    param.setTown(address.getTown());
-    param.setCounty(address.getCounty());
-    param.setPostcode(address.getPostcode());
-    param.setCountry(address.getCountry());
-    return param;
+  private AddressParam getAddressParam(RegisterAddressParam regAddressParam) {
+    AddressParam addressParam = new AddressParam();
+    addressParam.setLine1(regAddressParam.getLine1());
+    addressParam.setLine2(regAddressParam.getLine2());
+    addressParam.setTown(regAddressParam.getTown());
+    addressParam.setCounty(regAddressParam.getCounty());
+    addressParam.setPostcode(regAddressParam.getPostcode());
+    addressParam.setCountry(regAddressParam.getCountry());
+    return addressParam;
   }
 
   private SiteParam getSiteParam(OgelSubmission sub) {
-    RegisterOgel reg = sub.getRegisterOgelFromJson();
-    Site site = reg.getNewSite();
-    String siteName = site.getSiteName() != null ? site.getSiteName() : DEFAULT_SITE_NAME;
-    Address address = site.isUseCustomerAddress() ? reg.getNewCustomer().getRegisteredAddress() : site.getAddress();
+    RegisterParam regParam = sub.getRegisterParamFromJson();
+    RegisterParam.RegisterSiteParam regSiteParam = regParam.getNewSite();
+    String siteName = regSiteParam.getSiteName() != null ? regSiteParam.getSiteName() : DEFAULT_SITE_NAME;
+    RegisterAddressParam regAddressParam = regSiteParam.isUseCustomerAddress() ? regParam.getNewCustomer().getRegisteredAddress() : regSiteParam.getAddress();
 
     SiteParam siteParam = new SiteParam();
     siteParam.setSiteName(siteName);
-    siteParam.setAddressParam(getAddressParam(address));
+    siteParam.setAddressParam(getAddressParam(regAddressParam));
     return siteParam;
   }
 
@@ -191,12 +189,13 @@ class CustomerService {
    * Creates a UserRoleParam with an ADMIN roleType
    */
   private UserRoleParam getUserRoleParam(OgelSubmission sub) {
-    RegisterOgel reg = sub.getRegisterOgelFromJson();
-    AdminApproval admin = reg.getAdminApproval();
-    UserRoleParam param = new UserRoleParam();
-    param.setRoleType(UserRoleParam.RoleType.ADMIN);
-    param.setAdminUserId(admin.getAdminUserId());
-    return param;
+    RegisterParam regParam = sub.getRegisterParamFromJson();
+    RegisterParam.RegisterAdminApprovalParam regAdminApprovalParam = regParam.getAdminApproval();
+
+    UserRoleParam userRoleParam = new UserRoleParam();
+    userRoleParam.setRoleType(UserRoleParam.RoleType.ADMIN);
+    userRoleParam.setAdminUserId(regAdminApprovalParam.getAdminUserId());
+    return userRoleParam;
   }
 
   private boolean isOk(Response response) {

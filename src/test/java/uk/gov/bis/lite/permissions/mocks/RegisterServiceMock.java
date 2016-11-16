@@ -1,6 +1,6 @@
 package uk.gov.bis.lite.permissions.mocks;
 
-import uk.gov.bis.lite.permissions.model.register.RegisterOgel;
+import uk.gov.bis.lite.permissions.api.param.RegisterParam;
 import uk.gov.bis.lite.permissions.service.RegisterService;
 
 public class RegisterServiceMock implements RegisterService {
@@ -11,8 +11,19 @@ public class RegisterServiceMock implements RegisterService {
     this.mockSubmissionRef = mockSubmissionRef;
   }
 
-  public String register(RegisterOgel reg, String callbackUrl) {
+  public String register(RegisterParam reg, String callbackUrl) {
     return mockSubmissionRef;
   }
 
+  public boolean isValid(RegisterParam registerParam) {
+    return true;
+  }
+
+  public String validationInfo(RegisterParam registerParam) {
+    return "";
+  }
+
+  public String generateSubmissionReference(RegisterParam registerParam) {
+    return "";
+  }
 }
