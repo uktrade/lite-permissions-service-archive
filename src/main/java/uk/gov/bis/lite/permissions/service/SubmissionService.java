@@ -12,6 +12,6 @@ public interface SubmissionService {
 
   boolean prepareRoleUpdate(OgelSubmission sub);
 
-  void updateModeIfNotCompleted(String submissionRef);
+  void updateModeIfNotCompleted(int submissionId);
 
 }

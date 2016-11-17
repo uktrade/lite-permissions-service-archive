@@ -8,7 +8,7 @@ public interface OgelSubmissionDao {
 
   void update(OgelSubmission sub);
 
-  void create(OgelSubmission sub);
+  int create(OgelSubmission sub);
 
   List<OgelSubmission> getScheduled();
 
@@ -17,6 +17,8 @@ public interface OgelSubmissionDao {
   List<OgelSubmission> getScheduledCallbacks();
 
   OgelSubmission findBySubmissionRef(String submissionRef);
+
+  OgelSubmission findBySubmissionId(int submissionId);
 
   OgelSubmission findRecentBySubmissionRef(String submissionRef);
 }

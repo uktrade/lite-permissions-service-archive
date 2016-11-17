@@ -61,10 +61,10 @@ public class SubmissionServiceImpl implements SubmissionService {
    * If OgelSubmission has not completed processing or has not yet been 'called back'
    * then set MODE to 'SCHEDULED'
    */
-  public void updateModeIfNotCompleted(String submissionRef) {
-    OgelSubmission sub = submissionDao.findBySubmissionRef(submissionRef);
+  public void updateModeIfNotCompleted(int submissionId) {
+    OgelSubmission sub = submissionDao.findBySubmissionId(submissionId);
     if (!sub.hasCompleted() || !sub.isCalledBack()) {
-      LOGGER.info("Updating MODE to SCHEDULED for: [" + submissionRef + "]");
+      LOGGER.info("Updating MODE to SCHEDULED for: [" + submissionId + "]");
       sub.changeToScheduledMode();
       sub.updateStatus();
       submissionDao.update(sub);

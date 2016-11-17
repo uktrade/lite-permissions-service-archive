@@ -32,14 +32,16 @@ public class JobProcessService {
    * Process OgelSubmission through all stages - set Mode to SCHEDULED if process cannot be completed
    * (This method is called by ProcessImmediateJob)
    */
-  public void processImmediate(String submissionRef) {
-    LOGGER.info("IMMEDIATE [" + submissionRef + "]");
+  public void processImmediate(int submissionId) {
+    LOGGER.info("IMMEDIATE [" + submissionId + "]");
+
+    OgelSubmission sub = submissionDao.findBySubmissionId(submissionId);
 
     // Attempt to process this OgelSubmission immediately
-    doProcessOgelSubmission(submissionRef);
+    doProcessOgelSubmission(sub);
 
     // Update MODE if necessary
-    submissionService.updateModeIfNotCompleted(submissionRef);
+    submissionService.updateModeIfNotCompleted(submissionId);
   }
 
   /**
@@ -49,16 +51,14 @@ public class JobProcessService {
   public void processScheduled() {
     List<OgelSubmission> subs = submissionDao.getScheduledCallbacks();
     LOGGER.info("SCHEDULED [" + subs.size() + "]");
-    subs.stream().map(OgelSubmission::getSubmissionRef).forEach(this::doProcessOgelSubmission);
+    subs.forEach(this::doProcessOgelSubmission);
   }
 
   /**
    * Attempts to complete all OgelSubmission stages
    * Delegate services responsible for updating OgelSubmission status, and reporting failures
    */
-  private void doProcessOgelSubmission(String submissionRef) {
-
-    OgelSubmission sub = submissionDao.findBySubmissionRef(submissionRef);
+  private void doProcessOgelSubmission(OgelSubmission sub) {
 
     // Ensure we have Customer, Site and correct Role
     boolean preparedCustomer = submissionService.prepareCustomer(sub);

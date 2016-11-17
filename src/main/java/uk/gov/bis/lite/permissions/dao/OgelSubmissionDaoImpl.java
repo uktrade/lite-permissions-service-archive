@@ -31,6 +31,14 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
 
   @Override
   @Transaction
+  public OgelSubmission findBySubmissionId(int submissionId) {
+    try (final Handle handle = jdbi.open()) {
+      return attach(handle).findBySubmissionId(submissionId);
+    }
+  }
+
+  @Override
+  @Transaction
   public OgelSubmission findRecentBySubmissionRef(String submissionRef) {
     try (final Handle handle = jdbi.open()) {
       return attach(handle).findRecentBySubmissionRef(submissionRef);
@@ -63,9 +71,10 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
 
   @Override
   @Transaction
-  public void create(OgelSubmission sub) {
+  public int create(OgelSubmission sub) {
     try (final Handle handle = jdbi.open()) {
-      attach(handle).insert(
+      OgelSubmissionInterface subInterface = handle.attach(OgelSubmissionInterface.class);
+      return subInterface.insert(
           sub.getUserId(),
           sub.getOgelType(),
           sub.getSubmissionRef(),

@@ -1,6 +1,7 @@
 package uk.gov.bis.lite.permissions.dao.sqlite;
 
 import org.skife.jdbi.v2.sqlobject.Bind;
+import org.skife.jdbi.v2.sqlobject.GetGeneratedKeys;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
@@ -27,19 +28,20 @@ public interface OgelSubmissionInterface {
   @SqlUpdate("INSERT INTO LOCAL_OGEL_SUBMISSION (USER_ID, OGEL_TYPE, SUBMISSION_REF, CUSTOMER_REF, SITE_REF, SPIRE_REF, " +
       "CALLBACK_URL, CALLED_BACK, JSON, MODE, STATUS, ROLE_UPDATE, ROLE_UPDATED) VALUES (:userId, :ogelType, :submissionRef, :customerRef, :siteRef, " +
       " :spireRef, :callbackUrl, :calledBack, :json, :mode, :status, :roleUpdate, :roleUpdated)")
-  void insert(@Bind("userId") String userId,
-              @Bind("ogelType") String ogelType,
-              @Bind("submissionRef") String submissionRef,
-              @Bind("customerRef") String customerRef,
-              @Bind("siteRef") String siteRef,
-              @Bind("spireRef") String spireRef,
-              @Bind("callbackUrl") String callbackUrl,
-              @Bind("calledBack") Boolean calledBack,
-              @Bind("json") String json,
-              @Bind("mode") String mode,
-              @Bind("status") String status,
-              @Bind("roleUpdate") Boolean roleUpdate,
-              @Bind("roleUpdated") Boolean roleUpdated);
+  @GetGeneratedKeys
+  int insert(@Bind("userId") String userId,
+             @Bind("ogelType") String ogelType,
+             @Bind("submissionRef") String submissionRef,
+             @Bind("customerRef") String customerRef,
+             @Bind("siteRef") String siteRef,
+             @Bind("spireRef") String spireRef,
+             @Bind("callbackUrl") String callbackUrl,
+             @Bind("calledBack") Boolean calledBack,
+             @Bind("json") String json,
+             @Bind("mode") String mode,
+             @Bind("status") String status,
+             @Bind("roleUpdate") Boolean roleUpdate,
+             @Bind("roleUpdated") Boolean roleUpdated);
 
 
   @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE MODE = 'SCHEDULED' AND STATUS != 'SUCCESS' AND STATUS != 'ERROR'")
@@ -54,17 +56,15 @@ public interface OgelSubmissionInterface {
   @Mapper(OgelSubmissionMapper.class)
   List<OgelSubmission> getScheduledCallbacks();
 
-  /*
-  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE (STATUS = 'SUCCESS' || STATUS = 'ERROR') " +
-      "  AND MODE = 'SCHEDULED' AND (CALLBACK_URL IS NOT NULL AND CALLBACK_URL != '') AND CALLED_BACK = 0")
-  @Mapper(OgelSubmissionMapper.class)
-  List<OgelSubmission> getScheduledCallbacks();*/
-
   @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE SUBMISSION_REF = :submissionRef")
   @Mapper(OgelSubmissionMapper.class)
   OgelSubmission findBySubmissionRef(@Bind("submissionRef") String submissionRef);
 
-  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE SUBMISSION_REF = :submissionRef AND CREATED > date('now','-3 months')")
+  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE ID = :submissionId")
+  @Mapper(OgelSubmissionMapper.class)
+  OgelSubmission findBySubmissionId(@Bind("submissionId") int submissionId);
+
+  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE SUBMISSION_REF = :submissionRef AND CALLED_BACK = 0")
   @Mapper(OgelSubmissionMapper.class)
   OgelSubmission findRecentBySubmissionRef(@Bind("submissionRef") String submissionRef);
 
