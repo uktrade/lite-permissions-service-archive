@@ -11,16 +11,16 @@ public class ProcessImmediateJob implements Job {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProcessImmediateJob.class);
   private JobProcessService jobProcessService;
-  private String submissionRef;
+  private int submissionId;
 
   @Override
   public void execute(JobExecutionContext context) throws JobExecutionException {
     init(context);
-    jobProcessService.processImmediate(submissionRef);
+    jobProcessService.processImmediate(submissionId);
   }
 
   private void init(JobExecutionContext context) {
     jobProcessService = (JobProcessService) context.getMergedJobDataMap().get(Scheduler.JOB_PROCESS_SERVICE_NAME);
-    submissionRef = (String) context.getMergedJobDataMap().get(Scheduler.SUBMISSION_REF);
+    submissionId = (int) context.getMergedJobDataMap().get(Scheduler.SUBMISSION_ID);
   }
 }

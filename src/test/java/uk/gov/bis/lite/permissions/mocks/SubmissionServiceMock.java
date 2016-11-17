@@ -23,7 +23,7 @@ public class SubmissionServiceMock implements SubmissionService {
     return true;
   }
 
-  public void updateModeIfNotCompleted(String submissionRef) {
+  public void updateModeIfNotCompleted(int submissionId) {
 
   }
 

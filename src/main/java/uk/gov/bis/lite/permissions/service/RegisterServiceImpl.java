@@ -53,10 +53,10 @@ public class RegisterServiceImpl implements RegisterService {
     sub.setMode(OgelSubmission.Mode.IMMEDIATE);
     sub.setStatus(OgelSubmission.Status.CREATED);
 
-    submissionDao.create(sub);
+    int submissionId = submissionDao.create(sub);
 
     // Trigger ProcessImmediateJob to process this submission
-    triggerProcessSubmissionJob(sub.getSubmissionRef());
+    triggerProcessSubmissionJob(submissionId);
 
     return sub.getSubmissionRef();
   }
@@ -118,13 +118,13 @@ public class RegisterServiceImpl implements RegisterService {
     return info;
   }
 
-  private void triggerProcessSubmissionJob(String submissionRef) {
+  private void triggerProcessSubmissionJob(int submissionId) {
     JobDetail detail = JobBuilder.newJob(ProcessImmediateJob.class).build();
     JobDataMap dataMap = detail.getJobDataMap();
     dataMap.put(Scheduler.JOB_PROCESS_SERVICE_NAME, jobProcessService);
-    dataMap.put(Scheduler.SUBMISSION_REF, submissionRef);
+    dataMap.put(Scheduler.SUBMISSION_ID, submissionId);
     Trigger trigger = TriggerBuilder.newTrigger()
-        .withIdentity(TriggerKey.triggerKey("SubmissionProcessJobTrigger-" + submissionRef))
+        .withIdentity(TriggerKey.triggerKey("SubmissionProcessJobTrigger-" + submissionId))
         .startNow().build();
     try {
       scheduler.scheduleJob(detail, trigger);
