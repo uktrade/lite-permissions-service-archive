@@ -4,11 +4,11 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * RegisterParam
- *
+ * <p>
  * Including static nested classes:
- *  RegisterSiteParam
- *  RegisterCustomerParam
- *  RegisterAdminApprovalParam
+ * RegisterSiteParam
+ * RegisterCustomerParam
+ * RegisterAdminApprovalParam
  */
 public class RegisterParam {
 
@@ -25,25 +25,34 @@ public class RegisterParam {
     return adminApproval != null && !StringUtils.isBlank(adminApproval.getAdminUserId());
   }
 
-  public boolean valid() {
-    boolean valid = mandatoryFieldsOk() && customerFieldsOk() && siteFieldsOk();
-    if (valid && newSite != null) {
-      valid = newSite.valid(newCustomer);
-    }
-    return valid;
+  public String joinedInstanceStateData() {
+    String strings = StringUtils.join(userId, ogelType, existingCustomer, existingSite);
+    String customer = newCustomer != null ? newCustomer.joinedInstanceStateData() : "";
+    String site = newSite != null ? newSite.joinedInstanceStateData() : "";
+    String admin = adminApproval != null ? adminApproval.joinedInstanceStateData() : "";
+    return strings + customer + site + admin;
   }
 
-  public String validationInfo() {
-    String info = !mandatoryFieldsOk() ? "Fields are mandatory: userId, ogelType. " : "";
-    String customerCheck = !customerFieldsOk() ? "Must have existing Customer or new Customer fields. " : "";
-    String siteCheck = !siteFieldsOk() ? "Must have existing Site or new Site fields. " : "";
-    info = info + customerCheck + siteCheck;
-    if (newSite != null) {
-      if (!newSite.valid(newCustomer)) {
-        info = info + "New Site must have full address";
-      }
-    }
-    return info;
+  public boolean mandatoryFieldsOk() {
+    return !StringUtils.isBlank(userId) && !StringUtils.isBlank(ogelType);
+  }
+
+  public boolean customerFieldsOk() {
+    return (StringUtils.isBlank(existingCustomer) && newCustomer != null) ||
+        (!StringUtils.isBlank(existingCustomer) && newCustomer == null);
+  }
+
+  public boolean siteFieldsOk() {
+    return (StringUtils.isBlank(existingSite) && newSite != null) ||
+        (!StringUtils.isBlank(existingSite) && newSite == null);
+  }
+
+  public boolean hasNewSite() {
+    return newSite != null;
+  }
+
+  public boolean hasNewCustomer() {
+    return newCustomer != null;
   }
 
   /**
@@ -54,37 +63,11 @@ public class RegisterParam {
     private String siteName;
     private RegisterAddressParam address;
 
-    boolean valid(RegisterCustomerParam customer) {
-      boolean valid = false;
-      if (useCustomerAddress) {
-        if (customer != null) {
-          RegisterAddressParam address = customer.getRegisteredAddress();
-          if (address != null) {
-            if (address.valid()) {
-              return true;
-            }
-          }
-        }
-      } else {
-        valid = valid(siteName, address);
-      }
-      return valid;
-    }
-
     String joinedInstanceStateData() {
       String strings = StringUtils.join(siteName);
       String booleans = StringUtils.join(useCustomerAddress);
       String add = address != null ? address.addressData() : "";
       return strings + booleans + add;
-    }
-
-    private boolean valid(String siteName, RegisterAddressParam address) {
-      if (!StringUtils.isBlank(siteName) && address != null) {
-        if (address.valid()) {
-          return true;
-        }
-      }
-      return false;
     }
 
     public boolean isUseCustomerAddress() {
@@ -217,30 +200,8 @@ public class RegisterParam {
   }
 
   /**
-   * Private methods
+   * Getters/Setters
    */
-  public String joinedInstanceStateData() {
-    String strings = StringUtils.join(userId, ogelType, existingCustomer, existingSite);
-    String customer = newCustomer != null ? newCustomer.joinedInstanceStateData() : "";
-    String site = newSite != null ? newSite.joinedInstanceStateData() : "";
-    String admin = adminApproval != null ? adminApproval.joinedInstanceStateData() : "";
-    return strings + customer + site + admin;
-  }
-
-  private boolean mandatoryFieldsOk() {
-    return !StringUtils.isBlank(userId) && !StringUtils.isBlank(ogelType);
-  }
-
-  private boolean customerFieldsOk() {
-    return (StringUtils.isBlank(existingCustomer) && newCustomer != null) ||
-        (!StringUtils.isBlank(existingCustomer) && newCustomer == null);
-  }
-
-  private boolean siteFieldsOk() {
-    return (StringUtils.isBlank(existingSite) && newSite != null) ||
-        (!StringUtils.isBlank(existingSite) && newSite == null);
-  }
-
   public String getUserId() {
     return userId;
   }

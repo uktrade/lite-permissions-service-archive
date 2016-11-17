@@ -40,12 +40,13 @@ public class RegisterOgelResource {
   public Response registerOgel(RegisterParam registerParam, @QueryParam("callbackUrl") String callbackUrl) {
     LOGGER.info("************ register-ogel ************ ");
 
-    // Check if register Ogel request is valid
-    if (!registerService.isValid(registerParam)) {
-      return badRequest(ERROR_INVALID_REQUEST, "Request invalid - " + registerService.validationInfo(registerParam));
+    // Check if RegisterParam request is valid
+    if (!registerService.isRegisterParamValid(registerParam)) {
+      return badRequest(ERROR_INVALID_REQUEST, "Request invalid - "
+          + registerService.getRegisterParamValidationInfo(registerParam));
     }
 
-    // Check if we are already processing this register Ogel request
+    // Check if we are already processing RegisterParam request
     if (submissionService.submissionCurrentlyExists(registerService.generateSubmissionReference(registerParam))) {
       return badRequest(ERROR_ALREADY_IN_QUEUE, "Duplicate request exists in the queue");
     }

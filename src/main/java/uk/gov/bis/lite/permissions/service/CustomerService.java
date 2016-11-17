@@ -162,22 +162,22 @@ class CustomerService {
     return customerParam;
   }
 
-  private AddressParam getAddressParam(RegisterAddressParam regAddressParam) {
+  private AddressParam getAddressParam(RegisterAddressParam param) {
     AddressParam addressParam = new AddressParam();
-    addressParam.setLine1(regAddressParam.getLine1());
-    addressParam.setLine2(regAddressParam.getLine2());
-    addressParam.setTown(regAddressParam.getTown());
-    addressParam.setCounty(regAddressParam.getCounty());
-    addressParam.setPostcode(regAddressParam.getPostcode());
-    addressParam.setCountry(regAddressParam.getCountry());
+    addressParam.setLine1(param.getLine1());
+    addressParam.setLine2(param.getLine2());
+    addressParam.setTown(param.getTown());
+    addressParam.setCounty(param.getCounty());
+    addressParam.setPostcode(param.getPostcode());
+    addressParam.setCountry(param.getCountry());
     return addressParam;
   }
 
   private SiteParam getSiteParam(OgelSubmission sub) {
-    RegisterParam regParam = sub.getRegisterParamFromJson();
-    RegisterParam.RegisterSiteParam regSiteParam = regParam.getNewSite();
+    RegisterParam param = sub.getRegisterParamFromJson();
+    RegisterParam.RegisterSiteParam regSiteParam = param.getNewSite();
     String siteName = regSiteParam.getSiteName() != null ? regSiteParam.getSiteName() : DEFAULT_SITE_NAME;
-    RegisterAddressParam regAddressParam = regSiteParam.isUseCustomerAddress() ? regParam.getNewCustomer().getRegisteredAddress() : regSiteParam.getAddress();
+    RegisterAddressParam regAddressParam = regSiteParam.isUseCustomerAddress() ? param.getNewCustomer().getRegisteredAddress() : regSiteParam.getAddress();
 
     SiteParam siteParam = new SiteParam();
     siteParam.setSiteName(siteName);

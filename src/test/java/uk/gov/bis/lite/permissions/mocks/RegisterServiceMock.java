@@ -15,11 +15,11 @@ public class RegisterServiceMock implements RegisterService {
     return mockSubmissionRef;
   }
 
-  public boolean isValid(RegisterParam registerParam) {
+  public boolean isRegisterParamValid(RegisterParam registerParam) {
     return true;
   }
 
-  public String validationInfo(RegisterParam registerParam) {
+  public String getRegisterParamValidationInfo(RegisterParam registerParam) {
     return "";
   }
 
