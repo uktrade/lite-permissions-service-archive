@@ -24,7 +24,8 @@ logging:
   appenders:
     - type: console
       includeCallerData : true
-      logFormat: '[%d{HH:mm:ss.SSS}] [%-5level] [%class{0}:%method:%line] %msg %n'
+      logFormat: "[%mdc{corrID}] %d [%p] %marker %logger %m%n"
+      # logFormat: '[%d{HH:mm:ss.SSS}] [%-5level] [%class{0}:%method:%line] %msg %n'
   loggers:
     uk.gov.bis.lite.common.spire.client: TRACE
 

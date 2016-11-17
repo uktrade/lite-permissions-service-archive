@@ -8,6 +8,7 @@ import org.flywaydb.core.Flyway;
 import ru.vyarus.dropwizard.guice.GuiceBundle;
 import ru.vyarus.dropwizard.guice.module.installer.feature.ManagedInstaller;
 import ru.vyarus.dropwizard.guice.module.installer.feature.jersey.ResourceInstaller;
+import uk.gov.bis.lite.common.jersey.filter.ContainerCorrelationIdFilter;
 import uk.gov.bis.lite.permissions.config.GuiceModule;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
 import uk.gov.bis.lite.permissions.resource.OgelRegistrationResource;
@@ -30,6 +31,8 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
 
   @Override
   public void run(PermissionsAppConfig config, Environment environment) throws Exception {
+
+    environment.jersey().register(ContainerCorrelationIdFilter.class);
 
     // Perform/validate flyway migration on startup
     DataSourceFactory dataSourceFactory = config.getDataSourceFactory();

@@ -15,6 +15,7 @@ import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
 import org.skife.jdbi.v2.DBI;
 import ru.vyarus.dropwizard.guice.module.support.ConfigurationAwareModule;
+import uk.gov.bis.lite.common.jersey.filter.ClientCorrelationIdFilter;
 import uk.gov.bis.lite.common.spire.client.SpireClientConfig;
 import uk.gov.bis.lite.common.spire.client.SpireRequestConfig;
 import uk.gov.bis.lite.common.spire.client.parser.ReferenceParser;
@@ -68,7 +69,9 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
     JerseyClientBuilder builder = new JerseyClientBuilder(environment);
     builder.setApacheHttpClientBuilder(clientBuilder);
 
-    return builder.build("jerseyClient");
+    Client client = builder.build("jerseyClient");
+    client.register(ClientCorrelationIdFilter.class);
+    return client;
   }
 
   @Override
