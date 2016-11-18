@@ -60,7 +60,7 @@ public class JobProcessService {
    */
   private void doProcessOgelSubmission(OgelSubmission sub) {
 
-    // Ensure we have CustomerParam1, SiteParam1 and correct Role
+    // Ensure we have Customer, Site and correct Role
     boolean preparedCustomer = submissionService.prepareCustomer(sub);
 
     boolean preparedSite = false;

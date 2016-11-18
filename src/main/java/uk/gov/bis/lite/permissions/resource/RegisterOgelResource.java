@@ -52,12 +52,12 @@ public class RegisterOgelResource {
     }
 
     // Creates and persists an OgelSubmission
-    String submissionRef = registerService.register(registerParam, callbackUrl);
+    String requestId = registerService.register(registerParam, callbackUrl);
 
-    LOGGER.info("************ register-ogel : " + submissionRef);
+    LOGGER.info("************ register-ogel : " + requestId);
 
-    // Return with new submission reference
-    return goodSubmissionRequest(submissionRef);
+    // Return with new requestId (submissionRef + submissionId)
+    return goodSubmissionRequest(requestId);
   }
 
   private Response badRequest(String errorCode, String message) {

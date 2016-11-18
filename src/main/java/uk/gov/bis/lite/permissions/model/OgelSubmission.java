@@ -45,8 +45,8 @@ public class OgelSubmission {
 
   /**
    * CREATED    - initial status on creation
-   * CUSTOMER   - we need to create a CustomerParam1 and populate customerId with resulting sarRef
-   * SITE       - we need to create a SiteParam1 and populate siteId with resulting siteRef
+   * CUSTOMER   - we need to create a Customer and populate customerId with resulting sarRef
+   * SITE       - we need to create a Site and populate siteId with resulting siteRef
    * USER_ROLE  - we need to update user role permissions
    * READY      - this OgelSubmission is now setUp and we can create the Ogel via Spire
    * SUCCESS    - Registration completed on Spire, OgelSubmission updated with Spire Ref, processing submission complete
@@ -65,6 +65,14 @@ public class OgelSubmission {
     this.ogelType = ogelType;
     this.mode = Mode.IMMEDIATE;
     this.status = Status.CREATED;
+  }
+
+  /**
+   * RequestId is used to identify a submission to external services. It is made up
+   * from the submissionRef plus the id
+   */
+  public String getRequestId() {
+    return submissionRef + "_" + id;
   }
 
   public boolean isModeScheduled() {

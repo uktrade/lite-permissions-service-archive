@@ -43,6 +43,7 @@ public class RegisterServiceImpl implements RegisterService {
   /**
    * Creates and persists OgelSubmission in IMMEDIATE mode
    * Triggers a ProcessImmediateJob job to process submission
+   * Returns the requestId associated with the submission
    */
   public String register(RegisterParam reg, String callbackUrl) {
     LOGGER.info("Creating OgelSubmission: " + reg.getUserId() + "/" + reg.getOgelType());
@@ -58,7 +59,8 @@ public class RegisterServiceImpl implements RegisterService {
     // Trigger ProcessImmediateJob to process this submission
     triggerProcessSubmissionJob(submissionId);
 
-    return sub.getSubmissionRef();
+    sub.setId(submissionId); // set temporarily (id not set on object during create dao process) so we can then extract requestId
+    return sub.getRequestId();
   }
 
   /**
