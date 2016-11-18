@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.api.param.RegisterParam;
+import uk.gov.bis.lite.permissions.api.view.CallbackView;
 import uk.gov.bis.lite.permissions.util.Util;
 
 import java.io.IOException;
@@ -26,6 +27,7 @@ public class OgelSubmission {
   private String spireRef;
   private String firstFail;
   private String lastFailMessage;
+  private CallbackView.FailReason failReason;
   private String callbackUrl;
   private boolean calledBack;
   private String json;
@@ -307,5 +309,13 @@ public class OgelSubmission {
 
   public void setLastFailMessage(String lastFailMessage) {
     this.lastFailMessage = lastFailMessage;
+  }
+
+  public CallbackView.FailReason getFailReason() {
+    return failReason;
+  }
+
+  public void setFailReason(CallbackView.FailReason failReason) {
+    this.failReason = failReason;
   }
 }

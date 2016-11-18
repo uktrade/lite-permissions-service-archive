@@ -13,7 +13,7 @@ public interface OgelSubmissionInterface {
 
   @SqlUpdate("UPDATE LOCAL_OGEL_SUBMISSION SET CUSTOMER_REF = :customerRef, SITE_REF = :siteRef, SPIRE_REF = :spireRef, " +
       "MODE = :mode, STATUS = :status, ROLE_UPDATED = :roleUpdated, CALLED_BACK = :calledBack, FIRST_FAIL = :firstFail, " +
-      " LAST_FAIL_MESSAGE = :lastFailMessage WHERE id = :id")
+      " LAST_FAIL_MESSAGE = :lastFailMessage, FAIL_REASON = :failReason WHERE id = :id")
   void update(@Bind("customerRef") String customerRef,
               @Bind("siteRef") String siteRef,
               @Bind("spireRef") String spireRef,
@@ -23,6 +23,7 @@ public interface OgelSubmissionInterface {
               @Bind("calledBack") Boolean calledBack,
               @Bind("firstFail") String firstFail,
               @Bind("lastFailMessage") String lastFailMessage,
+              @Bind("failReason") String failReason,
               @Bind("id") int id);
 
   @SqlUpdate("INSERT INTO LOCAL_OGEL_SUBMISSION (USER_ID, OGEL_TYPE, SUBMISSION_REF, CUSTOMER_REF, SITE_REF, SPIRE_REF, " +

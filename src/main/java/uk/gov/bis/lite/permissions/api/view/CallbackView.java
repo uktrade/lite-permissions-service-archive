@@ -8,7 +8,7 @@ public class CallbackView {
   private FailReason failReason;
 
   public enum FailReason {
-    PERMISSION_DENIED, SITE_ALREADY_REGISTERED, BLACKLISTED, ENDPOINT_ERROR, UNCLASSIFIED_ERROR;
+    PERMISSION_DENIED, SITE_ALREADY_REGISTERED, BLACKLISTED, ENDPOINT_ERROR, UNCLASSIFIED;
   }
 
   public String getRequestId() {

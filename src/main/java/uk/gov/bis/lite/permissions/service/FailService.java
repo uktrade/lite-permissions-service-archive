@@ -57,8 +57,8 @@ class FailService {
   }
 
   CallbackView.FailReason getFailReasonFromMessage(String message) {
-    CallbackView.FailReason reason = CallbackView.FailReason.UNCLASSIFIED_ERROR;
-    String term = searchTerms.stream().filter(message::contains).findFirst().orElse(CallbackView.FailReason.UNCLASSIFIED_ERROR.name());
+    CallbackView.FailReason reason = CallbackView.FailReason.UNCLASSIFIED;
+    String term = searchTerms.stream().filter(message::contains).findFirst().orElse(CallbackView.FailReason.UNCLASSIFIED.name());
     if (term.equals(TERM_USER_LACKS_SITE_PRIVILEGES) || term.equals(TERM_LACKS_PRIVILEGES)) {
       reason = CallbackView.FailReason.PERMISSION_DENIED;
     } else if (term.equals(TERM_SITE_ALREADY_REGISTERED)) {
@@ -69,6 +69,10 @@ class FailService {
       reason = CallbackView.FailReason.ENDPOINT_ERROR;
     }
     return reason;
+  }
+
+  void fail(OgelSubmission sub, CallbackView.FailReason failReason, FailService.Origin origin) {
+    doFailUpdate(sub, failReason, origin);
   }
 
   void fail(OgelSubmission sub, Response response, FailService.Origin origin) {
@@ -110,6 +114,17 @@ class FailService {
       sub.updateStatusToError();
     }
 
+    sub.setLastFailMessage(failMessage);
+    submissionDao.update(sub);
+  }
+
+  private void doFailUpdate(OgelSubmission sub, CallbackView.FailReason failReason, Origin origin) {
+    String failMessage = "FailReason[" + failReason.name() + "] Origin[" + origin.name() + "]";
+    LOGGER.error(failMessage);
+
+    sub.setFirstFailDateTime();
+    sub.updateStatusToError();
+    sub.setFailReason(failReason);
     sub.setLastFailMessage(failMessage);
     submissionDao.update(sub);
   }

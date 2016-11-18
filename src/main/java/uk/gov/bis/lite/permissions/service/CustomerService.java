@@ -15,6 +15,7 @@ import uk.gov.bis.lite.customer.api.view.CustomerView;
 import uk.gov.bis.lite.customer.api.view.SiteView;
 import uk.gov.bis.lite.permissions.api.param.RegisterAddressParam;
 import uk.gov.bis.lite.permissions.api.param.RegisterParam;
+import uk.gov.bis.lite.permissions.api.view.CallbackView;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
 import java.util.Optional;
@@ -76,6 +77,8 @@ class CustomerService {
       Response response = target.request().post(Entity.json(getSiteParam(sub)));
       if (isOk(response)) {
         return Optional.of(response.readEntity(SiteView.class).getSiteId());
+      } else if (isForbidden(response)) {
+        failService.fail(sub, CallbackView.FailReason.PERMISSION_DENIED, FailService.Origin.SITE);
       } else {
         failService.fail(sub, response, FailService.Origin.SITE);
       }
@@ -200,6 +203,10 @@ class CustomerService {
 
   private boolean isOk(Response response) {
     return response != null && (response.getStatus() == Response.Status.OK.getStatusCode());
+  }
+
+  private boolean isForbidden(Response response) {
+    return response != null && (response.getStatus() == Response.Status.FORBIDDEN.getStatusCode());
   }
 
 }

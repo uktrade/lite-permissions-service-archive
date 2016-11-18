@@ -1,7 +1,9 @@
 package uk.gov.bis.lite.permissions.dao.sqlite;
 
+import org.apache.commons.lang3.EnumUtils;
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.tweak.ResultSetMapper;
+import uk.gov.bis.lite.permissions.api.view.CallbackView;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
 import java.sql.ResultSet;
@@ -24,6 +26,18 @@ public class OgelSubmissionMapper implements ResultSetMapper<OgelSubmission> {
     sub.setCalledBack(r.getBoolean("CALLED_BACK"));
     sub.setFirstFail(r.getString("FIRST_FAIL"));
     sub.setLastFailMessage(r.getString("LAST_FAIL_MESSAGE"));
+
+    if (r.getString("FAIL_REASON") == null) {
+      sub.setFailReason(null);
+    } else {
+      String failReasonValue = r.getString("FAIL_REASON");
+      if (EnumUtils.isValidEnum(CallbackView.FailReason.class, failReasonValue)) {
+        sub.setFailReason(CallbackView.FailReason.valueOf(failReasonValue));
+      } else {
+        sub.setFailReason(null);
+      }
+    }
+
     sub.setJson(r.getString("JSON"));
     sub.setCreated(r.getString("CREATED"));
     sub.setRoleUpdate(r.getBoolean("ROLE_UPDATE"));

@@ -95,6 +95,10 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
   @Transaction
   public void update(OgelSubmission sub) {
     try (final Handle handle = jdbi.open()) {
+      String failReason = null;
+      if (sub.getFailReason() != null) {
+        failReason = sub.getFailReason().name();
+      }
       attach(handle).update(
           sub.getCustomerRef(),
           sub.getSiteRef(),
@@ -105,6 +109,7 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
           sub.isCalledBack(),
           sub.getFirstFail(),
           sub.getLastFailMessage(),
+          failReason,
           sub.getId());
     }
   }

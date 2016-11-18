@@ -61,7 +61,13 @@ public class CallbackService {
     if (sub.isStatusError()) {
       view.setRequestId(sub.getRequestId());
       view.setStatus(CALLBACK_STATUS_FAILED);
-      view.setFailReason(failService.getFailReasonFromMessage(sub.getLastFailMessage()));
+      CallbackView.FailReason failReason = sub.getFailReason();
+      if (failReason != null) {
+        view.setFailReason(failReason);
+      } else {
+        view.setFailReason(failService.getFailReasonFromMessage(sub.getLastFailMessage()));
+      }
+
     }
     return view;
   }
