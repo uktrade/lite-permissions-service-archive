@@ -3,6 +3,8 @@ package uk.gov.bis.lite.permissions.dao.sqlite;
 import org.apache.commons.lang3.EnumUtils;
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.tweak.ResultSetMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.api.view.CallbackView;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
@@ -10,6 +12,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class OgelSubmissionMapper implements ResultSetMapper<OgelSubmission> {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(OgelSubmissionMapper.class);
 
   @Override
   public OgelSubmission map(int index, ResultSet r, StatementContext ctx) throws SQLException {
@@ -34,6 +38,7 @@ public class OgelSubmissionMapper implements ResultSetMapper<OgelSubmission> {
       if (EnumUtils.isValidEnum(CallbackView.FailReason.class, failReasonValue)) {
         sub.setFailReason(CallbackView.FailReason.valueOf(failReasonValue));
       } else {
+        LOGGER.warn("Database FailReason is not valid for Enum: " + failReasonValue);
         sub.setFailReason(null);
       }
     }

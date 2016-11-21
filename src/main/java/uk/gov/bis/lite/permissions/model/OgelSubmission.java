@@ -1,14 +1,11 @@
 package uk.gov.bis.lite.permissions.model;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.bis.lite.permissions.api.param.RegisterParam;
 import uk.gov.bis.lite.permissions.api.view.CallbackView;
 import uk.gov.bis.lite.permissions.util.Util;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -162,17 +159,6 @@ public class OgelSubmission {
 
   public boolean needsRoleUpdate() {
     return roleUpdate && !roleUpdated;
-  }
-
-  public RegisterParam getRegisterParamFromJson() {
-    RegisterParam param = null;
-    ObjectMapper mapper = new ObjectMapper();
-    try {
-      param = mapper.readValue(this.getJson(), RegisterParam.class);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return param;
   }
 
   public String getJson() {

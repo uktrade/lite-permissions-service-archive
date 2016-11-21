@@ -25,14 +25,6 @@ public class RegisterParam {
     return adminApproval != null && !StringUtils.isBlank(adminApproval.getAdminUserId());
   }
 
-  public String joinedInstanceStateData() {
-    String strings = StringUtils.join(userId, ogelType, existingCustomer, existingSite);
-    String customer = newCustomer != null ? newCustomer.joinedInstanceStateData() : "";
-    String site = newSite != null ? newSite.joinedInstanceStateData() : "";
-    String admin = adminApproval != null ? adminApproval.joinedInstanceStateData() : "";
-    return strings + customer + site + admin;
-  }
-
   public boolean mandatoryFieldsOk() {
     return !StringUtils.isBlank(userId) && !StringUtils.isBlank(ogelType);
   }
@@ -62,13 +54,6 @@ public class RegisterParam {
     private boolean useCustomerAddress;
     private String siteName;
     private RegisterAddressParam address;
-
-    String joinedInstanceStateData() {
-      String strings = StringUtils.join(siteName);
-      String booleans = StringUtils.join(useCustomerAddress);
-      String add = address != null ? address.addressData() : "";
-      return strings + booleans + add;
-    }
 
     public boolean isUseCustomerAddress() {
       return useCustomerAddress;
@@ -107,13 +92,6 @@ public class RegisterParam {
     private boolean eoriNumberValidated;
     private String website;
     private RegisterAddressParam registeredAddress;
-
-    String joinedInstanceStateData() {
-      String strings = StringUtils.join(customerName, customerType, chNumber, eoriNumber, website);
-      String booleans = StringUtils.join(chNumberValidated, eoriNumberValidated);
-      String address = registeredAddress != null ? registeredAddress.addressData() : "";
-      return strings + booleans + address;
-    }
 
     public String getCustomerName() {
       return customerName;

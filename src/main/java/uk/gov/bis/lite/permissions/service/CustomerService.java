@@ -1,5 +1,6 @@
 package uk.gov.bis.lite.permissions.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -16,8 +17,11 @@ import uk.gov.bis.lite.customer.api.view.SiteView;
 import uk.gov.bis.lite.permissions.api.param.RegisterAddressParam;
 import uk.gov.bis.lite.permissions.api.param.RegisterParam;
 import uk.gov.bis.lite.permissions.api.view.CallbackView;
+import uk.gov.bis.lite.permissions.exception.PermissionServiceException;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
+import uk.gov.bis.lite.permissions.util.Util;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import javax.ws.rs.ProcessingException;
@@ -36,6 +40,7 @@ class CustomerService {
   private FailService failService;
   private String customerServiceUrl;
   private Client httpClient;
+  private ObjectMapper objectMapper;
 
   @Inject
   public CustomerService(Client httpClient, FailService failService,
@@ -43,6 +48,7 @@ class CustomerService {
     this.httpClient = httpClient;
     this.failService = failService;
     this.customerServiceUrl = customerServiceUrl;
+    this.objectMapper = new ObjectMapper();
   }
 
   /**
@@ -80,10 +86,10 @@ class CustomerService {
       } else if (isForbidden(response)) {
         failService.fail(sub, CallbackView.FailReason.PERMISSION_DENIED, FailService.Origin.SITE);
       } else {
-        failService.fail(sub, response, FailService.Origin.SITE);
+        failService.fail(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.SITE, Util.info(response));
       }
     } catch (ProcessingException e) {
-      failService.fail(sub, e, FailService.Origin.SITE);
+      failService.fail(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.SITE, Util.info(e));
     }
     return Optional.empty();
   }
@@ -103,7 +109,7 @@ class CustomerService {
     if (isOk(response)) {
       return true;
     } else {
-      failService.fail(sub, response, FailService.Origin.USER_ROLE);
+      failService.fail(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.USER_ROLE, Util.info(response));
     }
     return false;
   }
@@ -120,10 +126,10 @@ class CustomerService {
       if (isOk(response)) {
         return Optional.of(response.readEntity(CustomerView.class).getCustomerId());
       } else {
-        failService.fail(sub, response, FailService.Origin.CUSTOMER);
+        failService.fail(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.CUSTOMER, Util.info(response));
       }
     } catch (ProcessingException e) {
-      failService.fail(sub, e, FailService.Origin.CUSTOMER);
+      failService.fail(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.CUSTOMER, Util.info(e));
     }
     return Optional.empty();
   }
@@ -148,7 +154,7 @@ class CustomerService {
   }
 
   private CustomerParam getCustomerParam(OgelSubmission sub) {
-    RegisterParam regParam = sub.getRegisterParamFromJson();
+    RegisterParam regParam = getRegisterParam(sub);
     RegisterParam.RegisterCustomerParam regCustomerParam = regParam.getNewCustomer();
     RegisterAddressParam regAddressParam = regCustomerParam.getRegisteredAddress();
 
@@ -177,7 +183,7 @@ class CustomerService {
   }
 
   private SiteParam getSiteParam(OgelSubmission sub) {
-    RegisterParam param = sub.getRegisterParamFromJson();
+    RegisterParam param = getRegisterParam(sub);
     RegisterParam.RegisterSiteParam regSiteParam = param.getNewSite();
     String siteName = regSiteParam.getSiteName() != null ? regSiteParam.getSiteName() : DEFAULT_SITE_NAME;
     RegisterAddressParam regAddressParam = regSiteParam.isUseCustomerAddress() ? param.getNewCustomer().getRegisteredAddress() : regSiteParam.getAddress();
@@ -192,7 +198,7 @@ class CustomerService {
    * Creates a UserRoleParam with an ADMIN roleType
    */
   private UserRoleParam getUserRoleParam(OgelSubmission sub) {
-    RegisterParam regParam = sub.getRegisterParamFromJson();
+    RegisterParam regParam = getRegisterParam(sub);
     RegisterParam.RegisterAdminApprovalParam regAdminApprovalParam = regParam.getAdminApproval();
 
     UserRoleParam userRoleParam = new UserRoleParam();
@@ -207,6 +213,19 @@ class CustomerService {
 
   private boolean isForbidden(Response response) {
     return response != null && (response.getStatus() == Response.Status.FORBIDDEN.getStatusCode());
+  }
+
+  private RegisterParam getRegisterParam(OgelSubmission sub) {
+    String json = sub.getJson();
+    RegisterParam param;
+    try {
+      param = objectMapper.readValue(json, RegisterParam.class);
+    } catch (IOException e) {
+      String info = "Unable to deserialize Json for OgelSubmission id: " + sub.getId();
+      LOGGER.error(info);
+      throw new PermissionServiceException(info);
+    }
+    return param;
   }
 
 }

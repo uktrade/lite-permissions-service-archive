@@ -1,7 +1,5 @@
 package uk.gov.bis.lite.permissions.api.param;
 
-import uk.gov.bis.lite.permissions.util.Util;
-
 public class RegisterAddressParam {
 
   private String line1;
@@ -10,10 +8,6 @@ public class RegisterAddressParam {
   private String county;
   private String postcode;
   private String country;
-
-  String addressData() {
-    return Util.joinDelimited("", line1, line2, town, county, postcode, country);
-  }
 
   public String getLine1() {
     return line1;

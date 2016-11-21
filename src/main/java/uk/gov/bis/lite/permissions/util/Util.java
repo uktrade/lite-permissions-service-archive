@@ -6,6 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Optional;
 
+import javax.ws.rs.core.Response;
+
 public class Util {
 
   public static boolean isBlank(String arg) {
@@ -17,13 +19,31 @@ public class Util {
     return new String(Hex.encodeHex(resultByte));
   }
 
-  public static String getInfo(Exception e) {
+  /**
+   * Returns exception class name and message as String
+   */
+  public static String info(Exception e) {
     String info = e.getClass().getCanonicalName();
     String message = e.getMessage();
     if (message != null) {
       info = info + " [" + message + "]";
     }
     return info;
+  }
+
+  /**
+   * Returns response status and body as String
+   */
+  public static String info(Response response) {
+    String status = "-";
+    String body = "-";
+    if (response != null) {
+      status = "" + response.getStatus();
+      if (response.hasEntity()) {
+        body = response.readEntity(String.class);
+      }
+    }
+    return "Status[" + status + "] Body[" + body + "]";
   }
 
   public static String info(String name, String arg) {
@@ -33,9 +53,4 @@ public class Util {
   public static String info(String name, Boolean arg) {
     return " [" + name + "|" + Optional.ofNullable(arg).map(Object::toString).orElse("null") + "] ";
   }
-
-  public static String joinDelimited(String delimited, String... args) {
-    return StringUtils.join(args, delimited);
-  }
-
 }

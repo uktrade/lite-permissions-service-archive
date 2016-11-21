@@ -67,8 +67,8 @@ public class RegisterServiceImpl implements RegisterService {
    * Gathers data, creates  hash
    */
   public String generateSubmissionReference(RegisterParam registerParam) {
-    String message = registerParam.joinedInstanceStateData().replaceAll("\\s+", "").toUpperCase();
-    return Util.generateHashFromString(message);
+    String data = getDataStringFromRegisterParam(registerParam);
+    return Util.generateHashFromString(data.replaceAll("\\s+", "").toUpperCase());
   }
 
   /**
@@ -118,6 +118,47 @@ public class RegisterServiceImpl implements RegisterService {
       }
     }
     return info;
+  }
+
+  /**
+   * Extracts and returns data from RegisterParam as a string
+   */
+  private String getDataStringFromRegisterParam(RegisterParam param) {
+    String registerString = StringUtils.join(param.getUserId(), param.getOgelType(), param.getExistingCustomer(), param.getExistingSite());
+
+    // Customer data
+    String customerString = "";
+    if (param.hasNewCustomer()) {
+      RegisterParam.RegisterCustomerParam customer = param.getNewCustomer();
+      customerString = StringUtils.join(customer.getCustomerName(), customer.getCustomerType(), customer.getChNumber(),
+          customer.getEoriNumber(), customer.getWebsite());
+      customerString = customerString + StringUtils.join(customer.isChNumberValidated(), customer.isEoriNumberValidated());
+      RegisterAddressParam address = customer.getRegisteredAddress();
+      if (address != null) {
+        customerString = customerString + StringUtils.join("", address.getLine1(), address.getLine2(), address.getTown(), address.getCounty(), address.getPostcode(), address.getCountry());
+      }
+    }
+
+    // Site data
+    String siteString = "";
+    if (param.hasNewSite()) {
+      RegisterParam.RegisterSiteParam site = param.getNewSite();
+      siteString = site.getSiteName() + site.isUseCustomerAddress();
+      RegisterAddressParam address = site.getAddress();
+      if (address != null) {
+        siteString = siteString + StringUtils.join("", address.getLine1(), address.getLine2(), address.getTown(), address.getCounty(), address.getPostcode(), address.getCountry());
+      }
+    }
+
+    // Admin approval data
+    String adminString = "";
+    RegisterParam.RegisterAdminApprovalParam admin = param.getAdminApproval();
+    if (admin != null && !StringUtils.isBlank(admin.getAdminUserId())) {
+      adminString = admin.getAdminUserId();
+    }
+
+    // Concat all and return
+    return registerString + customerString + siteString + adminString;
   }
 
   private void triggerProcessSubmissionJob(int submissionId) {
