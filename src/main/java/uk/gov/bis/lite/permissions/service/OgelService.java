@@ -60,14 +60,16 @@ public class OgelService {
         submissionDao.update(sub);
         LOGGER.info("STATUS: " + sub.getStatus().name());
       } else {
-        failService.fail(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.OGEL_CREATE, "No Spire reference returned");
+        failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.OGEL_CREATE, "No Spire reference returned");
       }
     } catch (SpireClientException e) {
       String info = Util.info(e);
-      if (info.contains(CallbackService.TERM_BLACKLISTED)) {
+      if (info.contains(FailService.BLACKLISTED)) {
         failService.fail(sub, CallbackView.FailReason.BLACKLISTED, FailService.Origin.OGEL_CREATE);
+      } else if (info.contains(FailService.USER_LACKS_SITE_PRIVILEGES) || info.contains(FailService.USER_LACKS_PRIVILEGES)) {
+        failService.fail(sub, CallbackView.FailReason.PERMISSION_DENIED, FailService.Origin.OGEL_CREATE);
       } else {
-        failService.fail(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.OGEL_CREATE, info);
+        failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.OGEL_CREATE, info);
       }
     }
     return created;

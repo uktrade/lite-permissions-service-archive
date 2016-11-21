@@ -13,6 +13,9 @@ import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 @Singleton
 class FailService {
@@ -21,6 +24,20 @@ class FailService {
 
   private OgelSubmissionDao submissionDao;
   private int maxMinutesRetryAfterFail;
+
+  static String BLACKLISTED = "BLACKLISTED";
+  static String USER_LACKS_SITE_PRIVILEGES = "USER_LACKS_SITE_PRIVILEGES";
+  static String USER_LACKS_PRIVILEGES = "USER_LACKS_PRIVILEGES";
+
+  //public static String LICENSE_ALREADY_EXISTS = "There is already a licence for OGEL ref";
+  //public static String SITE_ALREADY_REGISTERED = "SITE_ALREADY_REGISTERED";
+  //public static String SOAP_FAULT = "soap:Fault";
+  //public static String CUSTOMER_NAME_ALREADY_EXISTS = "Customer name already exists";
+
+  private static final Set<CallbackView.FailReason> terminalFailReasons = new HashSet<>(Arrays.asList(new CallbackView.FailReason[]{
+      CallbackView.FailReason.BLACKLISTED,
+      CallbackView.FailReason.PERMISSION_DENIED}
+  ));
 
   /**
    * Origin of call to 'fail': CUSTOMER, SITE, USER_ROLE, OGEL_CREATE, CALLBACK
@@ -36,11 +53,17 @@ class FailService {
     this.maxMinutesRetryAfterFail = maxMinutesRetryAfterFail;
   }
 
+  /**
+   * Updates OgelSubmission with fail details
+   */
   void fail(OgelSubmission sub, CallbackView.FailReason failReason, FailService.Origin origin) {
     doFailUpdate(sub, failReason, origin, null);
   }
 
-  void fail(OgelSubmission sub, CallbackView.FailReason failReason, FailService.Origin origin, String message) {
+  /**
+   * Updates OgelSubmission with fail details, appending message to lastFailMes
+   */
+  void failWithMessage(OgelSubmission sub, CallbackView.FailReason failReason, FailService.Origin origin, String message) {
     doFailUpdate(sub, failReason, origin, message);
   }
 
@@ -65,7 +88,7 @@ class FailService {
     sub.setLastFailMessage(failMessage);
 
     // Check if we have a terminal fail reason
-    if (failReason == CallbackView.FailReason.BLACKLISTED || failReason == CallbackView.FailReason.PERMISSION_DENIED) {
+    if (terminalFailReasons.contains(failReason)) {
       sub.updateStatusToError();
     }
 
