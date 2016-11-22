@@ -7,9 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.common.spire.client.SpireRequest;
 import uk.gov.bis.lite.common.spire.client.exception.SpireClientException;
+import uk.gov.bis.lite.permissions.api.view.CallbackView;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.spire.SpireReferenceClient;
+import uk.gov.bis.lite.permissions.util.Util;
 
 @Singleton
 public class OgelService {
@@ -19,6 +21,11 @@ public class OgelService {
   private SpireReferenceClient createOgelAppReferenceClient;
   private FailService failService;
   private OgelSubmissionDao submissionDao;
+
+  private static String BLACKLISTED = "BLACKLISTED";
+  private static String USER_LACKS_SITE_PRIVILEGES = "USER_LACKS_SITE_PRIVILEGES";
+  private static String USER_LACKS_PRIVILEGES = "USER_LACKS_PRIVILEGES";
+  private static String SITE_ALREADY_REGISTERED = "SITE_ALREADY_REGISTERED";
 
   @Inject
   public OgelService(SpireReferenceClient createOgelAppReferenceClient, FailService failService, OgelSubmissionDao submissionDao) {
@@ -51,7 +58,6 @@ public class OgelService {
     boolean created = false;
     try {
       String reference = createOgelAppReferenceClient.sendRequest(request);
-
       if (!StringUtils.isBlank(reference)) {
         created = true;
         sub.setSpireRef(reference);
@@ -59,10 +65,19 @@ public class OgelService {
         submissionDao.update(sub);
         LOGGER.info("STATUS: " + sub.getStatus().name());
       } else {
-        failService.fail(sub, "No Spire reference returned", FailService.Origin.OGEL_CREATE);
+        failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.OGEL_CREATE, "No Spire reference returned");
       }
     } catch (SpireClientException e) {
-      failService.fail(sub, e, FailService.Origin.OGEL_CREATE);
+      String info = Util.info(e);
+      if (info.contains(BLACKLISTED)) {
+        failService.fail(sub, CallbackView.FailReason.BLACKLISTED, FailService.Origin.OGEL_CREATE);
+      } else if (info.contains(USER_LACKS_SITE_PRIVILEGES) || info.contains(USER_LACKS_PRIVILEGES)) {
+        failService.fail(sub, CallbackView.FailReason.PERMISSION_DENIED, FailService.Origin.OGEL_CREATE);
+      } else if (info.contains(SITE_ALREADY_REGISTERED)) {
+        failService.fail(sub, CallbackView.FailReason.SITE_ALREADY_REGISTERED, FailService.Origin.OGEL_CREATE);
+      } else {
+        failService.failWithMessage(sub, CallbackView.FailReason.ENDPOINT_ERROR, FailService.Origin.OGEL_CREATE, info);
+      }
     }
     return created;
   }

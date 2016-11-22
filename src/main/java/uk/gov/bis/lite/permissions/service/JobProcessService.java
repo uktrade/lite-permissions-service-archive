@@ -1,9 +1,11 @@
 package uk.gov.bis.lite.permissions.service;
 
+import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.bis.lite.permissions.api.view.CallbackView;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
@@ -18,14 +20,16 @@ public class JobProcessService {
   private SubmissionService submissionService;
   private OgelService ogelService;
   private CallbackService callbackService;
+  private FailService failService;
 
   @Inject
   public JobProcessService(OgelSubmissionDao submissionDao, SubmissionService submissionService,
-                           OgelService ogelService, CallbackService callbackService) {
+                           OgelService ogelService, CallbackService callbackService, FailService failService) {
     this.submissionDao = submissionDao;
     this.submissionService = submissionService;
     this.ogelService = ogelService;
     this.callbackService = callbackService;
+    this.failService = failService;
   }
 
   /**
@@ -36,12 +40,20 @@ public class JobProcessService {
     LOGGER.info("IMMEDIATE [" + submissionId + "]");
 
     OgelSubmission sub = submissionDao.findBySubmissionId(submissionId);
+    try {
 
-    // Attempt to process this OgelSubmission immediately
-    doProcessOgelSubmission(sub);
+      // Attempt to process this OgelSubmission immediately
+      doProcessOgelSubmission(sub);
 
-    // Update MODE if necessary
-    submissionService.updateModeIfNotCompleted(submissionId);
+      // Update MODE if necessary
+      submissionService.updateModeIfNotCompleted(sub.getId());
+
+    } catch (Throwable e) {
+      String stackTrace = Throwables.getStackTraceAsString(e);
+      failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.UNKNOWN, stackTrace);
+      LOGGER.error("JobProcessService.processImmediate: " + e.getMessage(), e);
+    }
+
   }
 
   /**
@@ -51,7 +63,16 @@ public class JobProcessService {
   public void processScheduled() {
     List<OgelSubmission> subs = submissionDao.getScheduledCallbacks();
     LOGGER.info("SCHEDULED [" + subs.size() + "]");
-    subs.forEach(this::doProcessOgelSubmission);
+
+    for (OgelSubmission sub : subs) {
+      try {
+        doProcessOgelSubmission(sub);
+      } catch (Throwable e) {
+        String stackTrace = Throwables.getStackTraceAsString(e);
+        failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.UNKNOWN, stackTrace);
+        LOGGER.error("JobProcessService.processScheduled: " + e.getMessage(), e);
+      }
+    }
   }
 
   /**

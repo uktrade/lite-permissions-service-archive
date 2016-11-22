@@ -2,15 +2,13 @@ package uk.gov.bis.lite.permissions.resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import org.junit.ClassRule;
 import org.junit.Test;
+import uk.gov.bis.lite.permissions.api.RegisterOgelResponse;
+import uk.gov.bis.lite.permissions.api.param.RegisterParam;
 import uk.gov.bis.lite.permissions.mocks.RegisterServiceMock;
 import uk.gov.bis.lite.permissions.mocks.SubmissionServiceMock;
-import uk.gov.bis.lite.permissions.model.register.RegisterOgel;
-import uk.gov.bis.lite.permissions.model.register.RegisterOgelResponse;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
@@ -22,7 +20,6 @@ public class ResourceRegisterOgelTest {
 
   private int OK = Response.Status.OK.getStatusCode();
   private int NOT_OK = Response.Status.BAD_REQUEST.getStatusCode();
-  private static ObjectMapper mapper = new ObjectMapper();
 
   private static String MOCK_USER_ID = "ID1";
   private static String MOCK_OGEL_TYPE = "TYPE1";
@@ -39,29 +36,23 @@ public class ResourceRegisterOgelTest {
   @Test
   public void invalidRegisterOgel() {
     Response response = request("/register-ogel", MediaType.APPLICATION_JSON)
-        .post(Entity.entity(getRegisterOgelJson(new RegisterOgel()), MediaType.APPLICATION_JSON));
+        .post(Entity.entity(new RegisterParam(), MediaType.APPLICATION_JSON));
     assertThat(status(response)).isEqualTo(NOT_OK);
   }
 
   @Test
   public void alreadyExistsRegisterOgel() {
-
     mockSubmissionService.setSubmissionCurrentlyExists(true); // Update mockSubmissionService first
-
     Response response = request("/register-ogel", MediaType.APPLICATION_JSON)
-        .post(Entity.entity(getRegisterOgelJson(getValidRegisterOgel()), MediaType.APPLICATION_JSON));
-
+        .post(Entity.entity(getValidRegisterOgel(), MediaType.APPLICATION_JSON));
     assertThat(status(response)).isEqualTo(NOT_OK);
   }
 
   @Test
   public void validRegisterOgel() {
-
     mockSubmissionService.setSubmissionCurrentlyExists(false);  // Update mockSubmissionService first
-
     Response response = request("/register-ogel", MediaType.APPLICATION_JSON)
-        .post(Entity.entity(getRegisterOgelJson(getValidRegisterOgel()), MediaType.APPLICATION_JSON));
-
+        .post(Entity.entity(getValidRegisterOgel(), MediaType.APPLICATION_JSON));
     assertThat(status(response)).isEqualTo(OK);
     assertThat(getResponseRequestId(response)).isEqualTo(MOCK_SUBMISSION_REF);
   }
@@ -81,18 +72,8 @@ public class ResourceRegisterOgelTest {
     return response.getStatus();
   }
 
-  private String getRegisterOgelJson(RegisterOgel ogel) {
-    String json = "";
-    try {
-      json = mapper.writeValueAsString(ogel);
-    } catch (JsonProcessingException e) {
-      e.printStackTrace();
-    }
-    return json;
-  }
-
-  private RegisterOgel getValidRegisterOgel() {
-    RegisterOgel reg = new RegisterOgel();
+  private RegisterParam getValidRegisterOgel() {
+    RegisterParam reg = new RegisterParam();
     reg.setUserId(MOCK_USER_ID);
     reg.setOgelType(MOCK_OGEL_TYPE);
     reg.setExistingCustomer(MOCK_SAR_REF);

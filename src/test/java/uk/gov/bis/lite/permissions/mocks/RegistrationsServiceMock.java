@@ -1,8 +1,7 @@
 package uk.gov.bis.lite.permissions.mocks;
 
-import uk.gov.bis.lite.permissions.model.OgelRegistration;
+import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
 import uk.gov.bis.lite.permissions.service.RegistrationsService;
-import uk.gov.bis.lite.permissions.spire.model.SpireOgelRegistration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +10,7 @@ import java.util.stream.Collectors;
 public class RegistrationsServiceMock implements RegistrationsService {
 
 
-  private List<OgelRegistration> mockRegistrations = new ArrayList<>();
+  private List<OgelRegistrationView> mockRegistrations = new ArrayList<>();
   private boolean noResults = false;
   private String mockRegistrationTag;
 
@@ -22,17 +21,17 @@ public class RegistrationsServiceMock implements RegistrationsService {
 
   private void initOgelRegistrations(int numberOfRegistrations) {
     for (int i = 1; i < numberOfRegistrations + 1; i++) {
-      SpireOgelRegistration reg = new SpireOgelRegistration();
-      reg.setRegistrationRef(mockRegistrationTag + i);
-      mockRegistrations.add(new OgelRegistration(reg));
+      OgelRegistrationView view = new OgelRegistrationView();
+      view.setRegistrationReference(mockRegistrationTag + i);
+      mockRegistrations.add(view);
     }
   }
 
-  public List<OgelRegistration> getRegistrations(String userId, String registrationReference) {
+  public List<OgelRegistrationView> getRegistrations(String userId, String registrationReference) {
     return mockRegistrations.stream().filter(or -> or.getRegistrationReference().equals(registrationReference)).collect(Collectors.toList());
   }
 
-  public List<OgelRegistration> getRegistrations(String userId) {
+  public List<OgelRegistrationView> getRegistrations(String userId) {
     if (noResults) {
       return new ArrayList<>();
     }

@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.bis.lite.permissions.model.register.RegisterOgel;
+import uk.gov.bis.lite.permissions.api.param.RegisterParam;
 import uk.gov.bis.lite.permissions.service.RegisterService;
 import uk.gov.bis.lite.permissions.service.SubmissionService;
 
@@ -37,26 +37,27 @@ public class RegisterOgelResource {
   @Consumes({MediaType.APPLICATION_JSON})
   @Produces({MediaType.APPLICATION_JSON})
   @Path("/register-ogel")
-  public Response registerOgel(RegisterOgel registerOgel, @QueryParam("callbackUrl") String callbackUrl) {
+  public Response registerOgel(RegisterParam registerParam, @QueryParam("callbackUrl") String callbackUrl) {
     LOGGER.info("************ register-ogel ************ ");
 
-    // Check if register Ogel request is valid
-    if (!registerOgel.isValid()) {
-      return badRequest(ERROR_INVALID_REQUEST, "Request invalid - " + registerOgel.getValidityInfo());
+    // Check if RegisterParam request is valid
+    if (!registerService.isRegisterParamValid(registerParam)) {
+      return badRequest(ERROR_INVALID_REQUEST, "Request invalid - "
+          + registerService.getRegisterParamValidationInfo(registerParam));
     }
 
-    // Check if we are already processing this register Ogel request
-    if (submissionService.submissionCurrentlyExists(registerOgel.generateSubmissionReference())) {
+    // Check if we are already processing RegisterParam request
+    if (submissionService.submissionCurrentlyExists(registerService.generateSubmissionReference(registerParam))) {
       return badRequest(ERROR_ALREADY_IN_QUEUE, "Duplicate request exists in the queue");
     }
 
     // Creates and persists an OgelSubmission
-    String submissionRef = registerService.register(registerOgel, callbackUrl);
+    String requestId = registerService.register(registerParam, callbackUrl);
 
-    LOGGER.info("************ register-ogel : " + submissionRef);
+    LOGGER.info("************ register-ogel : " + requestId);
 
-    // Return with new submission reference
-    return goodSubmissionRequest(submissionRef);
+    // Return with new requestId (submissionRef + submissionId)
+    return goodSubmissionRequest(requestId);
   }
 
   private Response badRequest(String errorCode, String message) {

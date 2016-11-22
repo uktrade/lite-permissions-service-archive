@@ -6,8 +6,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import org.junit.ClassRule;
 import org.junit.Test;
+import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
 import uk.gov.bis.lite.permissions.mocks.RegistrationsServiceMock;
-import uk.gov.bis.lite.permissions.model.OgelRegistration;
 
 import java.util.List;
 
@@ -58,8 +58,8 @@ public class ResourceOgelRegistrationTest {
   /**
    * Private Methods
    */
-  private List<OgelRegistration> getOgelRegistrationsResponse(Response response) {
-    return (List<OgelRegistration>) response.readEntity(List.class);
+  private List<OgelRegistrationView> getOgelRegistrationsResponse(Response response) {
+    return (List<OgelRegistrationView>) response.readEntity(List.class);
   }
 
   private Invocation.Builder request(String url) {

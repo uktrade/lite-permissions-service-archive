@@ -1,14 +1,15 @@
-package uk.gov.bis.lite.permissions.model.callback;
+package uk.gov.bis.lite.permissions.api.view;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class CallbackParam {
+public class CallbackView {
 
   private String requestId;
   private String status;
   private String registrationReference;
-  private String failReason;
+  private FailReason failReason;
+
+  public enum FailReason {
+    PERMISSION_DENIED, SITE_ALREADY_REGISTERED, BLACKLISTED, ENDPOINT_ERROR, UNCLASSIFIED;
+  }
 
   public String getRequestId() {
     return requestId;
@@ -34,11 +35,11 @@ public class CallbackParam {
     this.registrationReference = registrationReference;
   }
 
-  public String getFailReason() {
+  public FailReason getFailReason() {
     return failReason;
   }
 
-  public void setFailReason(String failReason) {
+  public void setFailReason(FailReason failReason) {
     this.failReason = failReason;
   }
 }

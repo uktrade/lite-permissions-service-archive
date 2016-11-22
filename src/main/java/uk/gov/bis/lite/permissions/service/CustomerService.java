@@ -1,5 +1,6 @@
 package uk.gov.bis.lite.permissions.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -13,13 +14,14 @@ import uk.gov.bis.lite.customer.api.param.SiteParam;
 import uk.gov.bis.lite.customer.api.param.UserRoleParam;
 import uk.gov.bis.lite.customer.api.view.CustomerView;
 import uk.gov.bis.lite.customer.api.view.SiteView;
+import uk.gov.bis.lite.permissions.api.param.RegisterAddressParam;
+import uk.gov.bis.lite.permissions.api.param.RegisterParam;
+import uk.gov.bis.lite.permissions.api.view.CallbackView;
+import uk.gov.bis.lite.permissions.exception.PermissionServiceException;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
-import uk.gov.bis.lite.permissions.model.register.Address;
-import uk.gov.bis.lite.permissions.model.register.AdminApproval;
-import uk.gov.bis.lite.permissions.model.register.Customer;
-import uk.gov.bis.lite.permissions.model.register.RegisterOgel;
-import uk.gov.bis.lite.permissions.model.register.Site;
+import uk.gov.bis.lite.permissions.util.Util;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import javax.ws.rs.ProcessingException;
@@ -38,6 +40,7 @@ class CustomerService {
   private FailService failService;
   private String customerServiceUrl;
   private Client httpClient;
+  private ObjectMapper objectMapper;
 
   @Inject
   public CustomerService(Client httpClient, FailService failService,
@@ -45,6 +48,7 @@ class CustomerService {
     this.httpClient = httpClient;
     this.failService = failService;
     this.customerServiceUrl = customerServiceUrl;
+    this.objectMapper = new ObjectMapper();
   }
 
   /**
@@ -79,11 +83,13 @@ class CustomerService {
       Response response = target.request().post(Entity.json(getSiteParam(sub)));
       if (isOk(response)) {
         return Optional.of(response.readEntity(SiteView.class).getSiteId());
+      } else if (isForbidden(response)) {
+        failService.fail(sub, CallbackView.FailReason.PERMISSION_DENIED, FailService.Origin.SITE);
       } else {
-        failService.fail(sub, response, FailService.Origin.SITE);
+        failService.failWithMessage(sub, CallbackView.FailReason.ENDPOINT_ERROR, FailService.Origin.SITE, Util.info(response));
       }
     } catch (ProcessingException e) {
-      failService.fail(sub, e, FailService.Origin.SITE);
+      failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.SITE, Util.info(e));
     }
     return Optional.empty();
   }
@@ -103,7 +109,7 @@ class CustomerService {
     if (isOk(response)) {
       return true;
     } else {
-      failService.fail(sub, response, FailService.Origin.USER_ROLE);
+      failService.failWithMessage(sub, CallbackView.FailReason.ENDPOINT_ERROR, FailService.Origin.USER_ROLE, Util.info(response));
     }
     return false;
   }
@@ -120,10 +126,10 @@ class CustomerService {
       if (isOk(response)) {
         return Optional.of(response.readEntity(CustomerView.class).getCustomerId());
       } else {
-        failService.fail(sub, response, FailService.Origin.CUSTOMER);
+        failService.failWithMessage(sub, CallbackView.FailReason.ENDPOINT_ERROR, FailService.Origin.CUSTOMER, Util.info(response));
       }
     } catch (ProcessingException e) {
-      failService.fail(sub, e, FailService.Origin.CUSTOMER);
+      failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.CUSTOMER, Util.info(e));
     }
     return Optional.empty();
   }
@@ -148,42 +154,43 @@ class CustomerService {
   }
 
   private CustomerParam getCustomerParam(OgelSubmission sub) {
-    RegisterOgel reg = sub.getRegisterOgelFromJson();
-    Customer customer = reg.getNewCustomer();
-    Address address = customer.getRegisteredAddress();
-    CustomerParam param = new CustomerParam();
-    param.setUserId(sub.getUserId());
-    param.setCustomerName(customer.getCustomerName());
-    param.setAddressParam(getAddressParam(address));
-    param.setCompaniesHouseNumber(customer.getChNumber());
-    param.setCompaniesHouseValidated(customer.isChNumberValidated());
-    param.setCustomerType(customer.getCustomerType());
-    param.setEoriNumber(customer.getEoriNumber());
-    param.setEoriValidated(customer.isEoriNumberValidated());
-    param.setWebsite(customer.getWebsite());
-    return param;
+    RegisterParam regParam = getRegisterParam(sub);
+    RegisterParam.RegisterCustomerParam regCustomerParam = regParam.getNewCustomer();
+    RegisterAddressParam regAddressParam = regCustomerParam.getRegisteredAddress();
+
+    CustomerParam customerParam = new CustomerParam();
+    customerParam.setUserId(sub.getUserId());
+    customerParam.setCustomerName(regCustomerParam.getCustomerName());
+    customerParam.setAddressParam(getAddressParam(regAddressParam));
+    customerParam.setCompaniesHouseNumber(regCustomerParam.getChNumber());
+    customerParam.setCompaniesHouseValidated(regCustomerParam.isChNumberValidated());
+    customerParam.setCustomerType(regCustomerParam.getCustomerType());
+    customerParam.setEoriNumber(regCustomerParam.getEoriNumber());
+    customerParam.setEoriValidated(regCustomerParam.isEoriNumberValidated());
+    customerParam.setWebsite(regCustomerParam.getWebsite());
+    return customerParam;
   }
 
-  private AddressParam getAddressParam(Address address) {
-    AddressParam param = new AddressParam();
-    param.setLine1(address.getLine1());
-    param.setLine2(address.getLine2());
-    param.setTown(address.getTown());
-    param.setCounty(address.getCounty());
-    param.setPostcode(address.getPostcode());
-    param.setCountry(address.getCountry());
-    return param;
+  private AddressParam getAddressParam(RegisterAddressParam param) {
+    AddressParam addressParam = new AddressParam();
+    addressParam.setLine1(param.getLine1());
+    addressParam.setLine2(param.getLine2());
+    addressParam.setTown(param.getTown());
+    addressParam.setCounty(param.getCounty());
+    addressParam.setPostcode(param.getPostcode());
+    addressParam.setCountry(param.getCountry());
+    return addressParam;
   }
 
   private SiteParam getSiteParam(OgelSubmission sub) {
-    RegisterOgel reg = sub.getRegisterOgelFromJson();
-    Site site = reg.getNewSite();
-    String siteName = site.getSiteName() != null ? site.getSiteName() : DEFAULT_SITE_NAME;
-    Address address = site.isUseCustomerAddress() ? reg.getNewCustomer().getRegisteredAddress() : site.getAddress();
+    RegisterParam param = getRegisterParam(sub);
+    RegisterParam.RegisterSiteParam regSiteParam = param.getNewSite();
+    String siteName = regSiteParam.getSiteName() != null ? regSiteParam.getSiteName() : DEFAULT_SITE_NAME;
+    RegisterAddressParam regAddressParam = regSiteParam.isUseCustomerAddress() ? param.getNewCustomer().getRegisteredAddress() : regSiteParam.getAddress();
 
     SiteParam siteParam = new SiteParam();
     siteParam.setSiteName(siteName);
-    siteParam.setAddressParam(getAddressParam(address));
+    siteParam.setAddressParam(getAddressParam(regAddressParam));
     return siteParam;
   }
 
@@ -191,16 +198,34 @@ class CustomerService {
    * Creates a UserRoleParam with an ADMIN roleType
    */
   private UserRoleParam getUserRoleParam(OgelSubmission sub) {
-    RegisterOgel reg = sub.getRegisterOgelFromJson();
-    AdminApproval admin = reg.getAdminApproval();
-    UserRoleParam param = new UserRoleParam();
-    param.setRoleType(UserRoleParam.RoleType.ADMIN);
-    param.setAdminUserId(admin.getAdminUserId());
-    return param;
+    RegisterParam regParam = getRegisterParam(sub);
+    RegisterParam.RegisterAdminApprovalParam regAdminApprovalParam = regParam.getAdminApproval();
+
+    UserRoleParam userRoleParam = new UserRoleParam();
+    userRoleParam.setRoleType(UserRoleParam.RoleType.ADMIN);
+    userRoleParam.setAdminUserId(regAdminApprovalParam.getAdminUserId());
+    return userRoleParam;
   }
 
   private boolean isOk(Response response) {
     return response != null && (response.getStatus() == Response.Status.OK.getStatusCode());
+  }
+
+  private boolean isForbidden(Response response) {
+    return response != null && (response.getStatus() == Response.Status.FORBIDDEN.getStatusCode());
+  }
+
+  private RegisterParam getRegisterParam(OgelSubmission sub) {
+    String json = sub.getJson();
+    RegisterParam param;
+    try {
+      param = objectMapper.readValue(json, RegisterParam.class);
+    } catch (IOException e) {
+      String info = "Unable to deserialize Json for OgelSubmission id: " + sub.getId();
+      LOGGER.error(info);
+      throw new PermissionServiceException(info);
+    }
+    return param;
   }
 
 }

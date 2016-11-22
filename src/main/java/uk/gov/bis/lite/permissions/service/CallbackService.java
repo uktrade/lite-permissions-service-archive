@@ -4,9 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.bis.lite.permissions.api.view.CallbackView;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
-import uk.gov.bis.lite.permissions.model.callback.CallbackParam;
+import uk.gov.bis.lite.permissions.util.Util;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
@@ -35,38 +36,39 @@ public class CallbackService {
   void completeCallback(OgelSubmission sub) {
     if (sub != null && sub.hasCompleted() && !sub.isCalledBack()) {
       try {
-        Response response = doCallback(sub.getCallbackUrl(), getCallbackParam(sub));
+        Response response = doCallback(sub.getCallbackUrl(), getCallbackView(sub));
         if (isOk(response)) {
           sub.setCalledBack(true);
           submissionDao.update(sub);
-          LOGGER.info("CALLBACK completed [" + sub.getSubmissionRef() + "]");
+          LOGGER.info("CALLBACK completed [" + sub.getRequestId() + "]");
         } else {
-          failService.fail(sub, response, FailService.Origin.CALLBACK);
+          failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.CALLBACK, Util.info(response));
         }
       } catch (ProcessingException e) {
-        failService.fail(sub, e, FailService.Origin.CALLBACK);
+        failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.CALLBACK, Util.info(e));
       }
     } else {
       LOGGER.warn("OgelSubmission has not completed its processing. Postponing callback");
     }
   }
 
-  private CallbackParam getCallbackParam(OgelSubmission sub) {
-    CallbackParam param = new CallbackParam();
+  private CallbackView getCallbackView(OgelSubmission sub) {
+    CallbackView view = new CallbackView();
     if (sub.isStatusSuccess()) {
-      param.setRequestId(sub.getSubmissionRef());
-      param.setStatus(CALLBACK_STATUS_SUCCESS);
-      param.setRegistrationReference(sub.getSpireRef());
+      view.setRequestId(sub.getRequestId());
+      view.setStatus(CALLBACK_STATUS_SUCCESS);
+      view.setRegistrationReference(sub.getSpireRef());
     }
     if (sub.isStatusError()) {
-      param.setRequestId(sub.getSubmissionRef());
-      param.setStatus(CALLBACK_STATUS_FAILED);
-      param.setFailReason(FailService.getMatchedErrorFromMessage(sub.getLastFailMessage()));
+      view.setRequestId(sub.getRequestId());
+      view.setStatus(CALLBACK_STATUS_FAILED);
+      CallbackView.FailReason failReason = sub.getFailReason();
+      view.setFailReason(failReason);
     }
-    return param;
+    return view;
   }
 
-  private Response doCallback(String url, CallbackParam param) {
+  private Response doCallback(String url, CallbackView param) {
     // TODO remove once development is finished
     //url = "http://localhost:8123/callback"; // temp for development
     LOGGER.info("Attempting callback [" + url + "] ...");
@@ -76,4 +78,5 @@ public class CallbackService {
   private boolean isOk(Response response) {
     return response != null && (response.getStatus() == Response.Status.OK.getStatusCode());
   }
+
 }

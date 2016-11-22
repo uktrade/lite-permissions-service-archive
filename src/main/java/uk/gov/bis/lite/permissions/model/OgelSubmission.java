@@ -1,13 +1,11 @@
 package uk.gov.bis.lite.permissions.model;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.bis.lite.permissions.model.register.RegisterOgel;
+import uk.gov.bis.lite.permissions.api.view.CallbackView;
 import uk.gov.bis.lite.permissions.util.Util;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -26,6 +24,7 @@ public class OgelSubmission {
   private String spireRef;
   private String firstFail;
   private String lastFailMessage;
+  private CallbackView.FailReason failReason;
   private String callbackUrl;
   private boolean calledBack;
   private String json;
@@ -65,6 +64,14 @@ public class OgelSubmission {
     this.ogelType = ogelType;
     this.mode = Mode.IMMEDIATE;
     this.status = Status.CREATED;
+  }
+
+  /**
+   * RequestId is used to identify a submission to external services. It is made up
+   * from the submissionRef plus the id
+   */
+  public String getRequestId() {
+    return submissionRef + "_" + id;
   }
 
   public boolean isModeScheduled() {
@@ -152,17 +159,6 @@ public class OgelSubmission {
 
   public boolean needsRoleUpdate() {
     return roleUpdate && !roleUpdated;
-  }
-
-  public RegisterOgel getRegisterOgelFromJson() {
-    RegisterOgel regOgel = null;
-    ObjectMapper mapper = new ObjectMapper();
-    try {
-      regOgel = mapper.readValue(this.getJson(), RegisterOgel.class);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return regOgel;
   }
 
   public String getJson() {
@@ -299,5 +295,13 @@ public class OgelSubmission {
 
   public void setLastFailMessage(String lastFailMessage) {
     this.lastFailMessage = lastFailMessage;
+  }
+
+  public CallbackView.FailReason getFailReason() {
+    return failReason;
+  }
+
+  public void setFailReason(CallbackView.FailReason failReason) {
+    this.failReason = failReason;
   }
 }
