@@ -25,25 +25,16 @@ class FailService {
   private OgelSubmissionDao submissionDao;
   private int maxMinutesRetryAfterFail;
 
-  static String BLACKLISTED = "BLACKLISTED";
-  static String USER_LACKS_SITE_PRIVILEGES = "USER_LACKS_SITE_PRIVILEGES";
-  static String USER_LACKS_PRIVILEGES = "USER_LACKS_PRIVILEGES";
-
-  //public static String LICENSE_ALREADY_EXISTS = "There is already a licence for OGEL ref";
-  //public static String SITE_ALREADY_REGISTERED = "SITE_ALREADY_REGISTERED";
-  //public static String SOAP_FAULT = "soap:Fault";
-  //public static String CUSTOMER_NAME_ALREADY_EXISTS = "Customer name already exists";
-
   private static final Set<CallbackView.FailReason> terminalFailReasons = new HashSet<>(Arrays.asList(new CallbackView.FailReason[]{
       CallbackView.FailReason.BLACKLISTED,
       CallbackView.FailReason.PERMISSION_DENIED}
   ));
 
   /**
-   * Origin of call to 'fail': CUSTOMER, SITE, USER_ROLE, OGEL_CREATE, CALLBACK
+   * Origin of call to 'fail': CUSTOMER, SITE, USER_ROLE, OGEL_CREATE, CALLBACK, UNKNOWN
    */
   enum Origin {
-    CUSTOMER, SITE, USER_ROLE, OGEL_CREATE, CALLBACK;
+    CUSTOMER, SITE, USER_ROLE, OGEL_CREATE, CALLBACK, UNKNOWN;
   }
 
   @Inject

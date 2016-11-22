@@ -22,6 +22,11 @@ public class OgelService {
   private FailService failService;
   private OgelSubmissionDao submissionDao;
 
+  private static String BLACKLISTED = "BLACKLISTED";
+  private static String USER_LACKS_SITE_PRIVILEGES = "USER_LACKS_SITE_PRIVILEGES";
+  private static String USER_LACKS_PRIVILEGES = "USER_LACKS_PRIVILEGES";
+  private static String SITE_ALREADY_REGISTERED = "SITE_ALREADY_REGISTERED";
+
   @Inject
   public OgelService(SpireReferenceClient createOgelAppReferenceClient, FailService failService, OgelSubmissionDao submissionDao) {
     this.createOgelAppReferenceClient = createOgelAppReferenceClient;
@@ -64,12 +69,14 @@ public class OgelService {
       }
     } catch (SpireClientException e) {
       String info = Util.info(e);
-      if (info.contains(FailService.BLACKLISTED)) {
+      if (info.contains(BLACKLISTED)) {
         failService.fail(sub, CallbackView.FailReason.BLACKLISTED, FailService.Origin.OGEL_CREATE);
-      } else if (info.contains(FailService.USER_LACKS_SITE_PRIVILEGES) || info.contains(FailService.USER_LACKS_PRIVILEGES)) {
+      } else if (info.contains(USER_LACKS_SITE_PRIVILEGES) || info.contains(USER_LACKS_PRIVILEGES)) {
         failService.fail(sub, CallbackView.FailReason.PERMISSION_DENIED, FailService.Origin.OGEL_CREATE);
+      } else if (info.contains(SITE_ALREADY_REGISTERED)) {
+        failService.fail(sub, CallbackView.FailReason.SITE_ALREADY_REGISTERED, FailService.Origin.OGEL_CREATE);
       } else {
-        failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.OGEL_CREATE, info);
+        failService.failWithMessage(sub, CallbackView.FailReason.ENDPOINT_ERROR, FailService.Origin.OGEL_CREATE, info);
       }
     }
     return created;

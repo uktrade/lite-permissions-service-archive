@@ -86,7 +86,7 @@ class CustomerService {
       } else if (isForbidden(response)) {
         failService.fail(sub, CallbackView.FailReason.PERMISSION_DENIED, FailService.Origin.SITE);
       } else {
-        failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.SITE, Util.info(response));
+        failService.failWithMessage(sub, CallbackView.FailReason.ENDPOINT_ERROR, FailService.Origin.SITE, Util.info(response));
       }
     } catch (ProcessingException e) {
       failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.SITE, Util.info(e));
@@ -109,7 +109,7 @@ class CustomerService {
     if (isOk(response)) {
       return true;
     } else {
-      failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.USER_ROLE, Util.info(response));
+      failService.failWithMessage(sub, CallbackView.FailReason.ENDPOINT_ERROR, FailService.Origin.USER_ROLE, Util.info(response));
     }
     return false;
   }
@@ -126,7 +126,7 @@ class CustomerService {
       if (isOk(response)) {
         return Optional.of(response.readEntity(CustomerView.class).getCustomerId());
       } else {
-        failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.CUSTOMER, Util.info(response));
+        failService.failWithMessage(sub, CallbackView.FailReason.ENDPOINT_ERROR, FailService.Origin.CUSTOMER, Util.info(response));
       }
     } catch (ProcessingException e) {
       failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.CUSTOMER, Util.info(e));
