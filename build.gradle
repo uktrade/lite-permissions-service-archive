@@ -63,7 +63,7 @@ publishing {
     api(MavenPublication) {
       groupId 'uk.gov.bis.lite'
       artifactId 'lite-permissions-service-api'
-      version '0.9'
+      version '1.0'
       artifact litePermissionsServiceApiJar
     }
   }
