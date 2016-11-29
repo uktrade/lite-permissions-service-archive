@@ -7,7 +7,11 @@ public class OgelRegistrationView {
   private String registrationDate;
   private String customerId;
   private String siteId;
-  private String status;
+  private Status status;
+
+  public enum Status {
+    EXTANT, DEREGISTERED, SURRENDERED, UNKNOWN;
+  }
 
   public OgelRegistrationView() {
   }
@@ -52,11 +56,11 @@ public class OgelRegistrationView {
     this.siteId = siteId;
   }
 
-  public String getStatus() {
+  public Status getStatus() {
     return status;
   }
 
-  public void setStatus(String status) {
+  public void setStatus(Status status) {
     this.status = status;
   }
 }
