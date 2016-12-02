@@ -15,7 +15,7 @@ mainClassName = "uk.gov.bis.lite.permissions.PermissionsApp"
 
 repositories {
   mavenCentral()
-  maven { url "http://nexus.mgmt.int.licensing.service.trade.gov.uk/repository/maven-releases/" }
+  maven { url "http://nexus.mgmt.licensing.service.trade.gov.uk.test/repository/maven-releases/" }
 }
 
 dependencies {
