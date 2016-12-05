@@ -3,12 +3,16 @@ package uk.gov.bis.lite.permissions.api.view;
 public class CallbackView {
 
   private String requestId;
-  private String status;
+  private Status status;
   private String registrationReference;
   private FailReason failReason;
 
   public enum FailReason {
     PERMISSION_DENIED, SITE_ALREADY_REGISTERED, BLACKLISTED, ENDPOINT_ERROR, UNCLASSIFIED;
+  }
+
+  public enum Status {
+    SUCCESS, FAILED;
   }
 
   public String getRequestId() {
@@ -19,11 +23,11 @@ public class CallbackView {
     this.requestId = requestId;
   }
 
-  public String getStatus() {
+  public Status getStatus() {
     return status;
   }
 
-  public void setStatus(String status) {
+  public void setStatus(Status status) {
     this.status = status;
   }
 
