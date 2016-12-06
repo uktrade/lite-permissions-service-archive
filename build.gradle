@@ -15,7 +15,14 @@ mainClassName = "uk.gov.bis.lite.permissions.PermissionsApp"
 
 repositories {
   mavenCentral()
-  maven { url "http://nexus.mgmt.licensing.service.trade.gov.uk.test/repository/maven-releases/" }
+  maven {
+    name "snapshots"
+    url "http://nexus.mgmt.licensing.service.trade.gov.uk.test/repository/maven-snapshots/"
+  }
+  maven {
+    name "releases"
+    url "http://nexus.mgmt.licensing.service.trade.gov.uk.test/repository/maven-releases/"
+  }
 }
 
 dependencies {
@@ -30,7 +37,7 @@ dependencies {
   compile 'org.flywaydb:flyway-core:4.0.1'
 
   // Lite dependencies
-  compile 'uk.gov.bis.lite:spire-client:1.1'
+  compile 'uk.gov.bis.lite:spire-client:1.2'
   compile 'uk.gov.bis.lite:lite-customer-service-api:1.1'
   compile 'uk.gov.bis.lite:jersey-correlation-id:1.0'
 
@@ -70,11 +77,11 @@ publishing {
   repositories {
     maven {
       name "snapshots"
-      url "http://nexus.mgmt.int.licensing.service.trade.gov.uk/repository/maven-snapshots/"
+      url "http://nexus.mgmt.licensing.service.trade.gov.uk.test/repository/maven-snapshots/"
     }
     maven {
       name "releases"
-      url "http://nexus.mgmt.int.licensing.service.trade.gov.uk/repository/maven-releases/"
+      url "http://nexus.mgmt.licensing.service.trade.gov.uk.test/repository/maven-releases/"
     }
   }
 }

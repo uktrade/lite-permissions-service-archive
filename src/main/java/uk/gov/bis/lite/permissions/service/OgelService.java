@@ -6,12 +6,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.common.spire.client.SpireRequest;
-import uk.gov.bis.lite.common.spire.client.exception.SpireClientException;
 import uk.gov.bis.lite.permissions.api.view.CallbackView;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
+import uk.gov.bis.lite.permissions.exception.SpireFailReasonException;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.spire.SpireReferenceClient;
-import uk.gov.bis.lite.permissions.util.Util;
 
 @Singleton
 public class OgelService {
@@ -21,11 +20,6 @@ public class OgelService {
   private SpireReferenceClient createOgelAppReferenceClient;
   private FailService failService;
   private OgelSubmissionDao submissionDao;
-
-  private static String BLACKLISTED = "BLACKLISTED";
-  private static String USER_LACKS_SITE_PRIVILEGES = "USER_LACKS_SITE_PRIVILEGES";
-  private static String USER_LACKS_PRIVILEGES = "USER_LACKS_PRIVILEGES";
-  private static String SITE_ALREADY_REGISTERED = "SITE_ALREADY_REGISTERED";
 
   @Inject
   public OgelService(SpireReferenceClient createOgelAppReferenceClient, FailService failService, OgelSubmissionDao submissionDao) {
@@ -67,17 +61,8 @@ public class OgelService {
       } else {
         failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.OGEL_CREATE, "No Spire reference returned");
       }
-    } catch (SpireClientException e) {
-      String info = Util.info(e);
-      if (info.contains(BLACKLISTED)) {
-        failService.fail(sub, CallbackView.FailReason.BLACKLISTED, FailService.Origin.OGEL_CREATE);
-      } else if (info.contains(USER_LACKS_SITE_PRIVILEGES) || info.contains(USER_LACKS_PRIVILEGES)) {
-        failService.fail(sub, CallbackView.FailReason.PERMISSION_DENIED, FailService.Origin.OGEL_CREATE);
-      } else if (info.contains(SITE_ALREADY_REGISTERED)) {
-        failService.fail(sub, CallbackView.FailReason.SITE_ALREADY_REGISTERED, FailService.Origin.OGEL_CREATE);
-      } else {
-        failService.failWithMessage(sub, CallbackView.FailReason.ENDPOINT_ERROR, FailService.Origin.OGEL_CREATE, info);
-      }
+    } catch (SpireFailReasonException e) {
+      failService.failWithMessage(sub, e.getFailReason(), FailService.Origin.OGEL_CREATE, e.getMessage());
     }
     return created;
   }
