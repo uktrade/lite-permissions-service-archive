@@ -27,7 +27,7 @@ import uk.gov.bis.lite.permissions.service.RegistrationsService;
 import uk.gov.bis.lite.permissions.service.RegistrationsServiceImpl;
 import uk.gov.bis.lite.permissions.service.SubmissionService;
 import uk.gov.bis.lite.permissions.service.SubmissionServiceImpl;
-import uk.gov.bis.lite.permissions.spire.OgelErrorHandler;
+import uk.gov.bis.lite.permissions.spire.OgelErrorNodeErrorHandler;
 import uk.gov.bis.lite.permissions.spire.SpireOgelRegistrationClient;
 import uk.gov.bis.lite.permissions.spire.SpireReferenceClient;
 import uk.gov.bis.lite.permissions.spire.parsers.OgelRegistrationParser;
@@ -45,7 +45,7 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
         new ReferenceParser("REGISTRATION_REF"),
         new SpireClientConfig(config.getSpireClientUserName(), config.getSpireClientPassword(), config.getSpireClientUrl()),
         new SpireRequestConfig("SPIRE_CREATE_OGEL_APP", "OGEL_DETAILS", false),
-        new OgelErrorHandler());
+        new OgelErrorNodeErrorHandler());
   }
 
   @Provides

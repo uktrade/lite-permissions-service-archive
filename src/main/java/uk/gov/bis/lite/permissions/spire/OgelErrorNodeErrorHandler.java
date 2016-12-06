@@ -1,14 +1,14 @@
 package uk.gov.bis.lite.permissions.spire;
 
-import uk.gov.bis.lite.common.spire.client.errorhandler.AbstractErrorHandler;
+import uk.gov.bis.lite.common.spire.client.errorhandler.ErrorNodeErrorHandler;
 import uk.gov.bis.lite.permissions.api.view.CallbackView;
 import uk.gov.bis.lite.permissions.exception.SpireFailReasonException;
 
-public class OgelErrorHandler extends AbstractErrorHandler {
+public class OgelErrorNodeErrorHandler extends ErrorNodeErrorHandler {
 
-  public OgelErrorHandler() {}
+  public OgelErrorNodeErrorHandler() {}
 
-  public void mapErrorText(String errorText) {
+  public void handleError(String errorText) {
     if (errorText.contains("BLACKLISTED")) {
       throw new SpireFailReasonException(CallbackView.FailReason.BLACKLISTED, errorText);
     } else if (errorText.contains("USER_LACKS_SITE_PRIVILEGES") || errorText.contains("USER_LACKS_PRIVILEGES")) {
