@@ -19,9 +19,6 @@ public class CallbackService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CallbackService.class);
 
-  private static String CALLBACK_STATUS_SUCCESS = "SUCCESS";
-  private static String CALLBACK_STATUS_FAILED = "FAILED";
-
   private Client httpClient;
   private OgelSubmissionDao submissionDao;
   private FailService failService;
@@ -56,12 +53,12 @@ public class CallbackService {
     CallbackView view = new CallbackView();
     if (sub.isStatusSuccess()) {
       view.setRequestId(sub.getRequestId());
-      view.setStatus(CALLBACK_STATUS_SUCCESS);
+      view.setStatus(CallbackView.Status.SUCCESS);
       view.setRegistrationReference(sub.getSpireRef());
     }
     if (sub.isStatusError()) {
       view.setRequestId(sub.getRequestId());
-      view.setStatus(CALLBACK_STATUS_FAILED);
+      view.setStatus(CallbackView.Status.FAILED);
       CallbackView.FailReason failReason = sub.getFailReason();
       view.setFailReason(failReason);
     }
