@@ -50,6 +50,7 @@ public class RegistrationsServiceImpl implements RegistrationsService {
 
   private OgelRegistrationView getOgelRegistrationView(SpireOgelRegistration spireOgelRegistration) {
     OgelRegistrationView view = new OgelRegistrationView();
+    view.setRegistrationReference(spireOgelRegistration.getRegistrationRef());
     view.setCustomerId(spireOgelRegistration.getSarRef());
     view.setStatus(getStatus(spireOgelRegistration.getStatus()));
     view.setOgelType(spireOgelRegistration.getOgelTypeRef());
