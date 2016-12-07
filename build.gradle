@@ -69,10 +69,12 @@ publishing {
   publications {
 
     mavenJava(MavenPublication) {
-      from components.java
       artifactId 'lite-permissions-service-api'
+      artifact apiJar {
+        classifier "api"
+      }
       artifact jarWithSources {
-        classifier "sources"
+        classifier "api-sources"
       }
     }
   }
