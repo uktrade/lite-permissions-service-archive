@@ -51,6 +51,8 @@ public class CallbackService {
 
   private CallbackView getCallbackView(OgelSubmission sub) {
     CallbackView view = new CallbackView();
+    view.setCustomerId(sub.getCustomerRef());
+    view.setSiteId(sub.getSiteRef());
     if (sub.isStatusSuccess()) {
       view.setRequestId(sub.getRequestId());
       view.setStatus(CallbackView.Status.SUCCESS);

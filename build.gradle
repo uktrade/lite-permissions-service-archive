@@ -8,7 +8,7 @@ plugins {
 apply plugin: 'maven-publish'
 
 group 'uk.gov.bis.lite'
-version '1.1'
+version '1.2'
 
 mainClassName = "uk.gov.bis.lite.permissions.PermissionsApp"
 

@@ -7,6 +7,9 @@ public class CallbackView {
   private String registrationReference;
   private FailReason failReason;
 
+  private String customerId;
+  private String siteId;
+
   public enum FailReason {
     PERMISSION_DENIED, SITE_ALREADY_REGISTERED, BLACKLISTED, ENDPOINT_ERROR, UNCLASSIFIED;
   }
@@ -45,5 +48,21 @@ public class CallbackView {
 
   public void setFailReason(FailReason failReason) {
     this.failReason = failReason;
+  }
+
+  public String getCustomerId() {
+    return customerId;
+  }
+
+  public void setCustomerId(String customerId) {
+    this.customerId = customerId;
+  }
+
+  public String getSiteId() {
+    return siteId;
+  }
+
+  public void setSiteId(String siteId) {
+    this.siteId = siteId;
   }
 }
