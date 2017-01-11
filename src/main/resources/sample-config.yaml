@@ -1,5 +1,3 @@
-# processScheduledJobCron: 0 0,5,10,15,20,25,30,35,40,45,50,55 * * * ? # every 5 minutes
-# processScheduledJobCron: 0/20 * * * * ?  # every 20 seconds
 processScheduledJobCron: 0/10 * * * * ?  # every 10 seconds
 
 spireClientUserName: bisuat.api@test.com
@@ -24,8 +22,7 @@ logging:
   appenders:
     - type: console
       includeCallerData : true
-      # logFormat: "[%mdc{corrID}] %d [%p] %marker %logger %m%n"
-      logFormat: '[%mdc{corrID}] [%d{HH:mm:ss.SSS}] [%-5level] [%class{0}:%method:%line] %msg %n'
+      logFormat: "[%mdc{corrID}] %d [%p] %marker %logger %m%n"
   loggers:
     uk.gov.bis.lite.common.spire.client: TRACE
 
@@ -36,9 +33,9 @@ database:
     charSet: UTF-8
   maxWaitForConnection: 30s
   validationQuery: "SELECT 1"
-  initialSize: 1 # connections
-  minSize: 1 # connections
-  maxSize: 3 # connections
+  initialSize: 1
+  minSize: 1
+  maxSize: 3
   checkConnectionWhileIdle: false
   evictionInterval: 10s
   minIdleTime: 1 minute
