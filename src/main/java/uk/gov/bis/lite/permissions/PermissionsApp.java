@@ -12,6 +12,7 @@ import uk.gov.bis.lite.common.jersey.filter.ContainerCorrelationIdFilter;
 import uk.gov.bis.lite.permissions.config.GuiceModule;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
 import uk.gov.bis.lite.permissions.resource.OgelRegistrationResource;
+import uk.gov.bis.lite.permissions.resource.OgelSubmissionResource;
 import uk.gov.bis.lite.permissions.resource.RegisterOgelResource;
 import uk.gov.bis.lite.permissions.scheduler.Scheduler;
 
@@ -24,7 +25,7 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
     guiceBundle = new GuiceBundle.Builder<PermissionsAppConfig>()
         .modules(new GuiceModule())
         .installers(ResourceInstaller.class, ManagedInstaller.class)
-        .extensions(RegisterOgelResource.class, OgelRegistrationResource.class, Scheduler.class)
+        .extensions(RegisterOgelResource.class, OgelRegistrationResource.class, OgelSubmissionResource.class, Scheduler.class)
         .build();
     bootstrap.addBundle(guiceBundle);
   }

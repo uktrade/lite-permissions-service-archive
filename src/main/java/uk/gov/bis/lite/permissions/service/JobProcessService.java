@@ -64,6 +64,7 @@ public class JobProcessService {
     List<OgelSubmission> subs = submissionDao.getScheduledCallbacks();
     LOGGER.info("SCHEDULED [" + subs.size() + "]");
 
+    /*
     for (OgelSubmission sub : subs) {
       try {
         doProcessOgelSubmission(sub);
@@ -73,6 +74,7 @@ public class JobProcessService {
         LOGGER.error("JobProcessService.processScheduled: " + e.getMessage(), e);
       }
     }
+    */
   }
 
   /**

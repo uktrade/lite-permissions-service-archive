@@ -36,10 +36,11 @@ public class OgelSubmission {
 
   /**
    * IMMEDIATE      - submission is being processed immediately, through all stages
-   * SCHEDULED      - submission is to processed by scheduled jobs
+   * SCHEDULED      - submission processed by scheduled jobs
+   * CANCELLED      - submission is ignored and not processed
    */
   public enum Mode {
-    IMMEDIATE, SCHEDULED;
+    IMMEDIATE, SCHEDULED, CANCELLED;
   }
 
   /**
@@ -121,6 +122,10 @@ public class OgelSubmission {
 
   public void changeToScheduledMode() {
     mode = Mode.SCHEDULED;
+  }
+
+  public void changeToCancelledMode() {
+    mode = Mode.CANCELLED;
   }
 
   public void updateStatusToSuccess() {
