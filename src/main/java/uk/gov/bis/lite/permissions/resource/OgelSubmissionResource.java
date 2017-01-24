@@ -11,8 +11,8 @@ import uk.gov.bis.lite.permissions.service.OgelSubmissionService;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -48,7 +48,7 @@ public class OgelSubmissionResource {
     return ogelSubmissionService.getOgelSubmission(id);
   }
 
-  @POST
+  @DELETE
   @Produces({MediaType.APPLICATION_JSON})
   @Path("/ogel-submissions")
   public Response cancelScheduledSubmissions(@Auth PrincipalImpl user) {
@@ -56,7 +56,7 @@ public class OgelSubmissionResource {
     return Response.status(Response.Status.OK).build();
   }
 
-  @POST
+  @DELETE
   @Produces({MediaType.APPLICATION_JSON})
   @Path("/ogel-submissions/{id}")
   public Response cancelScheduledSubmission(@Auth PrincipalImpl user, @NotNull @PathParam("id") int id) {
