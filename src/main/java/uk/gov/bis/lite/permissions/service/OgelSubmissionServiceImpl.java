@@ -21,28 +21,32 @@ public class OgelSubmissionServiceImpl implements OgelSubmissionService {
     this.submissionDao = submissionDao;
   }
 
+
+  public boolean ogelSubmissionExists(Integer submissionId) {
+    return submissionDao.findBySubmissionId(submissionId) != null;
+  }
+
   public List<OgelSubmissionView> getOgelSubmissions() {
-    LOGGER.info("getOgelSubmissions");
-    return submissionDao.getScheduled().stream().map(this::getOgelSubmissionView).collect(Collectors.toList());
+    return submissionDao.getScheduledCallbacks().stream().map(this::getOgelSubmissionView).collect(Collectors.toList());
   }
 
   public OgelSubmissionView getOgelSubmission(int submissionId) {
-    LOGGER.info("getOgelSubmission");
     return getOgelSubmissionView(submissionDao.findBySubmissionId(submissionId));
   }
 
   public void cancelScheduledOgelSubmissions() {
-    LOGGER.info("cancelScheduledOgelSubmissions");
-    submissionDao.getScheduled().forEach(this::cancelScheduled);
+    submissionDao.getScheduledCallbacks().forEach(this::cancelScheduled);
   }
 
   public void cancelScheduledOgelSubmission(int submissionId) {
-    LOGGER.info("cancelScheduledOgelSubmission");
     cancelScheduled(submissionDao.findBySubmissionId(submissionId));
   }
 
+  /**
+   * Only SCHEDULED ogelSubmissions which have not reached the 'callback' stage can be cancelled.
+   */
   private void cancelScheduled(OgelSubmission sub) {
-    if(sub != null && sub.isModeScheduled() && !sub.isStatusSuccess() && !sub.isStatusError()) {
+    if (sub != null && sub.isModeScheduled() && !sub.isCalledBack()) {
       sub.changeToCancelledMode();
       submissionDao.update(sub);
     }
@@ -64,7 +68,6 @@ public class OgelSubmissionServiceImpl implements OgelSubmissionService {
     if(sub.getFailReason() != null) {
       view.setFailReason(sub.getFailReason().name());
     }
-
     view.setCallbackUrl(sub.getCallbackUrl());
     view.setCalledBack(sub.isCalledBack());
     view.setCreated(sub.getCreated());

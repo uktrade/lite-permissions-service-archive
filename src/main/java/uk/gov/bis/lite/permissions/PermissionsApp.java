@@ -1,6 +1,9 @@
 package uk.gov.bis.lite.permissions;
 
 import io.dropwizard.Application;
+import io.dropwizard.auth.AuthDynamicFeature;
+import io.dropwizard.auth.PrincipalImpl;
+import io.dropwizard.auth.basic.BasicCredentialAuthFilter;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -15,6 +18,7 @@ import uk.gov.bis.lite.permissions.resource.OgelRegistrationResource;
 import uk.gov.bis.lite.permissions.resource.OgelSubmissionResource;
 import uk.gov.bis.lite.permissions.resource.RegisterOgelResource;
 import uk.gov.bis.lite.permissions.scheduler.Scheduler;
+import uk.gov.bis.lite.permissions.util.SimpleAuthenticator;
 
 public class PermissionsApp extends Application<PermissionsAppConfig> {
 
@@ -32,6 +36,11 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
 
   @Override
   public void run(PermissionsAppConfig config, Environment environment) throws Exception {
+
+    environment.jersey().register(new AuthDynamicFeature(new BasicCredentialAuthFilter.Builder<PrincipalImpl>()
+        .setAuthenticator(new SimpleAuthenticator(config.getAdminLogin(), config.getAdminPassword()))
+        .setRealm("Permissions Service Admin Authentication")
+        .buildAuthFilter()));
 
     environment.jersey().register(ContainerCorrelationIdFilter.class);
 

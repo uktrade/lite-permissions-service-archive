@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface OgelSubmissionService {
 
+  boolean ogelSubmissionExists(Integer submissionId);
+
   List<OgelSubmissionView> getOgelSubmissions();
 
   OgelSubmissionView getOgelSubmission(int submissionId);

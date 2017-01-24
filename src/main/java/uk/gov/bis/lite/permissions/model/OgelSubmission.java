@@ -95,6 +95,10 @@ public class OgelSubmission {
     return isStatusSuccess() || isStatusError();
   }
 
+  public boolean isCallbackComplete() {
+    return calledBack;
+  }
+
   public boolean canCreateOgel() {
     return !needsCustomer() && !needsSite() && !needsRoleUpdate();
   }
