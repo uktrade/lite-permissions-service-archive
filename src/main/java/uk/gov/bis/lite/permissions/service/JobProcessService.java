@@ -61,7 +61,7 @@ public class JobProcessService {
    * (This method is called by ProcessScheduledJob)
    */
   public void processScheduled() {
-    List<OgelSubmission> subs = submissionDao.getScheduledCallbacks();
+    List<OgelSubmission> subs = submissionDao.getPendingScheduledSubmissions();
     LOGGER.info("SCHEDULED [" + subs.size() + "]");
 
     for (OgelSubmission sub : subs) {
@@ -73,6 +73,7 @@ public class JobProcessService {
         LOGGER.error("JobProcessService.processScheduled: " + e.getMessage(), e);
       }
     }
+
   }
 
   /**

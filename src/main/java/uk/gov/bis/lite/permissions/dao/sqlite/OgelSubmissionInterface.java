@@ -53,9 +53,9 @@ public interface OgelSubmissionInterface {
   @Mapper(OgelSubmissionMapper.class)
   List<OgelSubmission> getScheduledByStatus(@Bind("status") String status);
 
-  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE MODE = 'SCHEDULED' AND CALLED_BACK = 0")
+  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE MODE = 'SCHEDULED' AND CALLED_BACK = 0 ORDER BY ID")
   @Mapper(OgelSubmissionMapper.class)
-  List<OgelSubmission> getScheduledCallbacks();
+  List<OgelSubmission> getPendingScheduledSubmissions();
 
   @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE SUBMISSION_REF = :submissionRef")
   @Mapper(OgelSubmissionMapper.class)
