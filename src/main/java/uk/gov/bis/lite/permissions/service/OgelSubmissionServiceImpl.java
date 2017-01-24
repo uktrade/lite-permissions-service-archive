@@ -26,16 +26,16 @@ public class OgelSubmissionServiceImpl implements OgelSubmissionService {
     return submissionDao.findBySubmissionId(submissionId) != null;
   }
 
-  public List<OgelSubmissionView> getOgelSubmissions() {
-    return submissionDao.getScheduledCallbacks().stream().map(this::getOgelSubmissionView).collect(Collectors.toList());
+  public List<OgelSubmissionView> getPendingScheduledOgelSubmissions() {
+    return submissionDao.getPendingScheduledSubmissions().stream().map(this::getOgelSubmissionView).collect(Collectors.toList());
   }
 
   public OgelSubmissionView getOgelSubmission(int submissionId) {
     return getOgelSubmissionView(submissionDao.findBySubmissionId(submissionId));
   }
 
-  public void cancelScheduledOgelSubmissions() {
-    submissionDao.getScheduledCallbacks().forEach(this::cancelScheduled);
+  public void cancelPendingScheduledOgelSubmissions() {
+    submissionDao.getPendingScheduledSubmissions().forEach(this::cancelScheduled);
   }
 
   public void cancelScheduledOgelSubmission(int submissionId) {

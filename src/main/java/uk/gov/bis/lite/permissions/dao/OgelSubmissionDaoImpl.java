@@ -63,9 +63,9 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
 
   @Override
   @Transaction
-  public List<OgelSubmission> getScheduledCallbacks() {
+  public List<OgelSubmission> getPendingScheduledSubmissions() {
     try (final Handle handle = jdbi.open()) {
-      return attach(handle).getScheduledCallbacks();
+      return attach(handle).getPendingScheduledSubmissions();
     }
   }
 

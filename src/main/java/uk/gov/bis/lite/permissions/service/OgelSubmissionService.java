@@ -8,11 +8,11 @@ public interface OgelSubmissionService {
 
   boolean ogelSubmissionExists(Integer submissionId);
 
-  List<OgelSubmissionView> getOgelSubmissions();
+  List<OgelSubmissionView> getPendingScheduledOgelSubmissions();
 
   OgelSubmissionView getOgelSubmission(int submissionId);
 
-  void cancelScheduledOgelSubmissions();
+  void cancelPendingScheduledOgelSubmissions();
 
   void cancelScheduledOgelSubmission(int submissionId);
 

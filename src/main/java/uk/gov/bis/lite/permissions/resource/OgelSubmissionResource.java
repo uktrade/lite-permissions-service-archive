@@ -35,7 +35,7 @@ public class OgelSubmissionResource {
   @Produces({MediaType.APPLICATION_JSON})
   @Path("/ogel-submissions")
   public List<OgelSubmissionView> viewOgelSubmissions(@Auth PrincipalImpl user) {
-    return ogelSubmissionService.getOgelSubmissions();
+    return ogelSubmissionService.getPendingScheduledOgelSubmissions();
   }
 
   @GET
@@ -52,7 +52,7 @@ public class OgelSubmissionResource {
   @Produces({MediaType.APPLICATION_JSON})
   @Path("/ogel-submissions")
   public Response cancelScheduledSubmissions(@Auth PrincipalImpl user) {
-    ogelSubmissionService.cancelScheduledOgelSubmissions();
+    ogelSubmissionService.cancelPendingScheduledOgelSubmissions();
     return Response.status(Response.Status.OK).build();
   }
 
