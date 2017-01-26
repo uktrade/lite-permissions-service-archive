@@ -10,11 +10,15 @@ public interface OgelSubmissionDao {
 
   int create(OgelSubmission sub);
 
-  List<OgelSubmission> getScheduled();
+  List<OgelSubmission> getScheduledToProcess();
 
   List<OgelSubmission> getScheduledByStatus(OgelSubmission.Status status);
 
-  List<OgelSubmission> getPendingScheduledSubmissions();
+  List<OgelSubmission> getPendingSubmissions();
+
+  List<OgelSubmission> getCancelledSubmissions();
+
+  List<OgelSubmission> getCompleteSubmissions();
 
   OgelSubmission findBySubmissionRef(String submissionRef);
 

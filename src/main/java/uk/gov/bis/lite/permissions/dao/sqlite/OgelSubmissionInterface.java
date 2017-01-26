@@ -45,17 +45,25 @@ public interface OgelSubmissionInterface {
              @Bind("roleUpdated") Boolean roleUpdated);
 
 
-  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE MODE = 'SCHEDULED' AND STATUS != 'SUCCESS' AND STATUS != 'ERROR'")
+  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE MODE = 'SCHEDULED' AND CALLED_BACK = 0")
   @Mapper(OgelSubmissionMapper.class)
-  List<OgelSubmission> getScheduled();
+  List<OgelSubmission> getScheduledToProcess();
 
   @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE STATUS = :status AND MODE = 'SCHEDULED'")
   @Mapper(OgelSubmissionMapper.class)
   List<OgelSubmission> getScheduledByStatus(@Bind("status") String status);
 
-  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE MODE = 'SCHEDULED' AND CALLED_BACK = 0 ORDER BY ID")
+  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE (MODE = 'SCHEDULED' OR MODE = 'IMMEDIATE') AND CALLED_BACK = 0 ORDER BY ID DESC")
   @Mapper(OgelSubmissionMapper.class)
-  List<OgelSubmission> getPendingScheduledSubmissions();
+  List<OgelSubmission> getPendingSubmissions();
+
+  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE MODE = 'CANCELLED' ORDER BY ID DESC")
+  @Mapper(OgelSubmissionMapper.class)
+  List<OgelSubmission> getCancelledSubmissions();
+
+  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE (MODE = 'SCHEDULED' OR MODE = 'IMMEDIATE') AND (STATUS = 'SUCCESS' OR STATUS = 'ERROR') AND CALLED_BACK = 1 ORDER BY ID DESC")
+  @Mapper(OgelSubmissionMapper.class)
+  List<OgelSubmission> getCompleteSubmissions();
 
   @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE SUBMISSION_REF = :submissionRef")
   @Mapper(OgelSubmissionMapper.class)
@@ -65,7 +73,7 @@ public interface OgelSubmissionInterface {
   @Mapper(OgelSubmissionMapper.class)
   OgelSubmission findBySubmissionId(@Bind("submissionId") int submissionId);
 
-  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE SUBMISSION_REF = :submissionRef AND CALLED_BACK = 0")
+  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE SUBMISSION_REF = :submissionRef AND STATUS != 'ERROR' AND STATUS != 'SUCCESS' AND MODE != 'CANCELLED'")
   @Mapper(OgelSubmissionMapper.class)
   OgelSubmission findRecentBySubmissionRef(@Bind("submissionRef") String submissionRef);
 

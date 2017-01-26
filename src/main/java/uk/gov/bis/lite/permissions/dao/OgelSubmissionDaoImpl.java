@@ -47,9 +47,9 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
 
   @Override
   @Transaction
-  public List<OgelSubmission> getScheduled() {
+  public List<OgelSubmission> getScheduledToProcess() {
     try (final Handle handle = jdbi.open()) {
-      return attach(handle).getScheduled();
+      return attach(handle).getScheduledToProcess();
     }
   }
 
@@ -63,11 +63,28 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
 
   @Override
   @Transaction
-  public List<OgelSubmission> getPendingScheduledSubmissions() {
+  public List<OgelSubmission> getPendingSubmissions() {
     try (final Handle handle = jdbi.open()) {
-      return attach(handle).getPendingScheduledSubmissions();
+      return attach(handle).getPendingSubmissions();
     }
   }
+
+  @Override
+  @Transaction
+  public List<OgelSubmission> getCancelledSubmissions() {
+    try (final Handle handle = jdbi.open()) {
+      return attach(handle).getCancelledSubmissions();
+    }
+  }
+
+  @Override
+  @Transaction
+  public List<OgelSubmission> getCompleteSubmissions() {
+    try (final Handle handle = jdbi.open()) {
+      return attach(handle).getCompleteSubmissions();
+    }
+  }
+
 
   @Override
   @Transaction

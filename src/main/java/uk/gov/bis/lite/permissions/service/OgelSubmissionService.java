@@ -8,7 +8,7 @@ public interface OgelSubmissionService {
 
   boolean ogelSubmissionExists(Integer submissionId);
 
-  List<OgelSubmissionView> getPendingScheduledOgelSubmissions();
+  List<OgelSubmissionView> getOgelSubmissions(String filter);
 
   OgelSubmissionView getOgelSubmission(int submissionId);
 

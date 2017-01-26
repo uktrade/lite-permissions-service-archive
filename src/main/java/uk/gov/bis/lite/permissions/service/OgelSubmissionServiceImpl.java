@@ -7,6 +7,7 @@ import uk.gov.bis.lite.permissions.api.view.OgelSubmissionView;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,6 +16,13 @@ public class OgelSubmissionServiceImpl implements OgelSubmissionService {
   private static final Logger LOGGER = LoggerFactory.getLogger(OgelSubmissionServiceImpl.class);
 
   private OgelSubmissionDao submissionDao;
+
+  /**
+   * Used to filter OgelSubmission queries
+   */
+  public enum Filter {
+    PENDING, CANCELLED, COMPLETE;
+  }
 
   @Inject
   public OgelSubmissionServiceImpl(OgelSubmissionDao submissionDao) {
@@ -26,8 +34,16 @@ public class OgelSubmissionServiceImpl implements OgelSubmissionService {
     return submissionDao.findBySubmissionId(submissionId) != null;
   }
 
-  public List<OgelSubmissionView> getPendingScheduledOgelSubmissions() {
-    return submissionDao.getPendingScheduledSubmissions().stream().map(this::getOgelSubmissionView).collect(Collectors.toList());
+  public List<OgelSubmissionView> getOgelSubmissions(String filter) {
+    List<OgelSubmission> subs = new ArrayList<>();
+    if(Filter.PENDING.name().equalsIgnoreCase(filter)) {
+      subs = submissionDao.getPendingSubmissions();
+    } else if(Filter.CANCELLED.name().equalsIgnoreCase(filter)) {
+      subs = submissionDao.getCancelledSubmissions();
+    } else if(Filter.COMPLETE.name().equalsIgnoreCase(filter)) {
+      subs = submissionDao.getCompleteSubmissions();
+    }
+    return subs.stream().map(this::getOgelSubmissionView).collect(Collectors.toList());
   }
 
   public OgelSubmissionView getOgelSubmission(int submissionId) {
@@ -35,7 +51,7 @@ public class OgelSubmissionServiceImpl implements OgelSubmissionService {
   }
 
   public void cancelPendingScheduledOgelSubmissions() {
-    submissionDao.getPendingScheduledSubmissions().forEach(this::cancelScheduled);
+    submissionDao.getPendingSubmissions().forEach(this::cancelScheduled);
   }
 
   public void cancelScheduledOgelSubmission(int submissionId) {
