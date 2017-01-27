@@ -81,8 +81,8 @@ class FailService {
 
     // Check if we have a terminal fail reason
     if (terminalFailReasons.contains(failReason)) {
-      LOGGER.info("Terminal Fail - setting status to TERMINATED [" + sub.getRequestId() + "]");
-      sub.updateStatusToTerminated();
+      LOGGER.info("Terminal Fail - setting status to COMPLETE [" + sub.getRequestId() + "]");
+      sub.updateStatusToComplete();
     }
 
     submissionDao.update(sub);

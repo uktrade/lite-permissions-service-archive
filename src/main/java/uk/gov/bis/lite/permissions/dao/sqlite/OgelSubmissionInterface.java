@@ -71,7 +71,7 @@ public interface OgelSubmissionInterface {
   @Mapper(OgelSubmissionMapper.class)
   OgelSubmission findBySubmissionId(@Bind("submissionId") int submissionId);
 
-  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE SUBMISSION_REF = :submissionRef AND STATUS != 'ERROR' AND STATUS != 'SUCCESS' AND MODE != 'CANCELLED'")
+  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE SUBMISSION_REF = :submissionRef AND STATUS = 'ACTIVE' OR (STATUS = 'COMPLETE' AND CALLED_BACK = 0)")
   @Mapper(OgelSubmissionMapper.class)
   OgelSubmission findRecentBySubmissionRef(@Bind("submissionRef") String submissionRef);
 }
