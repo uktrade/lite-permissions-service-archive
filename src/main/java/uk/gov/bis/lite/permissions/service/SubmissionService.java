@@ -6,12 +6,10 @@ public interface SubmissionService {
 
   boolean submissionCurrentlyExists(String subRef);
 
-  boolean prepareCustomer(OgelSubmission sub);
+  boolean processForCustomer(OgelSubmission sub);
 
-  boolean prepareSite(OgelSubmission sub);
+  boolean processForSite(OgelSubmission sub);
 
-  boolean prepareRoleUpdate(OgelSubmission sub);
-
-  void updateModeIfNotCompleted(int submissionId);
+  boolean processForRoleUpdate(OgelSubmission sub);
 
 }

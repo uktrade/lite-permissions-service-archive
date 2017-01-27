@@ -16,7 +16,7 @@ public class ProcessScheduledJob implements Job {
   @Override
   public void execute(JobExecutionContext context) throws JobExecutionException {
     init(context);
-    jobProcessService.processScheduled();
+    jobProcessService.processOgelSubmissions();
   }
 
   private void init(JobExecutionContext context) {

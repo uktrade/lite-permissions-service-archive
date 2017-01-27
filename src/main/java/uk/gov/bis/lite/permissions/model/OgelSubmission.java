@@ -15,8 +15,10 @@ public class OgelSubmission {
 
   private int id;
   private String userId;
+  private String adminUserId;
   private String ogelType;
   private Mode mode;
+  private Stage stage;
   private Status status;
   private String submissionRef;
   private String customerRef;
@@ -37,10 +39,9 @@ public class OgelSubmission {
   /**
    * IMMEDIATE      - submission is being processed immediately, through all stages
    * SCHEDULED      - submission processed by scheduled jobs
-   * CANCELLED      - submission is ignored and not processed
    */
   public enum Mode {
-    IMMEDIATE, SCHEDULED, CANCELLED;
+    IMMEDIATE, SCHEDULED;
   }
 
   /**
@@ -48,12 +49,20 @@ public class OgelSubmission {
    * CUSTOMER   - we need to create a Customer and populate customerId with resulting sarRef
    * SITE       - we need to create a Site and populate siteId with resulting siteRef
    * USER_ROLE  - we need to update user role permissions
-   * READY      - this OgelSubmission is now setUp and we can create the Ogel via Spire
-   * SUCCESS    - Registration completed on Spire, OgelSubmission updated with Spire Ref, processing submission complete
-   * ERROR      - Unresolved repeating error, processing submission terminated
+   * OGEL       - we need to create Ogel via Spire
+   */
+  public enum Stage {
+    CREATED, CUSTOMER, SITE, USER_ROLE, OGEL;
+  }
+
+  /**
+   * ACTIVE      - submission is being processed through stages
+   * COMPLETE    - stage processing has been completed
+   * CANCELLED   - stage processing has been cancelled
+   * TERMINATED  - stage processing has been terminated
    */
   public enum Status {
-    CREATED, CUSTOMER, SITE, USER_ROLE, READY, SUCCESS, ERROR;
+    ACTIVE, COMPLETE, CANCELLED, TERMINATED;
   }
 
   public OgelSubmission(int id) {
@@ -64,7 +73,8 @@ public class OgelSubmission {
     this.userId = userId;
     this.ogelType = ogelType;
     this.mode = Mode.IMMEDIATE;
-    this.status = Status.CREATED;
+    this.stage = Stage.CREATED;
+    this.status = Status.ACTIVE;
   }
 
   /**
@@ -75,40 +85,32 @@ public class OgelSubmission {
     return submissionRef + "_" + id;
   }
 
+  public boolean isProcessingCompleted() {
+    return !status.equals(Status.ACTIVE);
+  }
+
+  public boolean isStatusComplete() {
+    return status.equals(Status.COMPLETE);
+  }
+
+  public boolean isStatusCancelled() {
+    return status.equals(Status.CANCELLED);
+  }
+
   public boolean isModeScheduled() {
     return mode.equals(OgelSubmission.Mode.SCHEDULED);
   }
 
-  public boolean isModeImmediate() {
-    return mode.equals(OgelSubmission.Mode.IMMEDIATE);
-  }
-
-  public boolean isStatusSuccess() {
-    return status.equals(Status.SUCCESS);
-  }
-
-  public boolean isStatusError() {
-    return status.equals(Status.ERROR);
-  }
-
-  public boolean hasCompleted() {
-    return isStatusSuccess() || isStatusError();
-  }
-
-  public boolean isCallbackComplete() {
-    return calledBack;
-  }
-
-  public boolean canCreateOgel() {
-    return !needsCustomer() && !needsSite() && !needsRoleUpdate();
-  }
-
-  public boolean isOgelCreated() {
-    return status.equals(Status.SUCCESS);
+  public void cancelProcessing() {
+    this.status = Status.CANCELLED;
   }
 
   public boolean hasFail() {
     return !StringUtils.isBlank(firstFail);
+  }
+
+  public boolean hasAdminUserId() {
+    return !StringUtils.isBlank(adminUserId);
   }
 
   public LocalDateTime getFirstFailDateTime() {
@@ -124,51 +126,70 @@ public class OgelSubmission {
     firstFail = now.format(ogelSubmissionDateFormatter);
   }
 
-  public void changeToScheduledMode() {
+  public void setScheduledMode() {
     mode = Mode.SCHEDULED;
   }
 
-  public void changeToCancelledMode() {
-    mode = Mode.CANCELLED;
+  public void updateStatusToComplete() {
+    status = Status.COMPLETE;
   }
 
-  public void updateStatusToSuccess() {
-    status = Status.SUCCESS;
+  public void updateStatusToTerminated() {
+    status = Status.TERMINATED;
   }
 
-  public void updateStatusToError() {
-    status = Status.ERROR;
+  public void updateStatusToCancelled() {
+    status = Status.CANCELLED;
   }
 
-  /**
-   * Sets appropriate Status value
-   * - only if current STATUS is not READY or if OgelSubmission has not completed
-   */
-  public void updateStatus() {
-    if (!status.equals(Status.READY) && !hasCompleted()) {
-      if (needsCustomer()) {
-        status = Status.CUSTOMER;
-      } else if (needsSite()) {
-        status = Status.SITE;
-      } else if (needsRoleUpdate()) {
-        status = Status.USER_ROLE;
-      } else {
-        status = Status.READY;
-      }
+  public void updateToNextStage() {
+    this.stage = getNextStage();
+    if(hasCompletedStage(this.stage)) {
+      updateToNextStage();
     }
   }
 
-  public boolean needsCustomer() {
-    return Util.isBlank(customerRef);
+  private Stage getNextStage() {
+    Stage stage = null;
+    if (this.stage.equals(Stage.CREATED)) {
+      stage = Stage.CUSTOMER;
+    } else if (this.stage.equals(Stage.CUSTOMER)) {
+      stage = Stage.SITE;
+    } else if (this.stage.equals(Stage.SITE)) {
+      stage = Stage.USER_ROLE;
+    }  else if (this.stage.equals(Stage.USER_ROLE)) {
+      stage = Stage.OGEL;
+    }
+    return stage;
   }
 
-  public boolean needsSite() {
-    return Util.isBlank(siteRef);
+  public boolean hasCompletedStage(Stage stage) {
+    boolean completed = false;
+    if(stage.equals(Stage.CREATED)) {
+      completed = true;
+    } else if(stage.equals(Stage.CUSTOMER)) {
+      completed = !Util.isBlank(customerRef);
+    } else if(stage.equals(Stage.SITE)) {
+      completed = !Util.isBlank(siteRef);
+    } else if(stage.equals(Stage.USER_ROLE)) {
+      completed = !roleUpdate || roleUpdated;
+    } else if(stage.equals(Stage.OGEL)) {
+      completed = !Util.isBlank(spireRef);
+    }
+    return completed;
   }
 
-  public boolean needsRoleUpdate() {
-    return roleUpdate && !roleUpdated;
+  public boolean hasCompletedAllStages(Stage... stages) {
+    boolean allCompleted = true;
+    for(Stage stage : stages){
+      if(!hasCompletedStage(stage)) {
+        allCompleted = false;
+        break;
+      }
+    }
+    return allCompleted;
   }
+
 
   public String getJson() {
     return json;
@@ -312,5 +333,21 @@ public class OgelSubmission {
 
   public void setFailReason(CallbackView.FailReason failReason) {
     this.failReason = failReason;
+  }
+
+  public String getAdminUserId() {
+    return adminUserId;
+  }
+
+  public void setAdminUserId(String adminUserId) {
+    this.adminUserId = adminUserId;
+  }
+
+  public Stage getStage() {
+    return stage;
+  }
+
+  public void setStage(Stage stage) {
+    this.stage = stage;
   }
 }

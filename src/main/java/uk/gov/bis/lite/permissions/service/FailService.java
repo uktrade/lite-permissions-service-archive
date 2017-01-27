@@ -59,7 +59,8 @@ class FailService {
   }
 
   /**
-   * Updates OgelSubmission with error details, sets OgelSubmission status to ERROR when appropriate
+   * Updates OgelSubmission fail reason/message
+   * Updates OgelSubmission Status to TERMINATED for repeating fail, or a configured terminal fail
    */
   private void doFailUpdate(OgelSubmission sub, CallbackView.FailReason failReason, Origin origin, String message) {
     String failMessage = createFailMessage(failReason, origin, message);
@@ -70,8 +71,8 @@ class FailService {
     } else {
       // Check for repeating error
       if (sub.getFirstFailDateTime().isBefore(LocalDateTime.now().minus(maxMinutesRetryAfterFail, MINUTES))) {
-        LOGGER.info("Terminal failure setting status to ERROR [" + sub.getRequestId() + "]");
-        sub.updateStatusToError();
+        LOGGER.info("Repeating Error - setting status to TERMINATED [" + sub.getRequestId() + "]");
+        sub.updateStatusToTerminated();
       }
     }
 
@@ -80,7 +81,8 @@ class FailService {
 
     // Check if we have a terminal fail reason
     if (terminalFailReasons.contains(failReason)) {
-      sub.updateStatusToError();
+      LOGGER.info("Terminal Fail - setting status to TERMINATED [" + sub.getRequestId() + "]");
+      sub.updateStatusToTerminated();
     }
 
     submissionDao.update(sub);

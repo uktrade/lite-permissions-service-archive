@@ -21,7 +21,7 @@ public class OgelSubmissionServiceImpl implements OgelSubmissionService {
    * Used to filter OgelSubmission queries
    */
   public enum Filter {
-    PENDING, CANCELLED, COMPLETE;
+    PENDING, CANCELLED, FINISHED;
   }
 
   @Inject
@@ -40,8 +40,8 @@ public class OgelSubmissionServiceImpl implements OgelSubmissionService {
       subs = submissionDao.getPendingSubmissions();
     } else if(Filter.CANCELLED.name().equalsIgnoreCase(filter)) {
       subs = submissionDao.getCancelledSubmissions();
-    } else if(Filter.COMPLETE.name().equalsIgnoreCase(filter)) {
-      subs = submissionDao.getCompleteSubmissions();
+    } else if(Filter.FINISHED.name().equalsIgnoreCase(filter)) {
+      subs = submissionDao.getFinishedSubmissions();
     }
     return subs.stream().map(this::getOgelSubmissionView).collect(Collectors.toList());
   }
@@ -63,7 +63,7 @@ public class OgelSubmissionServiceImpl implements OgelSubmissionService {
    */
   private void cancelScheduled(OgelSubmission sub) {
     if (sub != null && sub.isModeScheduled() && !sub.isCalledBack()) {
-      sub.changeToCancelledMode();
+      sub.cancelProcessing();
       submissionDao.update(sub);
     }
   }

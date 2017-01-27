@@ -42,11 +42,17 @@ public class JobProcessService {
     OgelSubmission sub = submissionDao.findBySubmissionId(submissionId);
     try {
 
-      // Attempt to process this OgelSubmission immediately
+      // Process this OgelSubmission immediately
       doProcessOgelSubmission(sub);
 
+      doCallbackOgelSubmission(sub);
+
       // Update MODE if necessary
-      submissionService.updateModeIfNotCompleted(sub.getId());
+      if (!sub.isCalledBack()) {
+        LOGGER.info("Setting submission MODE to SCHEDULED: [" + submissionId + "]");
+        sub.setScheduledMode();
+        submissionDao.update(sub);
+      }
 
     } catch (Throwable e) {
       String stackTrace = Throwables.getStackTraceAsString(e);
@@ -56,14 +62,18 @@ public class JobProcessService {
 
   }
 
+  public void processOgelSubmissions() {
+    processScheduled();
+    processCallbacks();
+  }
+
   /**
    * Find scheduled OgelSubmissions and attempt to process each through all stages.
    * (This method is called by ProcessScheduledJob)
    */
-  public void processScheduled() {
-    List<OgelSubmission> subs = submissionDao.getScheduledToProcess();
-    LOGGER.info("SCHEDULED [" + subs.size() + "]");
-
+  private void processScheduled() {
+    List<OgelSubmission> subs = submissionDao.getScheduledActive();
+    LOGGER.info("SCHEDULED ACTIVE [" + subs.size() + "]");
     for (OgelSubmission sub : subs) {
       try {
         doProcessOgelSubmission(sub);
@@ -73,7 +83,27 @@ public class JobProcessService {
         LOGGER.error("JobProcessService.processScheduled: " + e.getMessage(), e);
       }
     }
+  }
 
+  /**
+   *
+   */
+  private void processCallbacks() {
+    List<OgelSubmission> subs = submissionDao.getScheduledCompleteToCallback();
+    LOGGER.info("SCHEDULED COMPLETE CALLBACK [" + subs.size() + "]");
+    for (OgelSubmission sub : subs) {
+      try {
+        doCallbackOgelSubmission(sub);
+      } catch (Throwable e) {
+        String stackTrace = Throwables.getStackTraceAsString(e);
+        failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.UNKNOWN, stackTrace);
+        LOGGER.error("JobProcessService.processScheduled: " + e.getMessage(), e);
+      }
+    }
+  }
+
+  private void doCallbackOgelSubmission(OgelSubmission sub) {
+    callbackService.completeCallback(sub);
   }
 
   /**
@@ -82,29 +112,24 @@ public class JobProcessService {
    */
   private void doProcessOgelSubmission(OgelSubmission sub) {
 
-    // Ensure we have Customer, Site and correct Role
-    boolean preparedCustomer = submissionService.prepareCustomer(sub);
+    // Process Customer, Site and correct Role
+    boolean customerStageComplete = submissionService.processForCustomer(sub);
 
-    boolean preparedSite = false;
-    if (preparedCustomer) {
-      preparedSite = submissionService.prepareSite(sub);
+    // Process Site
+    boolean siteStageComplete = false;
+    if (customerStageComplete) {
+      siteStageComplete = submissionService.processForSite(sub);
     }
 
-    boolean preparedRoleUpdate = false;
-    if (preparedSite) {
-      preparedRoleUpdate = submissionService.prepareRoleUpdate(sub);
+    // Process Role
+    boolean roleUpdateStageComplete = false;
+    if (siteStageComplete) {
+      roleUpdateStageComplete = submissionService.processForRoleUpdate(sub);
     }
 
-    // Create Ogel
-    if (preparedCustomer && preparedSite && preparedRoleUpdate) {
-      if (!sub.isOgelCreated()) {
-        ogelService.createOgel(sub);
-      }
-    }
-
-    // Complete Callback
-    if (sub.hasCompleted() && !sub.isCalledBack()) {
-      callbackService.completeCallback(sub);
+    // Process create Ogel
+    if (customerStageComplete && siteStageComplete && roleUpdateStageComplete) {
+      ogelService.processForOgel(sub);
     }
   }
 }

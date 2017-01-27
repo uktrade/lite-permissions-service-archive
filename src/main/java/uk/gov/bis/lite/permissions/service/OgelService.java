@@ -28,16 +28,14 @@ public class OgelService {
     this.submissionDao = submissionDao;
   }
 
-  boolean createOgel(OgelSubmission sub) {
-    boolean created = false;
-    if (!StringUtils.isBlank(sub.getSpireRef())) {
-      created = true; // we check whether we already have created this Ogel
-    } else if (sub.canCreateOgel()) {
-      created = doCreateOgel(sub);
-    } else {
-      LOGGER.warn("Cannot create Ogel - OgelSubmission state is not complete");
+  public boolean processForOgel(OgelSubmission sub) {
+    boolean processed = true;
+    if (!sub.hasCompletedStage(OgelSubmission.Stage.OGEL)) {
+      if (sub.hasCompletedAllStages(OgelSubmission.Stage.CUSTOMER, OgelSubmission.Stage.SITE, OgelSubmission.Stage.USER_ROLE)) {
+        processed = doCreateOgel(sub);
+      }
     }
-    return created;
+    return processed;
   }
 
   private boolean doCreateOgel(OgelSubmission sub) {
@@ -55,7 +53,7 @@ public class OgelService {
       if (!StringUtils.isBlank(reference)) {
         created = true;
         sub.setSpireRef(reference);
-        sub.updateStatusToSuccess();
+        sub.updateStatusToComplete();
         submissionDao.update(sub);
         LOGGER.info("STATUS: " + sub.getStatus().name());
       } else {

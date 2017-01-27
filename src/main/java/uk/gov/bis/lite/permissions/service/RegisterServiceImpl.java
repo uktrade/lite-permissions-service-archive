@@ -52,7 +52,11 @@ public class RegisterServiceImpl implements RegisterService {
     OgelSubmission sub = getOgelSubmission(reg);
     sub.setCallbackUrl(callbackUrl);
     sub.setMode(OgelSubmission.Mode.IMMEDIATE);
-    sub.setStatus(OgelSubmission.Status.CREATED);
+    sub.setStatus(OgelSubmission.Status.ACTIVE);
+    sub.setStage(OgelSubmission.Stage.CREATED);
+
+    // Set the next stage
+    sub.updateToNextStage();
 
     int submissionId = submissionDao.create(sub);
 
@@ -188,6 +192,14 @@ public class RegisterServiceImpl implements RegisterService {
     } catch (JsonProcessingException e) {
       LOGGER.error("JsonProcessingException", e);
     }
+
+    if(param.getAdminApproval() != null) {
+      String adminUserId = param.getAdminApproval().getAdminUserId();
+      if(!StringUtils.isBlank(adminUserId)) {
+        sub.setAdminUserId(adminUserId);
+      }
+    }
+
     return sub;
   }
 

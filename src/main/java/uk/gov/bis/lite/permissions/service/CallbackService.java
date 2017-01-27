@@ -31,7 +31,7 @@ public class CallbackService {
   }
 
   void completeCallback(OgelSubmission sub) {
-    if (sub != null && sub.hasCompleted() && !sub.isCalledBack()) {
+    if (sub != null && sub.isStatusComplete() && !sub.isCalledBack()) {
       try {
         Response response = doCallback(sub.getCallbackUrl(), getCallbackView(sub));
         if (isOk(response)) {
@@ -53,17 +53,15 @@ public class CallbackService {
     CallbackView view = new CallbackView();
     view.setCustomerId(sub.getCustomerRef());
     view.setSiteId(sub.getSiteRef());
-    if (sub.isStatusSuccess()) {
-      view.setRequestId(sub.getRequestId());
+    view.setRequestId(sub.getRequestId());
+    view.setRegistrationReference(sub.getSpireRef());
+    if(sub.isProcessingCompleted()) {
       view.setStatus(CallbackView.Status.SUCCESS);
-      view.setRegistrationReference(sub.getSpireRef());
-    }
-    if (sub.isStatusError()) {
-      view.setRequestId(sub.getRequestId());
+    } else {
       view.setStatus(CallbackView.Status.FAILED);
-      CallbackView.FailReason failReason = sub.getFailReason();
-      view.setFailReason(failReason);
     }
+    view.setRequestId(sub.getRequestId());
+    view.setFailReason(sub.getFailReason());
     return view;
   }
 

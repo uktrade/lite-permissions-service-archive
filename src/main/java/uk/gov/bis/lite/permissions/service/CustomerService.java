@@ -78,7 +78,13 @@ class CustomerService {
     String createSitePath = "/customer-sites/{customerId}";
     String path = createSitePath.replace("{customerId}", sub.getCustomerRef());
 
-    WebTarget target = httpClient.target(customerServiceUrl).queryParam("userId", sub.getUserId()).path(path);
+    // When we attempt to create a new site we use adminUserId instead of userId if it exists
+    String userId = sub.getUserId();
+    if(sub.hasAdminUserId()) {
+      userId = sub.getAdminUserId();
+    }
+
+    WebTarget target = httpClient.target(customerServiceUrl).queryParam("userId", userId).path(path);
     try {
       Response response = target.request().post(Entity.json(getSiteParam(sub)));
       if (isOk(response)) {
@@ -198,12 +204,9 @@ class CustomerService {
    * Creates a UserRoleParam with an ADMIN roleType
    */
   private UserRoleParam getUserRoleParam(OgelSubmission sub) {
-    RegisterParam regParam = getRegisterParam(sub);
-    RegisterParam.RegisterAdminApprovalParam regAdminApprovalParam = regParam.getAdminApproval();
-
     UserRoleParam userRoleParam = new UserRoleParam();
     userRoleParam.setRoleType(UserRoleParam.RoleType.ADMIN);
-    userRoleParam.setAdminUserId(regAdminApprovalParam.getAdminUserId());
+    userRoleParam.setAdminUserId(sub.getAdminUserId());
     return userRoleParam;
   }
 

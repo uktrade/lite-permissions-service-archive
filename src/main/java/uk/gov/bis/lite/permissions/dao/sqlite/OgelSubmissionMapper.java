@@ -19,11 +19,13 @@ public class OgelSubmissionMapper implements ResultSetMapper<OgelSubmission> {
   public OgelSubmission map(int index, ResultSet r, StatementContext ctx) throws SQLException {
     OgelSubmission sub = new OgelSubmission(r.getInt("ID"));
     sub.setUserId(r.getString("USER_ID"));
+    sub.setAdminUserId(r.getString("ADMIN_USER_ID"));
     sub.setOgelType(r.getString("OGEL_TYPE"));
     sub.setSubmissionRef(r.getString("SUBMISSION_REF"));
     sub.setCustomerRef(r.getString("CUSTOMER_REF"));
     sub.setMode(OgelSubmission.Mode.valueOf(r.getString("MODE")));
     sub.setStatus(OgelSubmission.Status.valueOf(r.getString("STATUS")));
+    sub.setStage(OgelSubmission.Stage.valueOf(r.getString("STAGE")));
     sub.setSiteRef(r.getString("SITE_REF"));
     sub.setSpireRef(r.getString("SPIRE_REF"));
     sub.setCallbackUrl(r.getString("CALLBACK_URL"));

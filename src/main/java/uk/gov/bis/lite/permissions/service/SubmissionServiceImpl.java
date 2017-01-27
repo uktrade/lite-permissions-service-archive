@@ -27,48 +27,34 @@ public class SubmissionServiceImpl implements SubmissionService {
     return submissionDao.findRecentBySubmissionRef(subRef) != null;
   }
 
-  public boolean prepareCustomer(OgelSubmission sub) {
-    boolean prepared = true;
-    if (sub.needsCustomer()) {
+  public boolean processForCustomer(OgelSubmission sub) {
+    boolean processed = true;
+    if (!sub.hasCompletedStage(OgelSubmission.Stage.CUSTOMER)) {
       if (!doGetOrCreateCustomer(sub)) {
-        prepared = false;
+        processed = false;
       }
     }
-    return prepared;
+    return processed;
   }
 
-  public boolean prepareSite(OgelSubmission sub) {
-    boolean prepared = true;
-    if (sub.needsSite()) {
+  public boolean processForSite(OgelSubmission sub) {
+    boolean processed = true;
+    if (!sub.hasCompletedStage(OgelSubmission.Stage.SITE)) {
       if (!doCreateSite(sub)) {
-        prepared = false;
+        processed = false;
       }
     }
-    return prepared;
+    return processed;
   }
 
-  public boolean prepareRoleUpdate(OgelSubmission sub) {
-    boolean prepared = true;
-    if (sub.isRoleUpdate() && !sub.isRoleUpdated()) {
+  public boolean processForRoleUpdate(OgelSubmission sub) {
+    boolean processed = true;
+    if (!sub.hasCompletedStage(OgelSubmission.Stage.USER_ROLE)) {
       if (!doUserRoleUpdate(sub)) {
-        prepared = false;
+        processed = false;
       }
     }
-    return prepared;
-  }
-
-  /**
-   * If OgelSubmission has not completed processing or has not yet been 'called back'
-   * then set MODE to 'SCHEDULED'
-   */
-  public void updateModeIfNotCompleted(int submissionId) {
-    OgelSubmission sub = submissionDao.findBySubmissionId(submissionId);
-    if (!sub.hasCompleted() || !sub.isCalledBack()) {
-      LOGGER.info("Updating MODE to SCHEDULED for: [" + submissionId + "]");
-      sub.changeToScheduledMode();
-      sub.updateStatus();
-      submissionDao.update(sub);
-    }
+    return processed;
   }
 
   private boolean doGetOrCreateCustomer(OgelSubmission sub) {
@@ -76,7 +62,7 @@ public class SubmissionServiceImpl implements SubmissionService {
     boolean created = sarRef.isPresent();
     if (created) {
       sub.setCustomerRef(sarRef.get());
-      sub.updateStatus();
+      sub.updateToNextStage();
       submissionDao.update(sub);
       LOGGER.info("Updated record with created Customer sarRef: " + sarRef.get());
     }
@@ -88,7 +74,7 @@ public class SubmissionServiceImpl implements SubmissionService {
     boolean created = siteRef.isPresent();
     if (created) {
       sub.setSiteRef(siteRef.get());
-      sub.updateStatus();
+      sub.updateToNextStage();
       submissionDao.update(sub);
       LOGGER.info("Site created. Updated record: " + siteRef.get());
     }
@@ -99,7 +85,7 @@ public class SubmissionServiceImpl implements SubmissionService {
     boolean updated = customerService.updateUserRole(sub);
     if (updated) {
       sub.setRoleUpdated(true);
-      sub.updateStatus();
+      sub.updateToNextStage();
       submissionDao.update(sub);
       LOGGER.info("User role updated. Updated OgelSubmission: " + sub.getUserId() + "/" + sub.getOgelType());
     }
