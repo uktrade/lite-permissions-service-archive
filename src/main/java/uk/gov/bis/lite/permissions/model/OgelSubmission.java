@@ -93,6 +93,13 @@ public class OgelSubmission {
     return status.equals(Status.COMPLETE);
   }
 
+  /**
+   * OgelSubmission is COMPLETE and we have a SpireRef
+   */
+  public boolean isCompleteSuccess() {
+    return status.equals(Status.COMPLETE) && !StringUtils.isBlank(spireRef);
+  }
+
   public boolean isStatusCancelled() {
     return status.equals(Status.CANCELLED);
   }

@@ -54,8 +54,8 @@ public class CallbackService {
     view.setCustomerId(sub.getCustomerRef());
     view.setSiteId(sub.getSiteRef());
     view.setRequestId(sub.getRequestId());
-    view.setRegistrationReference(sub.getSpireRef());
-    if(sub.isProcessingCompleted()) {
+    if (sub.isProcessingCompleted() && sub.isCompleteSuccess()) {
+      view.setRegistrationReference(sub.getSpireRef());
       view.setStatus(CallbackView.Status.SUCCESS);
     } else {
       view.setStatus(CallbackView.Status.FAILED);
