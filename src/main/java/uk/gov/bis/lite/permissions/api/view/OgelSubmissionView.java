@@ -22,6 +22,7 @@ public class OgelSubmissionView {
   private String created;
   private boolean roleUpdate;
   private boolean roleUpdated;
+  private String json;
 
   public String getId() {
     return id;
@@ -157,5 +158,13 @@ public class OgelSubmissionView {
 
   public void setRoleUpdated(boolean roleUpdated) {
     this.roleUpdated = roleUpdated;
+  }
+
+  public String getJson() {
+    return json;
+  }
+
+  public void setJson(String json) {
+    this.json = json;
   }
 }

@@ -34,7 +34,6 @@ public class JobProcessService {
 
   /**
    * Process OgelSubmission through all stages - set Mode to SCHEDULED if process cannot be completed
-   * (This method is called by ProcessImmediateJob)
    */
   public void processImmediate(int submissionId) {
     LOGGER.info("IMMEDIATE [" + submissionId + "]");
@@ -55,21 +54,21 @@ public class JobProcessService {
       }
 
     } catch (Throwable e) {
-      String stackTrace = Throwables.getStackTraceAsString(e);
-      failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.UNKNOWN, stackTrace);
-      LOGGER.error("JobProcessService.processImmediate: " + e.getMessage(), e);
+      errorThrown(sub, e, "JobProcessService.processImmediate");
     }
-
   }
 
+  /**
+   * Processes SCHEDULED OgelSubmissions through stages
+   * Processes SCHEDULED OgelSubmissions callbacks
+   */
   public void processOgelSubmissions() {
     processScheduled();
     processCallbacks();
   }
 
   /**
-   * Find scheduled OgelSubmissions and attempt to process each through all stages.
-   * (This method is called by ProcessScheduledJob)
+   * Find ACTIVE SCHEDULED OgelSubmissions and attempt to process each through all stages.
    */
   private void processScheduled() {
     List<OgelSubmission> subs = submissionDao.getScheduledActive();
@@ -78,15 +77,13 @@ public class JobProcessService {
       try {
         doProcessOgelSubmission(sub);
       } catch (Throwable e) {
-        String stackTrace = Throwables.getStackTraceAsString(e);
-        failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.UNKNOWN, stackTrace);
-        LOGGER.error("JobProcessService.processScheduled: " + e.getMessage(), e);
+        errorThrown(sub, e, "JobProcessService.processScheduled");
       }
     }
   }
 
   /**
-   *
+   * Find COMPLETE scheduled OgelSubmissions to callback and attempt callback
    */
   private void processCallbacks() {
     List<OgelSubmission> subs = submissionDao.getScheduledCompleteToCallback();
@@ -95,15 +92,9 @@ public class JobProcessService {
       try {
         doCallbackOgelSubmission(sub);
       } catch (Throwable e) {
-        String stackTrace = Throwables.getStackTraceAsString(e);
-        failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.UNKNOWN, stackTrace);
-        LOGGER.error("JobProcessService.processScheduled: " + e.getMessage(), e);
+        errorThrown(sub, e, "JobProcessService.processScheduled");
       }
     }
-  }
-
-  private void doCallbackOgelSubmission(OgelSubmission sub) {
-    callbackService.completeCallback(sub);
   }
 
   /**
@@ -131,5 +122,15 @@ public class JobProcessService {
     if (customerStageComplete && siteStageComplete && roleUpdateStageComplete) {
       ogelService.processForOgel(sub);
     }
+  }
+
+  private void doCallbackOgelSubmission(OgelSubmission sub) {
+    callbackService.completeCallback(sub);
+  }
+
+  private void errorThrown(OgelSubmission sub, Throwable e, String info) {
+    String stackTrace = Throwables.getStackTraceAsString(e);
+    failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.UNKNOWN, stackTrace);
+    LOGGER.error(info + ": " + e.getMessage(), e);
   }
 }

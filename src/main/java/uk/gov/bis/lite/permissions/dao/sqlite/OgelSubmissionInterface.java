@@ -59,7 +59,7 @@ public interface OgelSubmissionInterface {
   @Mapper(OgelSubmissionMapper.class)
   List<OgelSubmission> getPendingSubmissions();
 
-  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE STATUS = 'CANCELLED' ORDER BY ID DESC")
+  @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE (STATUS = 'CANCELLED' OR STATUS = 'TERMINATED') ORDER BY ID DESC")
   @Mapper(OgelSubmissionMapper.class)
   List<OgelSubmission> getCancelledSubmissions();
 

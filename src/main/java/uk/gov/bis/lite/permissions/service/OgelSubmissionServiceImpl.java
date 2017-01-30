@@ -89,6 +89,7 @@ public class OgelSubmissionServiceImpl implements OgelSubmissionService {
     view.setCreated(sub.getCreated());
     view.setRoleUpdate(sub.isRoleUpdate());
     view.setRoleUpdated(sub.isRoleUpdated());
+    view.setJson(sub.getJson());
     return view;
   }
 

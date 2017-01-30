@@ -12,6 +12,7 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -35,7 +36,7 @@ public class OgelSubmissionResource {
   @GET
   @Produces({MediaType.APPLICATION_JSON})
   @Path("/ogel-submissions")
-  public List<OgelSubmissionView> viewOgelSubmissions(@Auth PrincipalImpl user, @QueryParam("filter") String filter) {
+  public List<OgelSubmissionView> viewOgelSubmissions(@Auth PrincipalImpl user, @DefaultValue("PENDING") @QueryParam("filter") String filter) {
     return ogelSubmissionService.getOgelSubmissions(filter);
   }
 

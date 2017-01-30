@@ -11,20 +11,16 @@ public class SubmissionServiceMock implements SubmissionService {
     return submissionCurrentlyExists;
   }
 
-  public boolean prepareCustomer(OgelSubmission sub) {
+  public boolean processForCustomer(OgelSubmission sub) {
     return true;
   }
 
-  public boolean prepareSite(OgelSubmission sub) {
+  public boolean processForSite(OgelSubmission sub) {
     return true;
   }
 
-  public boolean prepareRoleUpdate(OgelSubmission sub) {
+  public boolean processForRoleUpdate(OgelSubmission sub) {
     return true;
-  }
-
-  public void updateModeIfNotCompleted(int submissionId) {
-
   }
 
   public void setSubmissionCurrentlyExists(boolean submissionCurrentlyExists) {
