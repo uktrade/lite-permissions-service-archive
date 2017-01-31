@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.api.view.CallbackView;
-import uk.gov.bis.lite.permissions.util.Util;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -149,27 +148,7 @@ public class OgelSubmission {
     status = Status.CANCELLED;
   }
 
-  public void updateToNextStage() {
-    this.stage = getNextStage();
-    if(hasCompletedStage(this.stage)) {
-      updateToNextStage();
-    }
-  }
-
-  private Stage getNextStage() {
-    Stage stage = null;
-    if (this.stage.equals(Stage.CREATED)) {
-      stage = Stage.CUSTOMER;
-    } else if (this.stage.equals(Stage.CUSTOMER)) {
-      stage = Stage.SITE;
-    } else if (this.stage.equals(Stage.SITE)) {
-      stage = Stage.USER_ROLE;
-    }  else if (this.stage.equals(Stage.USER_ROLE)) {
-      stage = Stage.OGEL;
-    }
-    return stage;
-  }
-
+  /*
   public boolean hasCompletedStage(Stage stage) {
     boolean completed = false;
     if(stage.equals(Stage.CREATED)) {
@@ -196,7 +175,7 @@ public class OgelSubmission {
     }
     return allCompleted;
   }
-
+  */
 
   public String getJson() {
     return json;

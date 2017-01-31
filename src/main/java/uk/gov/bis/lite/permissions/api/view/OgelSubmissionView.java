@@ -1,6 +1,7 @@
 package uk.gov.bis.lite.permissions.api.view;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonRawValue;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OgelSubmissionView {
@@ -23,6 +24,11 @@ public class OgelSubmissionView {
   private boolean roleUpdate;
   private boolean roleUpdated;
   private String json;
+
+  @JsonRawValue
+  public String getJson() {
+    return json;
+  }
 
   public String getId() {
     return id;
@@ -158,10 +164,6 @@ public class OgelSubmissionView {
 
   public void setRoleUpdated(boolean roleUpdated) {
     this.roleUpdated = roleUpdated;
-  }
-
-  public String getJson() {
-    return json;
   }
 
   public void setJson(String json) {

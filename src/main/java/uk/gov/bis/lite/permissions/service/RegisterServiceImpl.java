@@ -56,7 +56,7 @@ public class RegisterServiceImpl implements RegisterService {
     sub.setStage(OgelSubmission.Stage.CREATED);
 
     // Set the next stage
-    sub.updateToNextStage();
+    //sub.updateToNextStage();
 
     int submissionId = submissionDao.create(sub);
 

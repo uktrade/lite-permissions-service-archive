@@ -27,32 +27,35 @@ public class SubmissionServiceImpl implements SubmissionService {
     return submissionDao.findRecentBySubmissionRef(subRef) != null;
   }
 
+  /**
+   * Returns TRUE if CUSTOMER stage has successfully completed
+   */
   public boolean processForCustomer(OgelSubmission sub) {
-    boolean processed = true;
-    if (!sub.hasCompletedStage(OgelSubmission.Stage.CUSTOMER)) {
-      if (!doGetOrCreateCustomer(sub)) {
-        processed = false;
-      }
+    boolean processed = false;
+    if (doGetOrCreateCustomer(sub)) {
+      processed = true;
     }
     return processed;
   }
 
+  /**
+   * Returns TRUE if SITE stage has successfully completed
+   */
   public boolean processForSite(OgelSubmission sub) {
-    boolean processed = true;
-    if (!sub.hasCompletedStage(OgelSubmission.Stage.SITE)) {
-      if (!doCreateSite(sub)) {
-        processed = false;
-      }
+    boolean processed = false;
+    if (doCreateSite(sub)) {
+      processed = true;
     }
     return processed;
   }
 
+  /**
+   * Returns TRUE if USER_ROLE stage has successfully completed
+   */
   public boolean processForRoleUpdate(OgelSubmission sub) {
-    boolean processed = true;
-    if (!sub.hasCompletedStage(OgelSubmission.Stage.USER_ROLE)) {
-      if (!doUserRoleUpdate(sub)) {
-        processed = false;
-      }
+    boolean processed = false;
+    if (doUserRoleUpdate(sub)) {
+      processed = true;
     }
     return processed;
   }
@@ -62,9 +65,7 @@ public class SubmissionServiceImpl implements SubmissionService {
     boolean created = sarRef.isPresent();
     if (created) {
       sub.setCustomerRef(sarRef.get());
-      sub.updateToNextStage();
-      submissionDao.update(sub);
-      LOGGER.info("Updated record with created Customer sarRef: " + sarRef.get());
+      LOGGER.info("[" + sub.getId() + "] OgelSubmission CUSTOMER created: " + sarRef.get());
     }
     return created;
   }
@@ -74,9 +75,7 @@ public class SubmissionServiceImpl implements SubmissionService {
     boolean created = siteRef.isPresent();
     if (created) {
       sub.setSiteRef(siteRef.get());
-      sub.updateToNextStage();
-      submissionDao.update(sub);
-      LOGGER.info("Site created. Updated record: " + siteRef.get());
+      LOGGER.info("[" + sub.getId() + "] OgelSubmission SITE created: " + siteRef.get());
     }
     return created;
   }
@@ -85,9 +84,7 @@ public class SubmissionServiceImpl implements SubmissionService {
     boolean updated = customerService.updateUserRole(sub);
     if (updated) {
       sub.setRoleUpdated(true);
-      sub.updateToNextStage();
-      submissionDao.update(sub);
-      LOGGER.info("User role updated. Updated OgelSubmission: " + sub.getUserId() + "/" + sub.getOgelType());
+      LOGGER.info("[" + sub.getId() + "] OgelSubmission USER_ROLE updated: " + sub.getUserId() + "/" + sub.getOgelType());
     }
     return updated;
   }

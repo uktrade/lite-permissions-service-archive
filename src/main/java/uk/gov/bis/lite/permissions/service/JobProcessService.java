@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.api.view.CallbackView;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
+import uk.gov.bis.lite.permissions.util.Util;
 
 import java.util.List;
 
@@ -98,30 +99,83 @@ public class JobProcessService {
   }
 
   /**
-   * Attempts to complete all OgelSubmission stages
-   * Delegate services responsible for updating OgelSubmission status, and reporting failures
+   * Attempts to process OgelSubmissions through each stage.
+   * When stage is completed we set OgelSubmission to next stage and save OgelSubmission
    */
   private void doProcessOgelSubmission(OgelSubmission sub) {
 
     // Process Customer, Site and correct Role
-    boolean customerStageComplete = submissionService.processForCustomer(sub);
+    boolean customerStageComplete = hasCompletedStage(sub, OgelSubmission.Stage.CUSTOMER);
+    boolean siteStageComplete = false;
+    boolean roleUpdateStageComplete = false;
+
+    // Process Customer
+    if (!customerStageComplete) {
+      customerStageComplete = submissionService.processForCustomer(sub);
+      progressStage(sub); // update OgelSubmission to next stage
+    }
 
     // Process Site
-    boolean siteStageComplete = false;
     if (customerStageComplete) {
       siteStageComplete = submissionService.processForSite(sub);
+      progressStage(sub); // update OgelSubmission to next stage
     }
 
     // Process Role
-    boolean roleUpdateStageComplete = false;
     if (siteStageComplete) {
       roleUpdateStageComplete = submissionService.processForRoleUpdate(sub);
+      progressStage(sub); // update OgelSubmission to next stage
     }
 
     // Process create Ogel
     if (customerStageComplete && siteStageComplete && roleUpdateStageComplete) {
       ogelService.processForOgel(sub);
     }
+  }
+
+  /**
+   * Progresses OgelSubmission to its next (uncompleted) stage
+   */
+  private void progressStage(OgelSubmission sub) {
+    OgelSubmission.Stage nextStage = getNextStage(sub.getStage());
+    if (nextStage != null) {
+      sub.setStage(nextStage);
+      if (hasCompletedStage(sub, nextStage)) {
+        progressStage(sub);
+      } else {
+        submissionDao.update(sub);
+      }
+    }
+  }
+
+  private OgelSubmission.Stage getNextStage(OgelSubmission.Stage stage) {
+    OgelSubmission.Stage nextStage = null;
+    if (stage.equals(OgelSubmission.Stage.CREATED)) {
+      nextStage = OgelSubmission.Stage.CUSTOMER;
+    } else if (stage.equals(OgelSubmission.Stage.CUSTOMER)) {
+      nextStage = OgelSubmission.Stage.SITE;
+    } else if (stage.equals(OgelSubmission.Stage.SITE)) {
+      nextStage = OgelSubmission.Stage.USER_ROLE;
+    } else if (stage.equals(OgelSubmission.Stage.USER_ROLE)) {
+      nextStage = OgelSubmission.Stage.OGEL;
+    }
+    return nextStage;
+  }
+
+  private boolean hasCompletedStage(OgelSubmission sub, OgelSubmission.Stage stage) {
+    boolean completed = false;
+    if (stage.equals(OgelSubmission.Stage.CREATED)) {
+      completed = true;
+    } else if (stage.equals(OgelSubmission.Stage.CUSTOMER)) {
+      completed = !Util.isBlank(sub.getCustomerRef());
+    } else if (stage.equals(OgelSubmission.Stage.SITE)) {
+      completed = !Util.isBlank(sub.getSiteRef());
+    } else if (stage.equals(OgelSubmission.Stage.USER_ROLE)) {
+      completed = !sub.isRoleUpdate() || sub.isRoleUpdated();
+    } else if (stage.equals(OgelSubmission.Stage.OGEL)) {
+      completed = !Util.isBlank(sub.getSpireRef());
+    }
+    return completed;
   }
 
   private void doCallbackOgelSubmission(OgelSubmission sub) {

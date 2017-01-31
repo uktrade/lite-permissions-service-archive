@@ -30,11 +30,11 @@ public class OgelService {
 
   public boolean processForOgel(OgelSubmission sub) {
     boolean processed = true;
-    if (!sub.hasCompletedStage(OgelSubmission.Stage.OGEL)) {
-      if (sub.hasCompletedAllStages(OgelSubmission.Stage.CUSTOMER, OgelSubmission.Stage.SITE, OgelSubmission.Stage.USER_ROLE)) {
+    //if (!sub.hasCompletedStage(OgelSubmission.Stage.OGEL)) {
+      //if (sub.hasCompletedAllStages(OgelSubmission.Stage.CUSTOMER, OgelSubmission.Stage.SITE, OgelSubmission.Stage.USER_ROLE)) {
         processed = doCreateOgel(sub);
-      }
-    }
+      //}
+    //}
     return processed;
   }
 
