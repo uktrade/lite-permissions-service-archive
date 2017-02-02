@@ -5,8 +5,8 @@ import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.api.param.RegisterParam;
+import uk.gov.bis.lite.permissions.service.OgelSubmissionService;
 import uk.gov.bis.lite.permissions.service.RegisterService;
-import uk.gov.bis.lite.permissions.service.SubmissionService;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -25,12 +25,12 @@ public class RegisterOgelResource {
   private static final String ERROR_INVALID_REQUEST = "INVALID_REQUEST";
 
   private final RegisterService registerService;
-  private final SubmissionService submissionService;
+  private final OgelSubmissionService ogelSubmissionService;
 
   @Inject
-  public RegisterOgelResource(RegisterService registerService, SubmissionService submissionService) {
+  public RegisterOgelResource(RegisterService registerService, OgelSubmissionService ogelSubmissionService) {
     this.registerService = registerService;
-    this.submissionService = submissionService;
+    this.ogelSubmissionService = ogelSubmissionService;
   }
 
   @POST
@@ -47,7 +47,7 @@ public class RegisterOgelResource {
     }
 
     // Check if we are already processing RegisterParam request
-    if (submissionService.submissionCurrentlyExists(registerService.generateSubmissionReference(registerParam))) {
+    if (ogelSubmissionService.submissionCurrentlyExists(registerService.generateSubmissionReference(registerParam))) {
       return badRequest(ERROR_ALREADY_IN_QUEUE, "Duplicate request exists in the queue");
     }
 

@@ -5,22 +5,22 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.bis.lite.permissions.service.JobProcessService;
+import uk.gov.bis.lite.permissions.service.ProcessOgelSubmissionService;
 
 public class ProcessImmediateJob implements Job {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProcessImmediateJob.class);
-  private JobProcessService jobProcessService;
+  private ProcessOgelSubmissionService processOgelSubmissionService;
   private int submissionId;
 
   @Override
   public void execute(JobExecutionContext context) throws JobExecutionException {
     init(context);
-    jobProcessService.processImmediate(submissionId);
+    processOgelSubmissionService.processImmediate(submissionId);
   }
 
   private void init(JobExecutionContext context) {
-    jobProcessService = (JobProcessService) context.getMergedJobDataMap().get(Scheduler.JOB_PROCESS_SERVICE_NAME);
+    processOgelSubmissionService = (ProcessOgelSubmissionService) context.getMergedJobDataMap().get(Scheduler.JOB_PROCESS_SERVICE_NAME);
     submissionId = (int) context.getMergedJobDataMap().get(Scheduler.SUBMISSION_ID);
   }
 }

@@ -8,6 +8,8 @@ public interface OgelSubmissionService {
 
   boolean ogelSubmissionExists(Integer submissionId);
 
+  boolean submissionCurrentlyExists(String subRef);
+
   List<OgelSubmissionView> getOgelSubmissions(String filter);
 
   OgelSubmissionView getOgelSubmission(int submissionId);

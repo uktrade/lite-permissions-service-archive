@@ -61,7 +61,7 @@ public class OgelSubmission {
    * TERMINATED  - stage processing has been terminated
    */
   public enum Status {
-    ACTIVE, COMPLETE, CANCELLED, TERMINATED;
+    ACTIVE, COMPLETE, TERMINATED;
   }
 
   public OgelSubmission(int id) {
@@ -74,6 +74,10 @@ public class OgelSubmission {
     this.mode = Mode.IMMEDIATE;
     this.stage = Stage.CREATED;
     this.status = Status.ACTIVE;
+  }
+
+  public String getProcessState() {
+    return mode.name() + "/" + stage.name() + "/" + status.name();
   }
 
   /**
@@ -99,16 +103,16 @@ public class OgelSubmission {
     return status.equals(Status.COMPLETE) && !StringUtils.isBlank(spireRef);
   }
 
-  public boolean isStatusCancelled() {
-    return status.equals(Status.CANCELLED);
+  public boolean isStatusTerminated() {
+    return status.equals(Status.TERMINATED);
   }
 
   public boolean isModeScheduled() {
     return mode.equals(OgelSubmission.Mode.SCHEDULED);
   }
 
-  public void cancelProcessing() {
-    this.status = Status.CANCELLED;
+  public void terminateProcessing() {
+    this.status = Status.TERMINATED;
   }
 
   public boolean hasFail() {
@@ -143,39 +147,6 @@ public class OgelSubmission {
   public void updateStatusToTerminated() {
     status = Status.TERMINATED;
   }
-
-  public void updateStatusToCancelled() {
-    status = Status.CANCELLED;
-  }
-
-  /*
-  public boolean hasCompletedStage(Stage stage) {
-    boolean completed = false;
-    if(stage.equals(Stage.CREATED)) {
-      completed = true;
-    } else if(stage.equals(Stage.CUSTOMER)) {
-      completed = !Util.isBlank(customerRef);
-    } else if(stage.equals(Stage.SITE)) {
-      completed = !Util.isBlank(siteRef);
-    } else if(stage.equals(Stage.USER_ROLE)) {
-      completed = !roleUpdate || roleUpdated;
-    } else if(stage.equals(Stage.OGEL)) {
-      completed = !Util.isBlank(spireRef);
-    }
-    return completed;
-  }
-
-  public boolean hasCompletedAllStages(Stage... stages) {
-    boolean allCompleted = true;
-    for(Stage stage : stages){
-      if(!hasCompletedStage(stage)) {
-        allCompleted = false;
-        break;
-      }
-    }
-    return allCompleted;
-  }
-  */
 
   public String getJson() {
     return json;

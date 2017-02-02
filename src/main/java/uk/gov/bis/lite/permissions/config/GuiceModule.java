@@ -21,14 +21,22 @@ import uk.gov.bis.lite.common.spire.client.SpireRequestConfig;
 import uk.gov.bis.lite.common.spire.client.parser.ReferenceParser;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDaoImpl;
+import uk.gov.bis.lite.permissions.service.CallbackService;
+import uk.gov.bis.lite.permissions.service.CallbackServiceImpl;
+import uk.gov.bis.lite.permissions.service.CustomerService;
+import uk.gov.bis.lite.permissions.service.CustomerServiceImpl;
+import uk.gov.bis.lite.permissions.service.FailService;
+import uk.gov.bis.lite.permissions.service.FailServiceImpl;
+import uk.gov.bis.lite.permissions.service.OgelService;
+import uk.gov.bis.lite.permissions.service.OgelServiceImpl;
 import uk.gov.bis.lite.permissions.service.OgelSubmissionService;
 import uk.gov.bis.lite.permissions.service.OgelSubmissionServiceImpl;
+import uk.gov.bis.lite.permissions.service.ProcessOgelSubmissionService;
+import uk.gov.bis.lite.permissions.service.ProcessOgelSubmissionServiceImpl;
 import uk.gov.bis.lite.permissions.service.RegisterService;
 import uk.gov.bis.lite.permissions.service.RegisterServiceImpl;
 import uk.gov.bis.lite.permissions.service.RegistrationsService;
 import uk.gov.bis.lite.permissions.service.RegistrationsServiceImpl;
-import uk.gov.bis.lite.permissions.service.SubmissionService;
-import uk.gov.bis.lite.permissions.service.SubmissionServiceImpl;
 import uk.gov.bis.lite.permissions.spire.OgelErrorNodeErrorHandler;
 import uk.gov.bis.lite.permissions.spire.SpireOgelRegistrationClient;
 import uk.gov.bis.lite.permissions.spire.SpireReferenceClient;
@@ -82,9 +90,14 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
   protected void configure() {
     bind(OgelSubmissionDao.class).to(OgelSubmissionDaoImpl.class);
     bind(RegisterService.class).to(RegisterServiceImpl.class);
-    bind(SubmissionService.class).to(SubmissionServiceImpl.class);
     bind(RegistrationsService.class).to(RegistrationsServiceImpl.class);
     bind(OgelSubmissionService.class).to(OgelSubmissionServiceImpl.class);
+
+    bind(CallbackService.class).to(CallbackServiceImpl.class);
+    bind(CustomerService.class).to(CustomerServiceImpl.class);
+    bind(OgelService.class).to(OgelServiceImpl.class);
+    bind(ProcessOgelSubmissionService.class).to(ProcessOgelSubmissionServiceImpl.class);
+    bind(FailService.class).to(FailServiceImpl.class);
   }
 
   @Provides

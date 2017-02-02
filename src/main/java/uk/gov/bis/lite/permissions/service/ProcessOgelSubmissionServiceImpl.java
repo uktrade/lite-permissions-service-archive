@@ -1,5 +1,6 @@
 package uk.gov.bis.lite.permissions.service;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -11,23 +12,24 @@ import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.util.Util;
 
 import java.util.List;
+import java.util.Optional;
 
 @Singleton
-public class JobProcessService {
+public class ProcessOgelSubmissionServiceImpl implements ProcessOgelSubmissionService {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(JobProcessService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessOgelSubmissionServiceImpl.class);
 
   private OgelSubmissionDao submissionDao;
-  private SubmissionService submissionService;
+  private CustomerService customerService;
   private OgelService ogelService;
   private CallbackService callbackService;
   private FailService failService;
 
   @Inject
-  public JobProcessService(OgelSubmissionDao submissionDao, SubmissionService submissionService,
-                           OgelService ogelService, CallbackService callbackService, FailService failService) {
+  public ProcessOgelSubmissionServiceImpl(OgelSubmissionDao submissionDao, CustomerService customerService,
+                                          OgelService ogelService, CallbackService callbackService, FailService failService) {
     this.submissionDao = submissionDao;
-    this.submissionService = submissionService;
+    this.customerService = customerService;
     this.ogelService = ogelService;
     this.callbackService = callbackService;
     this.failService = failService;
@@ -55,7 +57,7 @@ public class JobProcessService {
       }
 
     } catch (Throwable e) {
-      errorThrown(sub, e, "JobProcessService.processImmediate");
+      errorThrown(sub, e, "ProcessOgelSubmissionServiceImpl.processImmediate");
     }
   }
 
@@ -78,7 +80,7 @@ public class JobProcessService {
       try {
         doProcessOgelSubmission(sub);
       } catch (Throwable e) {
-        errorThrown(sub, e, "JobProcessService.processScheduled");
+        errorThrown(sub, e, "ProcessOgelSubmissionServiceImpl.processScheduled");
       }
     }
   }
@@ -93,7 +95,7 @@ public class JobProcessService {
       try {
         doCallbackOgelSubmission(sub);
       } catch (Throwable e) {
-        errorThrown(sub, e, "JobProcessService.processScheduled");
+        errorThrown(sub, e, "ProcessOgelSubmissionServiceImpl.processScheduled");
       }
     }
   }
@@ -102,61 +104,85 @@ public class JobProcessService {
    * Attempts to process OgelSubmissions through each stage.
    * When stage is completed we set OgelSubmission to next stage and save OgelSubmission
    */
-  private void doProcessOgelSubmission(OgelSubmission sub) {
+  @VisibleForTesting
+  public void doProcessOgelSubmission(OgelSubmission sub) {
 
     // Process Customer, Site and correct Role
     boolean customerStageComplete = hasCompletedStage(sub, OgelSubmission.Stage.CUSTOMER);
-    boolean siteStageComplete = false;
-    boolean roleUpdateStageComplete = false;
+    boolean siteStageComplete = hasCompletedStage(sub, OgelSubmission.Stage.SITE);
+    boolean roleUpdateStageComplete = hasCompletedStage(sub, OgelSubmission.Stage.USER_ROLE);
 
     // Process Customer
     if (!customerStageComplete) {
-      customerStageComplete = submissionService.processForCustomer(sub);
-      progressStage(sub); // update OgelSubmission to next stage
+      Optional<String> sarRef = customerService.getOrCreateCustomer(sub);
+      if (sarRef.isPresent()) {
+        sub.setCustomerRef(sarRef.get());
+        progressStage(sub);
+        submissionDao.update(sub);
+        customerStageComplete = true;
+        LOGGER.info("[" + sub.getId() + "] OgelSubmission CUSTOMER created: " + sarRef.get());
+      }
     }
 
     // Process Site
     if (customerStageComplete) {
-      siteStageComplete = submissionService.processForSite(sub);
-      progressStage(sub); // update OgelSubmission to next stage
+      Optional<String> siteRef = customerService.createSite(sub);
+      if (siteRef.isPresent()) {
+        sub.setSiteRef(siteRef.get());
+        progressStage(sub);
+        submissionDao.update(sub);
+        siteStageComplete = true;
+        LOGGER.info("[" + sub.getId() + "] OgelSubmission SITE created: " + siteRef.get());
+      }
     }
 
     // Process Role
     if (siteStageComplete) {
-      roleUpdateStageComplete = submissionService.processForRoleUpdate(sub);
-      progressStage(sub); // update OgelSubmission to next stage
+      boolean updated = customerService.updateUserRole(sub);
+      if (updated) {
+        sub.setRoleUpdated(true);
+        progressStage(sub);
+        submissionDao.update(sub);
+        roleUpdateStageComplete = true;
+        LOGGER.info("[" + sub.getId() + "] OgelSubmission USER_ROLE updated: " + sub.getUserId() + "/" + sub.getOgelType());
+      }
     }
 
     // Process create Ogel
     if (customerStageComplete && siteStageComplete && roleUpdateStageComplete) {
-      ogelService.processForOgel(sub);
+      Optional<String> spireRef = ogelService.createOgel(sub);
+      if (spireRef.isPresent()) {
+        sub.setSpireRef(spireRef.get());
+        sub.updateStatusToComplete();
+        submissionDao.update(sub);
+        LOGGER.info("[" + sub.getId() + "] OgelSubmission OGEL created: " + spireRef.get());
+      }
     }
   }
 
   /**
    * Progresses OgelSubmission to its next (uncompleted) stage
    */
-  private void progressStage(OgelSubmission sub) {
+  @VisibleForTesting
+  public void progressStage(OgelSubmission sub) {
     OgelSubmission.Stage nextStage = getNextStage(sub.getStage());
     if (nextStage != null) {
       sub.setStage(nextStage);
       if (hasCompletedStage(sub, nextStage)) {
         progressStage(sub);
-      } else {
-        submissionDao.update(sub);
       }
     }
   }
 
   private OgelSubmission.Stage getNextStage(OgelSubmission.Stage stage) {
     OgelSubmission.Stage nextStage = null;
-    if (stage.equals(OgelSubmission.Stage.CREATED)) {
+    if (stage == OgelSubmission.Stage.CREATED) {
       nextStage = OgelSubmission.Stage.CUSTOMER;
-    } else if (stage.equals(OgelSubmission.Stage.CUSTOMER)) {
+    } else if (stage == OgelSubmission.Stage.CUSTOMER) {
       nextStage = OgelSubmission.Stage.SITE;
-    } else if (stage.equals(OgelSubmission.Stage.SITE)) {
+    } else if (stage == OgelSubmission.Stage.SITE) {
       nextStage = OgelSubmission.Stage.USER_ROLE;
-    } else if (stage.equals(OgelSubmission.Stage.USER_ROLE)) {
+    } else if (stage == OgelSubmission.Stage.USER_ROLE) {
       nextStage = OgelSubmission.Stage.OGEL;
     }
     return nextStage;
@@ -164,15 +190,15 @@ public class JobProcessService {
 
   private boolean hasCompletedStage(OgelSubmission sub, OgelSubmission.Stage stage) {
     boolean completed = false;
-    if (stage.equals(OgelSubmission.Stage.CREATED)) {
+    if (stage == OgelSubmission.Stage.CREATED) {
       completed = true;
-    } else if (stage.equals(OgelSubmission.Stage.CUSTOMER)) {
+    } else if (stage == OgelSubmission.Stage.CUSTOMER) {
       completed = !Util.isBlank(sub.getCustomerRef());
-    } else if (stage.equals(OgelSubmission.Stage.SITE)) {
+    } else if (stage == OgelSubmission.Stage.SITE) {
       completed = !Util.isBlank(sub.getSiteRef());
-    } else if (stage.equals(OgelSubmission.Stage.USER_ROLE)) {
+    } else if (stage == OgelSubmission.Stage.USER_ROLE) {
       completed = !sub.isRoleUpdate() || sub.isRoleUpdated();
-    } else if (stage.equals(OgelSubmission.Stage.OGEL)) {
+    } else if (stage == OgelSubmission.Stage.OGEL) {
       completed = !Util.isBlank(sub.getSpireRef());
     }
     return completed;
@@ -184,7 +210,7 @@ public class JobProcessService {
 
   private void errorThrown(OgelSubmission sub, Throwable e, String info) {
     String stackTrace = Throwables.getStackTraceAsString(e);
-    failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailService.Origin.UNKNOWN, stackTrace);
+    failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailServiceImpl.Origin.UNKNOWN, stackTrace);
     LOGGER.error(info + ": " + e.getMessage(), e);
   }
 }

@@ -29,14 +29,14 @@ public class RegisterServiceImpl implements RegisterService {
 
   private OgelSubmissionDao submissionDao;
   private org.quartz.Scheduler scheduler;
-  private JobProcessService jobProcessService;
+  private ProcessOgelSubmissionService processOgelSubmissionService;
   private ObjectMapper mapper;
 
   @Inject
-  public RegisterServiceImpl(OgelSubmissionDao submissionDao, org.quartz.Scheduler scheduler, JobProcessService jobProcessService) {
+  public RegisterServiceImpl(OgelSubmissionDao submissionDao, org.quartz.Scheduler scheduler, ProcessOgelSubmissionService processOgelSubmissionService) {
     this.submissionDao = submissionDao;
     this.scheduler = scheduler;
-    this.jobProcessService = jobProcessService;
+    this.processOgelSubmissionService = processOgelSubmissionService;
     this.mapper = new ObjectMapper();
   }
 
@@ -54,9 +54,6 @@ public class RegisterServiceImpl implements RegisterService {
     sub.setMode(OgelSubmission.Mode.IMMEDIATE);
     sub.setStatus(OgelSubmission.Status.ACTIVE);
     sub.setStage(OgelSubmission.Stage.CREATED);
-
-    // Set the next stage
-    //sub.updateToNextStage();
 
     int submissionId = submissionDao.create(sub);
 
@@ -93,6 +90,11 @@ public class RegisterServiceImpl implements RegisterService {
       }
     }
 
+    // Check that we do not have a new Customer and an existing Site - this is impossible
+    if(valid && !param.hasNewCustomer() && param.hasNewSite()) {
+      valid = false;
+    }
+
     return valid;
   }
 
@@ -121,6 +123,11 @@ public class RegisterServiceImpl implements RegisterService {
         }
       }
     }
+
+    if(!param.hasNewCustomer() && param.hasNewSite()) {
+      info = info + " Cannot have an existing Site for a new Customer. ";
+    }
+
     return info;
   }
 
@@ -168,7 +175,7 @@ public class RegisterServiceImpl implements RegisterService {
   private void triggerProcessSubmissionJob(int submissionId) {
     JobDetail detail = JobBuilder.newJob(ProcessImmediateJob.class).build();
     JobDataMap dataMap = detail.getJobDataMap();
-    dataMap.put(Scheduler.JOB_PROCESS_SERVICE_NAME, jobProcessService);
+    dataMap.put(Scheduler.JOB_PROCESS_SERVICE_NAME, processOgelSubmissionService);
     dataMap.put(Scheduler.SUBMISSION_ID, submissionId);
     Trigger trigger = TriggerBuilder.newTrigger()
         .withIdentity(TriggerKey.triggerKey("SubmissionProcessJobTrigger-" + submissionId))

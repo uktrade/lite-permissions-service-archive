@@ -1,0 +1,45 @@
+processScheduledJobCron: 59 59 23 31 12 ? 2099  # 5am 31st February
+
+spireClientUserName: bisuat.api@test.com
+spireClientPassword: sp1reUAT
+#spireClientUrl: http://localhost:8080/spire/fox/ispire/
+spireClientUrl: https://www.spiretest.trade.gov.uk/spireuat/fox/ispire/
+
+customerServiceUrl: http://localhost:8095
+
+maxMinutesRetryAfterFail: 1
+
+server:
+  type: default
+  applicationConnectors:
+    - type: http
+      port: 8093
+  adminConnectors:
+    - type: http
+      port: 8094
+
+logging:
+  level: INFO
+  appenders:
+    - type: console
+      includeCallerData : true
+      logFormat: "[%mdc{corrID}] %d [%p] %marker %logger %m%n"
+  loggers:
+    uk.gov.bis.lite.common.spire.client: TRACE
+
+database:
+  driverClass: org.sqlite.JDBC
+  url: jdbc:sqlite:file::memory:?cache=shared
+  properties:
+    charSet: UTF-8
+  maxWaitForConnection: 30s
+  validationQuery: "SELECT 1"
+  initialSize: 1
+  minSize: 1
+  maxSize: 1
+  checkConnectionWhileIdle: false
+  evictionInterval: 10s
+  minIdleTime: 1 minute
+
+adminLogin: user
+adminPassword: password
