@@ -1,10 +1,12 @@
 package uk.gov.bis.lite.permissions.mocks;
 
+import com.google.inject.Singleton;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
 import java.util.List;
 
+@Singleton
 public class OgelSubmissionDaoMock implements OgelSubmissionDao {
 
   @Override
@@ -49,6 +51,11 @@ public class OgelSubmissionDaoMock implements OgelSubmissionDao {
 
   @Override
   public OgelSubmission findRecentBySubmissionRef(String submissionRef) {
+    return null;
+  }
+
+  @Override
+  public OgelSubmission findBySubmissionRef(String submissionRef) {
     return null;
   }
 }

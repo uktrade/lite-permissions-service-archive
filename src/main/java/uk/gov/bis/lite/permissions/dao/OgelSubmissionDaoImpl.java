@@ -39,6 +39,14 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
 
   @Override
   @Transaction
+  public OgelSubmission findBySubmissionRef(String submissionRef) {
+    try (final Handle handle = jdbi.open()) {
+      return attach(handle).findBySubmissionRef(submissionRef);
+    }
+  }
+
+  @Override
+  @Transaction
   public List<OgelSubmission> getScheduledActive() {
     try (final Handle handle = jdbi.open()) {
       return attach(handle).getScheduledActive();

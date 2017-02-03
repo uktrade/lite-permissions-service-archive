@@ -10,6 +10,6 @@ public interface ProcessOgelSubmissionService {
 
   void doProcessOgelSubmission(OgelSubmission sub);
 
-  void progressStage(OgelSubmission sub);
+  OgelSubmission.Stage progressStage(OgelSubmission sub);
 
 }

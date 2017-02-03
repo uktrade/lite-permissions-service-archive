@@ -1,8 +1,10 @@
 package uk.gov.bis.lite.permissions.mocks;
 
+import com.google.inject.Singleton;
 import uk.gov.bis.lite.permissions.api.param.RegisterParam;
 import uk.gov.bis.lite.permissions.service.RegisterService;
 
+@Singleton
 public class RegisterServiceMock implements RegisterService {
 
   private String mockSubmissionRef;

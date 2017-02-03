@@ -26,4 +26,6 @@ public interface OgelSubmissionDao {
   OgelSubmission findBySubmissionId(int submissionId);
 
   OgelSubmission findRecentBySubmissionRef(String submissionRef);
+
+  OgelSubmission findBySubmissionRef(String submissionRef);
 }

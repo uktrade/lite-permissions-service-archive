@@ -22,8 +22,6 @@ import uk.gov.bis.lite.permissions.service.ProcessOgelSubmissionServiceImpl;
 public class StageProgressionTest {
 
   private ProcessOgelSubmissionService service;
-  private String CUSTOMER_REF = "CUSTOMER_REF";
-  private String SITE_REF = "SITE_REF";
 
   @Before
   public void before() {
@@ -36,59 +34,95 @@ public class StageProgressionTest {
   }
 
   @Test
-  public void testFromCreatedWithRoleUpdate() throws Exception {
+  public void testStandard() throws Exception {
     OgelSubmission sub = getStagedWithRoleUpdate(OgelSubmission.Stage.CREATED);
-    service.progressStage(sub);
+    sub.setStage(service.progressStage(sub));
     assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.CUSTOMER);
+
+    sub.setCustomerRef("customerRef");
     service.progressStage(sub);
     assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.SITE);
+
+    sub.setSiteRef("siteRef");
     service.progressStage(sub);
     assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.USER_ROLE);
+
+    sub.setRoleUpdated(true);
     service.progressStage(sub);
     assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.OGEL);
+
+    sub.setSpireRef("spireRef");
     service.progressStage(sub);
     assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.OGEL);
   }
 
   @Test
-  public void testFromCreatedWithoutRoleUpdate() throws Exception {
+  public void testWithExistingCustomer() throws Exception {
+    OgelSubmission sub = getStagedWithRoleUpdate(OgelSubmission.Stage.CREATED);
+    sub.setCustomerRef("customerRef");
+
+    service.progressStage(sub);
+    assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.SITE);
+    sub.setSiteRef("siteRef");
+    service.progressStage(sub);
+    assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.USER_ROLE);
+    sub.setRoleUpdated(true);
+    service.progressStage(sub);
+    assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.OGEL);
+    sub.setSpireRef("spireRef");
+    service.progressStage(sub);
+    assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.OGEL);
+  }
+
+  @Test
+  public void testWithExistingCustomerAndSite() throws Exception {
+    OgelSubmission sub = getStagedWithRoleUpdate(OgelSubmission.Stage.CREATED);
+    sub.setCustomerRef("customerRef");
+    sub.setSiteRef("siteRef");
+    service.progressStage(sub);
+    assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.USER_ROLE);
+
+    sub.setRoleUpdated(true);
+    service.progressStage(sub);
+    assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.OGEL);
+
+    sub.setSpireRef("spireRef");
+    service.progressStage(sub);
+    assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.OGEL);
+  }
+
+  @Test
+  public void testWithoutRoleUpdate() throws Exception {
     OgelSubmission sub = getStagedWithoutRoleUpdate(OgelSubmission.Stage.CREATED);
     service.progressStage(sub);
     assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.CUSTOMER);
+
+    sub.setCustomerRef("customerRef");
     service.progressStage(sub);
     assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.SITE);
+
+    sub.setSiteRef("siteRef");
     service.progressStage(sub);
     assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.OGEL);
+
+    sub.setSpireRef("spireRef");
     service.progressStage(sub);
     assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.OGEL);
   }
 
   @Test
-  public void testFromCreatedWithExistingCustomer() throws Exception {
-    OgelSubmission sub = getStagedWithRoleUpdate(OgelSubmission.Stage.CREATED);
-    sub.setCustomerRef(CUSTOMER_REF);
-    service.progressStage(sub);
-    assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.SITE);
-  }
-
-  @Test
-  public void testFromCreatedWithExistingCustomerExistingSite() throws Exception {
-    OgelSubmission sub = getStagedWithRoleUpdate(OgelSubmission.Stage.CREATED);
-    sub.setCustomerRef(CUSTOMER_REF);
-    sub.setSiteRef(SITE_REF);
-    service.progressStage(sub);
-    assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.USER_ROLE);
-  }
-
-  @Test
-  public void testFromCreatedWithExistingCustomerExistingSiteWithoutRoleUpdate() throws Exception {
+  public void testWithExistingCustomerAndSiteWithoutRoleUpdate() throws Exception {
     OgelSubmission sub = getStagedWithoutRoleUpdate(OgelSubmission.Stage.CREATED);
-    sub.setCustomerRef(CUSTOMER_REF);
-    sub.setSiteRef(SITE_REF);
+    sub.setCustomerRef("customerRef");
+    sub.setSiteRef("siteRef");
+    service.progressStage(sub);
+    assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.OGEL);
+
+    sub.setSpireRef("spireRef");
     service.progressStage(sub);
     assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.OGEL);
   }
-  
+
   private OgelSubmission getStagedWithoutRoleUpdate(OgelSubmission.Stage stage) {
     OgelSubmission sub = getStagedWithRoleUpdate(stage);
     sub.setRoleUpdate(false);

@@ -71,6 +71,66 @@ public class ProcessOgelSubmissionServiceImpl implements ProcessOgelSubmissionSe
   }
 
   /**
+   * Attempts to process OgelSubmission through each stage
+   */
+  @VisibleForTesting
+  public void doProcessOgelSubmission(OgelSubmission sub) {
+
+    OgelSubmission.Stage stage = sub.getStage();
+    if(stage == OgelSubmission.Stage.CREATED) {
+      stage = progressStage(sub);
+      submissionDao.update(sub);
+    }
+
+    if(stage == OgelSubmission.Stage.CUSTOMER) {
+      if(processForCustomer(sub)) {
+        stage = progressStage(sub);
+        submissionDao.update(sub);
+      }
+    }
+
+    if(stage == OgelSubmission.Stage.SITE) {
+      if(processForSite(sub)) {
+        stage = progressStage(sub);
+        submissionDao.update(sub);
+      }
+    }
+
+    if(stage == OgelSubmission.Stage.USER_ROLE) {
+      if(processForUserRole(sub)) {
+        stage = progressStage(sub);
+        submissionDao.update(sub);
+      }
+    }
+
+    if(stage == OgelSubmission.Stage.OGEL) {
+      if(processForOgel(sub)) {
+        sub.updateStatusToComplete();
+        submissionDao.update(sub);
+      }
+    }
+  }
+
+  /**
+   * Updates and returns OgelSubmission STAGE
+   */
+  @VisibleForTesting
+  public OgelSubmission.Stage progressStage(OgelSubmission sub) {
+    if(hasCompletedCurrentStage(sub)) {
+      OgelSubmission.Stage nextStage = getNextStage(sub.getStage());
+      if (nextStage != null) {
+        sub.setStage(nextStage);
+        if (hasCompletedStage(sub, nextStage)) {
+          return progressStage(sub);
+        }
+      }
+      return sub.getStage();
+    } else {
+      return sub.getStage();
+    }
+  }
+
+  /**
    * Find ACTIVE SCHEDULED OgelSubmissions and attempt to process each through all stages.
    */
   private void processScheduled() {
@@ -100,78 +160,44 @@ public class ProcessOgelSubmissionServiceImpl implements ProcessOgelSubmissionSe
     }
   }
 
-  /**
-   * Attempts to process OgelSubmissions through each stage.
-   * When stage is completed we set OgelSubmission to next stage and save OgelSubmission
-   */
-  @VisibleForTesting
-  public void doProcessOgelSubmission(OgelSubmission sub) {
-
-    // Process Customer, Site and correct Role
-    boolean customerStageComplete = hasCompletedStage(sub, OgelSubmission.Stage.CUSTOMER);
-    boolean siteStageComplete = hasCompletedStage(sub, OgelSubmission.Stage.SITE);
-    boolean roleUpdateStageComplete = hasCompletedStage(sub, OgelSubmission.Stage.USER_ROLE);
-
-    // Process Customer
-    if (!customerStageComplete) {
-      Optional<String> sarRef = customerService.getOrCreateCustomer(sub);
-      if (sarRef.isPresent()) {
-        sub.setCustomerRef(sarRef.get());
-        progressStage(sub);
-        submissionDao.update(sub);
-        customerStageComplete = true;
-        LOGGER.info("[" + sub.getId() + "] OgelSubmission CUSTOMER created: " + sarRef.get());
-      }
+  private boolean processForCustomer(OgelSubmission sub) {
+    Optional<String> sarRef = customerService.getOrCreateCustomer(sub);
+    if (sarRef.isPresent()) {
+      sub.setCustomerRef(sarRef.get());
+      LOGGER.info("[" + sub.getId() + "] OgelSubmission CUSTOMER created: " + sarRef.get());
+      return true;
     }
-
-    // Process Site
-    if (customerStageComplete) {
-      Optional<String> siteRef = customerService.createSite(sub);
-      if (siteRef.isPresent()) {
-        sub.setSiteRef(siteRef.get());
-        progressStage(sub);
-        submissionDao.update(sub);
-        siteStageComplete = true;
-        LOGGER.info("[" + sub.getId() + "] OgelSubmission SITE created: " + siteRef.get());
-      }
-    }
-
-    // Process Role
-    if (siteStageComplete) {
-      boolean updated = customerService.updateUserRole(sub);
-      if (updated) {
-        sub.setRoleUpdated(true);
-        progressStage(sub);
-        submissionDao.update(sub);
-        roleUpdateStageComplete = true;
-        LOGGER.info("[" + sub.getId() + "] OgelSubmission USER_ROLE updated: " + sub.getUserId() + "/" + sub.getOgelType());
-      }
-    }
-
-    // Process create Ogel
-    if (customerStageComplete && siteStageComplete && roleUpdateStageComplete) {
-      Optional<String> spireRef = ogelService.createOgel(sub);
-      if (spireRef.isPresent()) {
-        sub.setSpireRef(spireRef.get());
-        sub.updateStatusToComplete();
-        submissionDao.update(sub);
-        LOGGER.info("[" + sub.getId() + "] OgelSubmission OGEL created: " + spireRef.get());
-      }
-    }
+    return false;
   }
 
-  /**
-   * Progresses OgelSubmission to its next (uncompleted) stage
-   */
-  @VisibleForTesting
-  public void progressStage(OgelSubmission sub) {
-    OgelSubmission.Stage nextStage = getNextStage(sub.getStage());
-    if (nextStage != null) {
-      sub.setStage(nextStage);
-      if (hasCompletedStage(sub, nextStage)) {
-        progressStage(sub);
-      }
+  private boolean processForSite(OgelSubmission sub) {
+    Optional<String> siteRef = customerService.createSite(sub);
+    if (siteRef.isPresent()) {
+      sub.setSiteRef(siteRef.get());
+      LOGGER.info("[" + sub.getId() + "] OgelSubmission SITE created: " + siteRef.get());
+      return true;
     }
+    return false;
+  }
+
+  private boolean processForUserRole(OgelSubmission sub) {
+    boolean updated = customerService.updateUserRole(sub);
+    if (updated) {
+      sub.setRoleUpdated(true);
+      LOGGER.info("[" + sub.getId() + "] OgelSubmission USER_ROLE updated: " + sub.getUserId() + "/" + sub.getOgelType());
+      return true;
+    }
+    return false;
+  }
+
+  private boolean processForOgel(OgelSubmission sub) {
+    Optional<String> spireRef = ogelService.createOgel(sub);
+    if (spireRef.isPresent()) {
+      sub.setSpireRef(spireRef.get());
+      LOGGER.info("[" + sub.getId() + "] OgelSubmission OGEL created: " + spireRef.get());
+      return true;
+    }
+    return false;
   }
 
   private OgelSubmission.Stage getNextStage(OgelSubmission.Stage stage) {
@@ -202,6 +228,10 @@ public class ProcessOgelSubmissionServiceImpl implements ProcessOgelSubmissionSe
       completed = !Util.isBlank(sub.getSpireRef());
     }
     return completed;
+  }
+
+  private boolean hasCompletedCurrentStage(OgelSubmission sub) {
+    return hasCompletedStage(sub, sub.getStage());
   }
 
   private void doCallbackOgelSubmission(OgelSubmission sub) {
