@@ -9,13 +9,23 @@ import uk.gov.bis.lite.permissions.service.FailServiceImpl;
 @Singleton
 public class FailServiceMock implements FailService {
 
+  private int failServiceCallCount = 0;
+
   @Override
   public void fail(OgelSubmission sub, CallbackView.FailReason failReason, FailServiceImpl.Origin origin) {
-
+    failServiceCallCount++;
   }
 
   @Override
   public void failWithMessage(OgelSubmission sub, CallbackView.FailReason failReason, FailServiceImpl.Origin origin, String message) {
+    failServiceCallCount++;
+  }
 
+  public int getFailServiceCallCount() {
+    return failServiceCallCount;
+  }
+
+  public void resetFailServiceCallCount() {
+    this.failServiceCallCount = 0;
   }
 }

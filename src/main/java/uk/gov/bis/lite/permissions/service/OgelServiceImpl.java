@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.common.spire.client.SpireRequest;
 import uk.gov.bis.lite.permissions.api.view.CallbackView;
-import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.exception.SpireFailReasonException;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.spire.SpireReferenceClient;
@@ -21,13 +20,11 @@ public class OgelServiceImpl implements OgelService {
 
   private SpireReferenceClient createOgelAppReferenceClient;
   private FailService failService;
-  private OgelSubmissionDao submissionDao;
 
   @Inject
-  public OgelServiceImpl(SpireReferenceClient createOgelAppReferenceClient, FailService failService, OgelSubmissionDao submissionDao) {
+  public OgelServiceImpl(SpireReferenceClient createOgelAppReferenceClient, FailService failService) {
     this.createOgelAppReferenceClient = createOgelAppReferenceClient;
     this.failService = failService;
-    this.submissionDao = submissionDao;
   }
 
   public Optional<String> createOgel(OgelSubmission sub) {

@@ -41,20 +41,39 @@ public class RegisterServiceImpl implements RegisterService {
   }
 
   /**
+   * Returns new OgelSubmission from RegisterParam
+   */
+  public OgelSubmission getOgelSubmission(RegisterParam param) {
+    OgelSubmission sub = new OgelSubmission(param.getUserId(), param.getOgelType());
+    sub.setCustomerRef(param.getExistingCustomer());
+    sub.setSiteRef(param.getExistingSite());
+    sub.setSubmissionRef(generateSubmissionReference(param));
+    sub.setRoleUpdate(param.roleUpdateRequired());
+    sub.setCalledBack(false);
+    try {
+      sub.setJson(mapper.writeValueAsString(param));
+    } catch (JsonProcessingException e) {
+      LOGGER.error("JsonProcessingException", e);
+    }
+    if(param.getAdminApproval() != null) {
+      String adminUserId = param.getAdminApproval().getAdminUserId();
+      if(!StringUtils.isBlank(adminUserId)) {
+        sub.setAdminUserId(adminUserId);
+      }
+    }
+    return sub;
+  }
+
+  /**
    * Creates and persists OgelSubmission in IMMEDIATE mode
    * Triggers a ProcessImmediateJob job to process submission
    * Returns the requestId associated with the submission
    */
-  public String register(RegisterParam reg, String callbackUrl) {
-    LOGGER.info("Creating OgelSubmission: " + reg.getUserId() + "/" + reg.getOgelType());
+  public String register(OgelSubmission sub, String callbackUrl) {
+    LOGGER.info("Registering OgelSubmission: " + sub.getUserId() + "/" + sub.getOgelType());
 
-    // Create new OgelSubmission and persist
-    OgelSubmission sub = getOgelSubmission(reg);
+    // Persist OgelSubmission
     sub.setCallbackUrl(callbackUrl);
-    sub.setMode(OgelSubmission.Mode.IMMEDIATE);
-    sub.setStatus(OgelSubmission.Status.ACTIVE);
-    sub.setStage(OgelSubmission.Stage.CREATED);
-
     int submissionId = submissionDao.create(sub);
 
     // Trigger ProcessImmediateJob to process this submission
@@ -185,29 +204,6 @@ public class RegisterServiceImpl implements RegisterService {
     } catch (SchedulerException e) {
       LOGGER.error("SchedulerException", e);
     }
-  }
-
-  private OgelSubmission getOgelSubmission(RegisterParam param) {
-    OgelSubmission sub = new OgelSubmission(param.getUserId(), param.getOgelType());
-    sub.setCustomerRef(param.getExistingCustomer());
-    sub.setSiteRef(param.getExistingSite());
-    sub.setSubmissionRef(generateSubmissionReference(param));
-    sub.setRoleUpdate(param.roleUpdateRequired());
-    sub.setCalledBack(false);
-    try {
-      sub.setJson(mapper.writeValueAsString(param));
-    } catch (JsonProcessingException e) {
-      LOGGER.error("JsonProcessingException", e);
-    }
-
-    if(param.getAdminApproval() != null) {
-      String adminUserId = param.getAdminApproval().getAdminUserId();
-      if(!StringUtils.isBlank(adminUserId)) {
-        sub.setAdminUserId(adminUserId);
-      }
-    }
-
-    return sub;
   }
 
   /**
