@@ -1,4 +1,4 @@
-package uk.gov.bis.lite.permissions.submissions;
+package uk.gov.bis.lite.permissions.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -16,11 +16,12 @@ import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.mocks.CustomerServiceMock;
 import uk.gov.bis.lite.permissions.mocks.OgelServiceMock;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
-import uk.gov.bis.lite.permissions.service.CustomerService;
-import uk.gov.bis.lite.permissions.service.OgelService;
-import uk.gov.bis.lite.permissions.service.ProcessOgelSubmissionService;
 
-public class ProcessSubmissionsTest {
+/**
+ * Integration tests for ProcessOgelSubmissionService with mocked CustomerService and OgelService
+ * Utilises in memory DB
+ */
+public class ProcessOgelSubmissionServiceTest {
 
   private static ProcessOgelSubmissionService processOgelSubmissionService;
   private static OgelSubmissionDao submissionDao;

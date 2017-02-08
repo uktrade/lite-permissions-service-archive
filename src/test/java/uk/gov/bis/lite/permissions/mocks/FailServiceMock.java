@@ -11,21 +11,31 @@ public class FailServiceMock implements FailService {
 
   private int failServiceCallCount = 0;
 
-  @Override
-  public void fail(OgelSubmission sub, CallbackView.FailReason failReason, FailServiceImpl.Origin origin) {
-    failServiceCallCount++;
-  }
+  private CallbackView.FailReason lastFailReason = null;
+  private FailServiceImpl.Origin lastOrigin = null;
 
   @Override
   public void failWithMessage(OgelSubmission sub, CallbackView.FailReason failReason, FailServiceImpl.Origin origin, String message) {
     failServiceCallCount++;
+    lastFailReason = failReason;
+    lastOrigin = origin;
   }
 
   public int getFailServiceCallCount() {
     return failServiceCallCount;
   }
 
-  public void resetFailServiceCallCount() {
+  public void resetAll() {
+    this.lastFailReason = null;
+    this.lastOrigin = null;
     this.failServiceCallCount = 0;
+  }
+
+  public CallbackView.FailReason getLastFailReason() {
+    return lastFailReason;
+  }
+
+  public FailServiceImpl.Origin getLastOrigin() {
+    return lastOrigin;
   }
 }

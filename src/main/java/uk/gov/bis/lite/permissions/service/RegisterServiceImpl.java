@@ -110,7 +110,7 @@ public class RegisterServiceImpl implements RegisterService {
     }
 
     // Check that we do not have a new Customer and an existing Site - this is impossible
-    if(valid && !param.hasNewCustomer() && param.hasNewSite()) {
+    if(valid && param.hasExistingSite() && param.hasNewCustomer()) {
       valid = false;
     }
 
@@ -143,7 +143,7 @@ public class RegisterServiceImpl implements RegisterService {
       }
     }
 
-    if(!param.hasNewCustomer() && param.hasNewSite()) {
+    if(param.hasExistingSite() && param.hasNewCustomer()) {
       info = info + " Cannot have an existing Site for a new Customer. ";
     }
 

@@ -11,6 +11,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.bis.lite.customer.api.param.CustomerParam;
 import uk.gov.bis.lite.customer.api.param.UserRoleParam;
+import uk.gov.bis.lite.permissions.api.view.CallbackView;
 import uk.gov.bis.lite.permissions.mocks.FailServiceMock;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
@@ -23,7 +24,7 @@ import javax.ws.rs.core.Response;
 
 /**
  * Tests CustomerService with external endpoints mocked.
- * Tests mocked FailService is called correctly
+ * Tests FailService dependency is called correctly
  */
 public class CustomerServiceTest {
 
@@ -55,7 +56,7 @@ public class CustomerServiceTest {
   @Test
   public void testUserRoleSuccess() throws Exception {
     // Setup
-    resetFailServiceCount();
+    resetMockFailService();
     userRoleMode(SUCCESS);
 
     // Test
@@ -66,18 +67,19 @@ public class CustomerServiceTest {
   @Test
   public void testUserRoleBadRequest() throws Exception {
     // Setup
-    resetFailServiceCount();
+    resetMockFailService();
     userRoleMode(BAD_REQUEST);
 
     // Test
     assertThat(customerService.updateUserRole(getUserRoleOgelSubmission())).isFalse();
     assertEquals(1, failServiceCount());
+    assertEquals(failServiceLastFailReason(), CallbackView.FailReason.ENDPOINT_ERROR);
   }
 
   @Test
   public void testCustomerSuccess() throws Exception {
     // Setup
-    resetFailServiceCount();
+    resetMockFailService();
     customerMode(SUCCESS);
 
     // Test
@@ -88,18 +90,19 @@ public class CustomerServiceTest {
   @Test
   public void testCustomerBadRequest() throws Exception {
     // Setup
-    resetFailServiceCount();
+    resetMockFailService();
     customerMode(BAD_REQUEST);
 
     // Test
     assertThat(customerService.getOrCreateCustomer(getCustomerOgelSubmission())).isNotPresent();
     assertEquals(1, failServiceCount());
+    assertEquals(failServiceLastFailReason(), CallbackView.FailReason.ENDPOINT_ERROR);
   }
 
   @Test
   public void testSiteSuccess() throws Exception {
     // Setup
-    resetFailServiceCount();
+    resetMockFailService();
     siteMode(SUCCESS);
 
     // Test
@@ -110,23 +113,25 @@ public class CustomerServiceTest {
   @Test
   public void testSiteForbidden() throws Exception {
     // Setup
-    resetFailServiceCount();
+    resetMockFailService();
     siteMode(FORBIDDEN);
 
     // Test
     assertThat(customerService.createSite(getSiteOgelSubmission())).isNotPresent();
     assertEquals(1, failServiceCount());
+    assertEquals(failServiceLastFailReason(), CallbackView.FailReason.PERMISSION_DENIED);
   }
 
   @Test
   public void testSiteBadRequest() throws Exception {
     // Setup
-    resetFailServiceCount();
+    resetMockFailService();
     siteMode(BAD_REQUEST);
 
     // Test
     assertThat(customerService.createSite(getSiteOgelSubmission())).isNotPresent();
     assertEquals(1, failServiceCount());
+    assertEquals(failServiceLastFailReason(), CallbackView.FailReason.ENDPOINT_ERROR);
   }
 
   /**
@@ -225,12 +230,16 @@ public class CustomerServiceTest {
     return sub;
   }
 
-  private void resetFailServiceCount() {
-    failService.resetFailServiceCallCount();
+  private void resetMockFailService() {
+    failService.resetAll();
   }
 
   private int failServiceCount() {
     return failService.getFailServiceCallCount();
+  }
+
+  private CallbackView.FailReason failServiceLastFailReason() {
+    return failService.getLastFailReason();
   }
 
 }

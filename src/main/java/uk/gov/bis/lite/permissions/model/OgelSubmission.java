@@ -57,7 +57,6 @@ public class OgelSubmission {
   /**
    * ACTIVE      - submission is being processed through stages
    * COMPLETE    - stage processing has been completed
-   * CANCELLED   - stage processing has been cancelled
    * TERMINATED  - stage processing has been terminated
    */
   public enum Status {
@@ -85,7 +84,7 @@ public class OgelSubmission {
    * from the submissionRef plus the id
    */
   public String getRequestId() {
-    return submissionRef + "_" + id;
+    return submissionRef + id;
   }
 
   public boolean isProcessingCompleted() {

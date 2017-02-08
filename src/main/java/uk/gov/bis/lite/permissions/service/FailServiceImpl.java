@@ -44,13 +44,6 @@ public class FailServiceImpl implements FailService {
   }
 
   /**
-   * Updates OgelSubmission with fail details
-   */
-  public void fail(OgelSubmission sub, CallbackView.FailReason failReason, FailServiceImpl.Origin origin) {
-    doFailUpdate(sub, failReason, origin, null);
-  }
-
-  /**
    * Updates OgelSubmission with fail details, appending message to lastFailMes
    */
   public void failWithMessage(OgelSubmission sub, CallbackView.FailReason failReason, FailServiceImpl.Origin origin, String message) {

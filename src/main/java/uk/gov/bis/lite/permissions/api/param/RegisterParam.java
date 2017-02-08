@@ -47,6 +47,14 @@ public class RegisterParam {
     return newCustomer != null;
   }
 
+  public boolean hasExistingCustomer() {
+    return !StringUtils.isBlank(existingCustomer);
+  }
+
+  public boolean hasExistingSite() {
+    return !StringUtils.isBlank(existingSite);
+  }
+
   /**
    * RegisterSiteParam
    */

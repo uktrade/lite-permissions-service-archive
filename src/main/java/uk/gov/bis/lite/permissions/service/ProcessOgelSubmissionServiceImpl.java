@@ -47,14 +47,17 @@ public class ProcessOgelSubmissionServiceImpl implements ProcessOgelSubmissionSe
       // Process this OgelSubmission immediately
       doProcessOgelSubmission(sub);
 
-      doCallbackOgelSubmission(sub);
+      //
+      boolean calledBack = callbackService.completeCallback(sub);
 
-      // Update MODE if necessary
-      if (!sub.isCalledBack()) {
+      // If not called back we set Update MODE to SCHEDULED
+      if (!calledBack) {
         LOGGER.info("Setting submission MODE to SCHEDULED: [" + submissionId + "]");
         sub.setScheduledMode();
-        submissionDao.update(sub);
       }
+
+      // Update state of OgelSubmission
+      submissionDao.update(sub);
 
     } catch (Throwable e) {
       errorThrown(sub, e, "ProcessOgelSubmissionServiceImpl.processImmediate");
@@ -150,10 +153,12 @@ public class ProcessOgelSubmissionServiceImpl implements ProcessOgelSubmissionSe
    */
   private void processCallbacks() {
     List<OgelSubmission> subs = submissionDao.getScheduledCompleteToCallback();
-    LOGGER.info("SCHEDULED COMPLETE CALLBACK [" + subs.size() + "]");
+    LOGGER.info("SCHEDULED CALLBACK [" + subs.size() + "]");
     for (OgelSubmission sub : subs) {
       try {
-        doCallbackOgelSubmission(sub);
+        if(callbackService.completeCallback(sub)) {
+          submissionDao.update(sub);
+        }
       } catch (Throwable e) {
         errorThrown(sub, e, "ProcessOgelSubmissionServiceImpl.processScheduled");
       }
@@ -232,10 +237,6 @@ public class ProcessOgelSubmissionServiceImpl implements ProcessOgelSubmissionSe
 
   private boolean hasCompletedCurrentStage(OgelSubmission sub) {
     return hasCompletedStage(sub, sub.getStage());
-  }
-
-  private void doCallbackOgelSubmission(OgelSubmission sub) {
-    callbackService.completeCallback(sub);
   }
 
   private void errorThrown(OgelSubmission sub, Throwable e, String info) {

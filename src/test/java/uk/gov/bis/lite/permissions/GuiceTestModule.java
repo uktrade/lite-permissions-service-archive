@@ -20,6 +20,9 @@ import uk.gov.bis.lite.permissions.service.RegisterServiceImpl;
 import uk.gov.bis.lite.permissions.service.RegistrationsService;
 import uk.gov.bis.lite.permissions.service.RegistrationsServiceImpl;
 
+/**
+ * Use with PermissionTestApp for integration tests - see ProcessOgelSubmissionServiceTest
+ */
 public class GuiceTestModule extends GuiceModule {
 
   @Override
@@ -32,6 +35,7 @@ public class GuiceTestModule extends GuiceModule {
     bind(ProcessOgelSubmissionService.class).to(ProcessOgelSubmissionServiceImpl.class);
     bind(FailService.class).to(FailServiceImpl.class);
 
+    // Mocked for testing
     bind(CustomerService.class).to(CustomerServiceMock.class);
     bind(OgelService.class).to(OgelServiceMock.class);
   }

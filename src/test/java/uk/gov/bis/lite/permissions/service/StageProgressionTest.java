@@ -1,4 +1,4 @@
-package uk.gov.bis.lite.permissions.submissions;
+package uk.gov.bis.lite.permissions.service;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -12,13 +12,10 @@ import uk.gov.bis.lite.permissions.mocks.FailServiceMock;
 import uk.gov.bis.lite.permissions.mocks.OgelServiceMock;
 import uk.gov.bis.lite.permissions.mocks.OgelSubmissionDaoMock;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
-import uk.gov.bis.lite.permissions.service.CallbackService;
-import uk.gov.bis.lite.permissions.service.CustomerService;
-import uk.gov.bis.lite.permissions.service.FailService;
-import uk.gov.bis.lite.permissions.service.OgelService;
-import uk.gov.bis.lite.permissions.service.ProcessOgelSubmissionService;
-import uk.gov.bis.lite.permissions.service.ProcessOgelSubmissionServiceImpl;
 
+/**
+ * Unit test for ProcessOgelSubmissionService progressStage method
+ */
 public class StageProgressionTest {
 
   private ProcessOgelSubmissionService service;

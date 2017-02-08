@@ -90,7 +90,8 @@ public class CustomerServiceImpl implements CustomerService {
       if (isOk(response)) {
         return Optional.of(response.readEntity(SiteView.class).getSiteId());
       } else if (isForbidden(response)) {
-        failService.fail(sub, CallbackView.FailReason.PERMISSION_DENIED, FailServiceImpl.Origin.SITE);
+        //failService.fail(sub, CallbackView.FailReason.PERMISSION_DENIED, FailServiceImpl.Origin.SITE);
+        failService.failWithMessage(sub, CallbackView.FailReason.PERMISSION_DENIED, FailServiceImpl.Origin.SITE, Util.info(response));
       } else {
         failService.failWithMessage(sub, CallbackView.FailReason.ENDPOINT_ERROR, FailServiceImpl.Origin.SITE, Util.info(response));
       }

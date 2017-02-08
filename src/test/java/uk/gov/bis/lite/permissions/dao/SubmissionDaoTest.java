@@ -1,4 +1,4 @@
-package uk.gov.bis.lite.permissions.submissions;
+package uk.gov.bis.lite.permissions.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -11,9 +11,11 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.bis.lite.permissions.PermissionsTestApp;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
-import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
+/**
+ * Integration test for OgelSubmissionDao
+ */
 public class SubmissionDaoTest {
 
   private static OgelSubmissionDao submissionDao;
