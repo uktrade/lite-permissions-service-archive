@@ -33,6 +33,8 @@ public class OgelSubmission {
   private boolean roleUpdate;
   private boolean roleUpdated;
 
+  private transient FailEvent failEvent = null;
+
   private static DateTimeFormatter ogelSubmissionDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
   /**
@@ -116,6 +118,10 @@ public class OgelSubmission {
 
   public boolean hasFail() {
     return !StringUtils.isBlank(firstFail);
+  }
+
+  public boolean hasFailEvent() {
+    return failEvent != null;
   }
 
   public boolean hasAdminUserId() {
@@ -305,5 +311,13 @@ public class OgelSubmission {
 
   public void setStage(Stage stage) {
     this.stage = stage;
+  }
+
+  public FailEvent getFailEvent() {
+    return failEvent;
+  }
+
+  public void setFailEvent(FailEvent failEvent) {
+    this.failEvent = failEvent;
   }
 }

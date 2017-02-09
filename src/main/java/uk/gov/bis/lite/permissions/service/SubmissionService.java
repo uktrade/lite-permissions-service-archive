@@ -4,7 +4,7 @@ import uk.gov.bis.lite.permissions.api.view.OgelSubmissionView;
 
 import java.util.List;
 
-public interface OgelSubmissionService {
+public interface SubmissionService {
 
   boolean ogelSubmissionExists(Integer submissionId);
 

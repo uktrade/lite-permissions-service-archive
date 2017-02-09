@@ -10,7 +10,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.bis.lite.permissions.Util;
 import uk.gov.bis.lite.permissions.api.view.CallbackView;
-import uk.gov.bis.lite.permissions.mocks.FailServiceMock;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
 import javax.ws.rs.Consumes;
@@ -29,7 +28,6 @@ public class CallbackServiceTest {
       .addResource(new CallbackEndpoint()).build();
 
   private CallbackServiceImpl callbackService;
-  private FailServiceMock failService;
 
   private static String SUCCESS = "SUCCESS";
   private static String FAILED = "FAILED";
@@ -37,14 +35,12 @@ public class CallbackServiceTest {
 
   @Before
   public void before() {
-    failService = new FailServiceMock();
-    callbackService = new CallbackServiceImpl(resources.client(), failService);
+    callbackService = new CallbackServiceImpl(resources.client());
   }
 
   @Test
   public void testCallbackSuccess() throws Exception {
     // Setup
-    resetMockFailService();
     setCallbackEndpointSuccess();
 
     OgelSubmission sub = getMockOgelSubmission();
@@ -52,22 +48,22 @@ public class CallbackServiceTest {
     // Test
     assertThat(callbackService.completeCallback(sub)).isEqualTo(true);
     assertThat(sub.isCalledBack()).isEqualTo(true);
-    assertEquals(0, failServiceCount());
+    assertThat(sub.hasFailEvent()).isFalse();
   }
 
   @Test
   public void testCallbackFailure() throws Exception {
     // Setup
-    resetMockFailService();
     setCallbackEndpointFailed();
 
     OgelSubmission sub = getMockOgelSubmission();
 
     // Test
-    assertThat(callbackService.completeCallback(getMockOgelSubmission())).isEqualTo(false);
+    assertThat(callbackService.completeCallback(sub)).isEqualTo(false);
     assertThat(sub.isCalledBack()).isEqualTo(false);
-    assertEquals(1, failServiceCount());
-    assertEquals(failServiceLastFailReason(), CallbackView.FailReason.UNCLASSIFIED);
+    assertThat(sub.hasFailEvent()).isTrue();
+    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(CallbackView.FailReason.UNCLASSIFIED);
+    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(ProcessSubmissionServiceImpl.Origin.CALLBACK);
   }
 
   @Test
@@ -138,7 +134,7 @@ public class CallbackServiceTest {
     @Consumes({MediaType.APPLICATION_JSON})
     @Path(Util.MOCK_CALLBACK_URL)
     public Response callback(CallbackView view) {
-      if(callbackEndpointResult.equals(SUCCESS)) {
+      if (callbackEndpointResult.equals(SUCCESS)) {
         return Response.ok().build();
       }
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -154,18 +150,6 @@ public class CallbackServiceTest {
 
   private void setCallbackEndpointFailed() {
     callbackEndpointResult = FAILED;
-  }
-
-  private void resetMockFailService() {
-    failService.resetAll();
-  }
-
-  private int failServiceCount() {
-    return failService.getFailServiceCallCount();
-  }
-
-  private CallbackView.FailReason failServiceLastFailReason() {
-    return failService.getLastFailReason();
   }
 
 }

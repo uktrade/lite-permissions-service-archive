@@ -9,7 +9,7 @@ import org.junit.Test;
 import uk.gov.bis.lite.permissions.api.param.RegisterParam;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.mocks.OgelSubmissionDaoMock;
-import uk.gov.bis.lite.permissions.mocks.ProcessOgelSubmissionServiceMock;
+import uk.gov.bis.lite.permissions.mocks.ProcessSubmissionServiceMock;
 
 import java.io.IOException;
 
@@ -21,7 +21,7 @@ public class RegisterParamValidationTest {
   @Before
   public void before() {
     OgelSubmissionDao submissionDao = new OgelSubmissionDaoMock();
-    ProcessOgelSubmissionServiceMock processOgelSubmissionServiceMock = new ProcessOgelSubmissionServiceMock();
+    ProcessSubmissionServiceMock processOgelSubmissionServiceMock = new ProcessSubmissionServiceMock();
     service = new RegisterServiceImpl(submissionDao, null, processOgelSubmissionServiceMock);
     mapper = new ObjectMapper();
   }

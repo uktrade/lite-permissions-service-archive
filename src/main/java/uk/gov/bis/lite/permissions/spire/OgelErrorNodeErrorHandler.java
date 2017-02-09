@@ -6,7 +6,8 @@ import uk.gov.bis.lite.permissions.exception.SpireFailReasonException;
 
 public class OgelErrorNodeErrorHandler extends ErrorNodeErrorHandler {
 
-  public OgelErrorNodeErrorHandler() {}
+  public OgelErrorNodeErrorHandler() {
+  }
 
   public void handleError(String errorText) {
     if (errorText.contains("BLACKLISTED")) {

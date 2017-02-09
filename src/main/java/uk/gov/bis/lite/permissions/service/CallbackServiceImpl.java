@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.api.view.CallbackView;
+import uk.gov.bis.lite.permissions.model.FailEvent;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.util.Util;
 
@@ -20,12 +21,10 @@ public class CallbackServiceImpl implements CallbackService {
   private static final Logger LOGGER = LoggerFactory.getLogger(CallbackServiceImpl.class);
 
   private Client httpClient;
-  private FailService failService;
 
   @Inject
-  public CallbackServiceImpl(Client httpClient, FailService failService) {
+  public CallbackServiceImpl(Client httpClient) {
     this.httpClient = httpClient;
-    this.failService = failService;
   }
 
   /**
@@ -36,16 +35,15 @@ public class CallbackServiceImpl implements CallbackService {
     if (sub != null && sub.isStatusComplete() && !sub.isCalledBack()) {
       try {
         Response response = doCallback(sub.getCallbackUrl(), getCallbackView(sub));
-        System.out.println("response: " + response.getStatus());
         if (isOk(response)) {
           sub.setCalledBack(true);
           callbackCompleted = true;
           LOGGER.info("CALLBACK completed [" + sub.getRequestId() + "]");
         } else {
-          failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailServiceImpl.Origin.CALLBACK, Util.info(response));
+          sub.setFailEvent(new FailEvent(CallbackView.FailReason.UNCLASSIFIED, ProcessSubmissionServiceImpl.Origin.CALLBACK, Util.info(response)));
         }
       } catch (ProcessingException e) {
-        failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailServiceImpl.Origin.CALLBACK, Util.info(e));
+        sub.setFailEvent(new FailEvent(CallbackView.FailReason.UNCLASSIFIED, ProcessSubmissionServiceImpl.Origin.CALLBACK, Util.info(e)));
       }
     } else {
       LOGGER.warn("OgelSubmission has not completed its processing. Postponing callback");
@@ -54,7 +52,7 @@ public class CallbackServiceImpl implements CallbackService {
   }
 
   @VisibleForTesting
-  public CallbackView getCallbackView(OgelSubmission sub) {
+  CallbackView getCallbackView(OgelSubmission sub) {
     CallbackView view = new CallbackView();
     view.setCustomerId(sub.getCustomerRef());
     view.setSiteId(sub.getSiteRef());

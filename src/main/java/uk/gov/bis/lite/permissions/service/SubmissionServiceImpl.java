@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class OgelSubmissionServiceImpl implements OgelSubmissionService {
+public class SubmissionServiceImpl implements SubmissionService {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(OgelSubmissionServiceImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SubmissionServiceImpl.class);
 
   private OgelSubmissionDao submissionDao;
 
@@ -25,7 +25,7 @@ public class OgelSubmissionServiceImpl implements OgelSubmissionService {
   }
 
   @Inject
-  public OgelSubmissionServiceImpl(OgelSubmissionDao submissionDao) {
+  public SubmissionServiceImpl(OgelSubmissionDao submissionDao) {
     this.submissionDao = submissionDao;
   }
 
@@ -40,11 +40,11 @@ public class OgelSubmissionServiceImpl implements OgelSubmissionService {
 
   public List<OgelSubmissionView> getOgelSubmissions(String filter) {
     List<OgelSubmission> subs = new ArrayList<>();
-    if(Filter.PENDING.name().equalsIgnoreCase(filter)) {
+    if (Filter.PENDING.name().equalsIgnoreCase(filter)) {
       subs = submissionDao.getPendingSubmissions();
-    } else if(Filter.CANCELLED.name().equalsIgnoreCase(filter)) {
+    } else if (Filter.CANCELLED.name().equalsIgnoreCase(filter)) {
       subs = submissionDao.getCancelledSubmissions();
-    } else if(Filter.FINISHED.name().equalsIgnoreCase(filter)) {
+    } else if (Filter.FINISHED.name().equalsIgnoreCase(filter)) {
       subs = submissionDao.getFinishedSubmissions();
     }
     return subs.stream().map(this::getOgelSubmissionView).collect(Collectors.toList());
@@ -85,7 +85,7 @@ public class OgelSubmissionServiceImpl implements OgelSubmissionService {
     view.setSpireRef(sub.getSpireRef());
     view.setFirstFail(sub.getFirstFail());
     view.setLastFailMessage(sub.getLastFailMessage());
-    if(sub.getFailReason() != null) {
+    if (sub.getFailReason() != null) {
       view.setFailReason(sub.getFailReason().name());
     }
     view.setCallbackUrl(sub.getCallbackUrl());

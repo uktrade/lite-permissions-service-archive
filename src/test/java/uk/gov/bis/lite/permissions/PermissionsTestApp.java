@@ -4,7 +4,7 @@ import com.google.inject.util.Modules;
 import uk.gov.bis.lite.permissions.config.GuiceModule;
 
 /**
- * Use for integration tests - see ProcessOgelSubmissionServiceTest
+ * Use for integration tests - see ProcessSubmissionServiceTest
  */
 public class PermissionsTestApp extends PermissionsApp {
 

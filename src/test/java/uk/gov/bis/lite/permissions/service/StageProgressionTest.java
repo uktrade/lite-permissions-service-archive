@@ -8,17 +8,16 @@ import org.junit.Test;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.mocks.CallbackServiceMock;
 import uk.gov.bis.lite.permissions.mocks.CustomerServiceMock;
-import uk.gov.bis.lite.permissions.mocks.FailServiceMock;
 import uk.gov.bis.lite.permissions.mocks.OgelServiceMock;
 import uk.gov.bis.lite.permissions.mocks.OgelSubmissionDaoMock;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
 /**
- * Unit test for ProcessOgelSubmissionService progressStage method
+ * Unit test for ProcessSubmissionService progressStage method
  */
 public class StageProgressionTest {
 
-  private ProcessOgelSubmissionService service;
+  private ProcessSubmissionService service;
 
   @Before
   public void before() {
@@ -26,8 +25,7 @@ public class StageProgressionTest {
     CustomerService customerService = new CustomerServiceMock();
     OgelService ogelService = new OgelServiceMock();
     CallbackService callbackService = new CallbackServiceMock();
-    FailService failService = new FailServiceMock();
-    service = new ProcessOgelSubmissionServiceImpl(submissionDao, customerService, ogelService, callbackService, failService);
+    service = new ProcessSubmissionServiceImpl(submissionDao, customerService, ogelService, callbackService, 1);
   }
 
   @Test

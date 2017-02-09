@@ -18,6 +18,7 @@ import uk.gov.bis.lite.permissions.api.param.RegisterAddressParam;
 import uk.gov.bis.lite.permissions.api.param.RegisterParam;
 import uk.gov.bis.lite.permissions.api.view.CallbackView;
 import uk.gov.bis.lite.permissions.exception.PermissionServiceException;
+import uk.gov.bis.lite.permissions.model.FailEvent;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.util.Util;
 
@@ -37,16 +38,13 @@ public class CustomerServiceImpl implements CustomerService {
 
   private static final String DEFAULT_SITE_NAME = "Main Site";
 
-  private FailService failService;
   private String customerServiceUrl;
   private Client httpClient;
   private ObjectMapper objectMapper;
 
   @Inject
-  public CustomerServiceImpl(Client httpClient, FailService failService,
-                             @Named("customerServiceUrl") String customerServiceUrl) {
+  public CustomerServiceImpl(Client httpClient, @Named("customerServiceUrl") String customerServiceUrl) {
     this.httpClient = httpClient;
-    this.failService = failService;
     this.customerServiceUrl = customerServiceUrl;
     this.objectMapper = new ObjectMapper();
   }
@@ -80,7 +78,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     // When we attempt to create a new site we use adminUserId instead of userId if it exists
     String userId = sub.getUserId();
-    if(sub.hasAdminUserId()) {
+    if (sub.hasAdminUserId()) {
       userId = sub.getAdminUserId();
     }
 
@@ -90,13 +88,12 @@ public class CustomerServiceImpl implements CustomerService {
       if (isOk(response)) {
         return Optional.of(response.readEntity(SiteView.class).getSiteId());
       } else if (isForbidden(response)) {
-        //failService.fail(sub, CallbackView.FailReason.PERMISSION_DENIED, FailServiceImpl.Origin.SITE);
-        failService.failWithMessage(sub, CallbackView.FailReason.PERMISSION_DENIED, FailServiceImpl.Origin.SITE, Util.info(response));
+        sub.setFailEvent(new FailEvent(CallbackView.FailReason.PERMISSION_DENIED, ProcessSubmissionServiceImpl.Origin.SITE, Util.info(response)));
       } else {
-        failService.failWithMessage(sub, CallbackView.FailReason.ENDPOINT_ERROR, FailServiceImpl.Origin.SITE, Util.info(response));
+        sub.setFailEvent(new FailEvent(CallbackView.FailReason.ENDPOINT_ERROR, ProcessSubmissionServiceImpl.Origin.SITE, Util.info(response)));
       }
     } catch (ProcessingException e) {
-      failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailServiceImpl.Origin.SITE, Util.info(e));
+      sub.setFailEvent(new FailEvent(CallbackView.FailReason.UNCLASSIFIED, ProcessSubmissionServiceImpl.Origin.SITE, Util.info(e)));
     }
     return Optional.empty();
   }
@@ -116,7 +113,7 @@ public class CustomerServiceImpl implements CustomerService {
     if (isOk(response)) {
       return true;
     } else {
-      failService.failWithMessage(sub, CallbackView.FailReason.ENDPOINT_ERROR, FailServiceImpl.Origin.USER_ROLE, Util.info(response));
+      sub.setFailEvent(new FailEvent(CallbackView.FailReason.ENDPOINT_ERROR, ProcessSubmissionServiceImpl.Origin.USER_ROLE, Util.info(response)));
     }
     return false;
   }
@@ -133,10 +130,10 @@ public class CustomerServiceImpl implements CustomerService {
       if (isOk(response)) {
         return Optional.of(response.readEntity(CustomerView.class).getCustomerId());
       } else {
-        failService.failWithMessage(sub, CallbackView.FailReason.ENDPOINT_ERROR, FailServiceImpl.Origin.CUSTOMER, Util.info(response));
+        sub.setFailEvent(new FailEvent(CallbackView.FailReason.ENDPOINT_ERROR, ProcessSubmissionServiceImpl.Origin.CUSTOMER, Util.info(response)));
       }
     } catch (ProcessingException e) {
-      failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailServiceImpl.Origin.CUSTOMER, Util.info(e));
+      sub.setFailEvent(new FailEvent(CallbackView.FailReason.ENDPOINT_ERROR, ProcessSubmissionServiceImpl.Origin.CUSTOMER, Util.info(e)));
     }
     return Optional.empty();
   }

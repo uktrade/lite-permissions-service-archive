@@ -1,9 +1,9 @@
 package uk.gov.bis.lite.permissions.mocks;
 
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
-import uk.gov.bis.lite.permissions.service.ProcessOgelSubmissionService;
+import uk.gov.bis.lite.permissions.service.ProcessSubmissionService;
 
-public class ProcessOgelSubmissionServiceMock implements ProcessOgelSubmissionService {
+public class ProcessSubmissionServiceMock implements ProcessSubmissionService {
 
   @Override
   public void processImmediate(int submissionId) {

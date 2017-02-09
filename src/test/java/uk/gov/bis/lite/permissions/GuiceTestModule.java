@@ -8,20 +8,18 @@ import uk.gov.bis.lite.permissions.mocks.OgelServiceMock;
 import uk.gov.bis.lite.permissions.service.CallbackService;
 import uk.gov.bis.lite.permissions.service.CallbackServiceImpl;
 import uk.gov.bis.lite.permissions.service.CustomerService;
-import uk.gov.bis.lite.permissions.service.FailService;
-import uk.gov.bis.lite.permissions.service.FailServiceImpl;
 import uk.gov.bis.lite.permissions.service.OgelService;
-import uk.gov.bis.lite.permissions.service.OgelSubmissionService;
-import uk.gov.bis.lite.permissions.service.OgelSubmissionServiceImpl;
-import uk.gov.bis.lite.permissions.service.ProcessOgelSubmissionService;
-import uk.gov.bis.lite.permissions.service.ProcessOgelSubmissionServiceImpl;
+import uk.gov.bis.lite.permissions.service.ProcessSubmissionService;
+import uk.gov.bis.lite.permissions.service.ProcessSubmissionServiceImpl;
 import uk.gov.bis.lite.permissions.service.RegisterService;
 import uk.gov.bis.lite.permissions.service.RegisterServiceImpl;
 import uk.gov.bis.lite.permissions.service.RegistrationsService;
 import uk.gov.bis.lite.permissions.service.RegistrationsServiceImpl;
+import uk.gov.bis.lite.permissions.service.SubmissionService;
+import uk.gov.bis.lite.permissions.service.SubmissionServiceImpl;
 
 /**
- * Use with PermissionTestApp for integration tests - see ProcessOgelSubmissionServiceTest
+ * Use with PermissionTestApp for integration tests - see ProcessSubmissionServiceTest
  */
 public class GuiceTestModule extends GuiceModule {
 
@@ -30,10 +28,9 @@ public class GuiceTestModule extends GuiceModule {
     bind(OgelSubmissionDao.class).to(OgelSubmissionDaoImpl.class);
     bind(RegisterService.class).to(RegisterServiceImpl.class);
     bind(RegistrationsService.class).to(RegistrationsServiceImpl.class);
-    bind(OgelSubmissionService.class).to(OgelSubmissionServiceImpl.class);
+    bind(SubmissionService.class).to(SubmissionServiceImpl.class);
     bind(CallbackService.class).to(CallbackServiceImpl.class);
-    bind(ProcessOgelSubmissionService.class).to(ProcessOgelSubmissionServiceImpl.class);
-    bind(FailService.class).to(FailServiceImpl.class);
+    bind(ProcessSubmissionService.class).to(ProcessSubmissionServiceImpl.class);
 
     // Mocked for testing
     bind(CustomerService.class).to(CustomerServiceMock.class);

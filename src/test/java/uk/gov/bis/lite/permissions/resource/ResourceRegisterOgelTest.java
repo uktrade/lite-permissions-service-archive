@@ -8,7 +8,7 @@ import org.junit.Test;
 import uk.gov.bis.lite.permissions.api.RegisterOgelResponse;
 import uk.gov.bis.lite.permissions.api.param.RegisterParam;
 import uk.gov.bis.lite.permissions.mocks.RegisterServiceMock;
-import uk.gov.bis.lite.permissions.mocks.OgelSubmissionServiceMock;
+import uk.gov.bis.lite.permissions.mocks.SubmissionServiceMock;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
@@ -27,7 +27,7 @@ public class ResourceRegisterOgelTest {
   private static String MOCK_SITE_REF = "SITE1";
   private static String MOCK_SUBMISSION_REF = "SUB1";
   private static RegisterServiceMock mockRegisterService = new RegisterServiceMock(MOCK_SUBMISSION_REF);
-  private static OgelSubmissionServiceMock mockSubmissionService = new OgelSubmissionServiceMock();
+  private static SubmissionServiceMock mockSubmissionService = new SubmissionServiceMock();
 
   @ClassRule
   public static final ResourceTestRule resources = ResourceTestRule.builder()

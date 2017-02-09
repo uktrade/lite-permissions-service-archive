@@ -2,7 +2,7 @@ package uk.gov.bis.lite.permissions.service;
 
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
-public interface ProcessOgelSubmissionService {
+public interface ProcessSubmissionService {
 
   void processImmediate(int submissionId);
 

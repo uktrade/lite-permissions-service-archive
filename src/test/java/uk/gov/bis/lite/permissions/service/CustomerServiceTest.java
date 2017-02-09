@@ -2,7 +2,6 @@ package uk.gov.bis.lite.permissions.service;
 
 import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.ImmutableMap;
 import io.dropwizard.testing.junit.ResourceTestRule;
@@ -12,7 +11,6 @@ import org.junit.Test;
 import uk.gov.bis.lite.customer.api.param.CustomerParam;
 import uk.gov.bis.lite.customer.api.param.UserRoleParam;
 import uk.gov.bis.lite.permissions.api.view.CallbackView;
-import uk.gov.bis.lite.permissions.mocks.FailServiceMock;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
 import javax.validation.constraints.NotNull;
@@ -35,7 +33,6 @@ public class CustomerServiceTest {
       .addResource(new UserRoleEndpoint()).build();
 
   private CustomerService customerService;
-  private FailServiceMock failService;
 
   private static String CUSTOMER_ID = "CUSTOMER_ID";
   private static String SITE_ID = "SITE_ID";
@@ -49,89 +46,99 @@ public class CustomerServiceTest {
 
   @Before
   public void before() {
-    failService = new FailServiceMock();
-    customerService = new CustomerServiceImpl(resources.client(), failService, "/");
+    customerService = new CustomerServiceImpl(resources.client(), "/");
   }
 
   @Test
   public void testUserRoleSuccess() throws Exception {
     // Setup
-    resetMockFailService();
     userRoleMode(SUCCESS);
 
+    OgelSubmission sub = getUserRoleOgelSubmission();
+
     // Test
-    assertThat(customerService.updateUserRole(getUserRoleOgelSubmission())).isTrue();
-    assertEquals(0, failServiceCount());
+    assertThat(customerService.updateUserRole(sub)).isTrue();
+    assertThat(sub.hasFailEvent()).isFalse();
   }
 
   @Test
   public void testUserRoleBadRequest() throws Exception {
     // Setup
-    resetMockFailService();
     userRoleMode(BAD_REQUEST);
 
+    OgelSubmission sub = getUserRoleOgelSubmission();
+
     // Test
-    assertThat(customerService.updateUserRole(getUserRoleOgelSubmission())).isFalse();
-    assertEquals(1, failServiceCount());
-    assertEquals(failServiceLastFailReason(), CallbackView.FailReason.ENDPOINT_ERROR);
+    assertThat(customerService.updateUserRole(sub)).isFalse();
+    assertThat(sub.hasFailEvent()).isTrue();
+    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(CallbackView.FailReason.ENDPOINT_ERROR);
+    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(ProcessSubmissionServiceImpl.Origin.USER_ROLE);
   }
 
   @Test
   public void testCustomerSuccess() throws Exception {
     // Setup
-    resetMockFailService();
     customerMode(SUCCESS);
 
+    OgelSubmission sub = getCustomerOgelSubmission();
+
     // Test
-    assertThat(customerService.getOrCreateCustomer(getCustomerOgelSubmission())).isPresent().contains(CUSTOMER_ID);
-    assertEquals(0, failServiceCount());
+    assertThat(customerService.getOrCreateCustomer(sub)).isPresent().contains(CUSTOMER_ID);
+    assertThat(sub.hasFailEvent()).isFalse();
   }
 
   @Test
   public void testCustomerBadRequest() throws Exception {
     // Setup
-    resetMockFailService();
     customerMode(BAD_REQUEST);
 
+    OgelSubmission sub = getCustomerOgelSubmission();
+
     // Test
-    assertThat(customerService.getOrCreateCustomer(getCustomerOgelSubmission())).isNotPresent();
-    assertEquals(1, failServiceCount());
-    assertEquals(failServiceLastFailReason(), CallbackView.FailReason.ENDPOINT_ERROR);
+    assertThat(customerService.getOrCreateCustomer(sub)).isNotPresent();
+    assertThat(sub.hasFailEvent()).isTrue();
+    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(CallbackView.FailReason.ENDPOINT_ERROR);
+    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(ProcessSubmissionServiceImpl.Origin.CUSTOMER);
   }
 
   @Test
   public void testSiteSuccess() throws Exception {
     // Setup
-    resetMockFailService();
     siteMode(SUCCESS);
 
+    OgelSubmission sub = getSiteOgelSubmission();
+
     // Test
-    assertThat(customerService.createSite(getSiteOgelSubmission())).isPresent().contains(SITE_ID);
-    assertEquals(0, failServiceCount());
+    assertThat(customerService.createSite(sub)).isPresent().contains(SITE_ID);
+    assertThat(sub.hasFailEvent()).isFalse();
   }
 
   @Test
   public void testSiteForbidden() throws Exception {
     // Setup
-    resetMockFailService();
     siteMode(FORBIDDEN);
 
+    OgelSubmission sub = getSiteOgelSubmission();
+
     // Test
-    assertThat(customerService.createSite(getSiteOgelSubmission())).isNotPresent();
-    assertEquals(1, failServiceCount());
-    assertEquals(failServiceLastFailReason(), CallbackView.FailReason.PERMISSION_DENIED);
+    assertThat(customerService.createSite(sub)).isNotPresent();
+    assertThat(sub.hasFailEvent()).isTrue();
+    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(CallbackView.FailReason.PERMISSION_DENIED);
+    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(ProcessSubmissionServiceImpl.Origin.SITE);
   }
 
   @Test
   public void testSiteBadRequest() throws Exception {
     // Setup
-    resetMockFailService();
     siteMode(BAD_REQUEST);
 
+    OgelSubmission sub = getSiteOgelSubmission();
+
     // Test
-    assertThat(customerService.createSite(getSiteOgelSubmission())).isNotPresent();
-    assertEquals(1, failServiceCount());
-    assertEquals(failServiceLastFailReason(), CallbackView.FailReason.ENDPOINT_ERROR);
+    assertThat(customerService.createSite(sub)).isNotPresent();
+    assertThat(sub.hasFailEvent()).isTrue();
+    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(CallbackView.FailReason.ENDPOINT_ERROR);
+    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(ProcessSubmissionServiceImpl.Origin.SITE);
   }
 
   /**
@@ -143,10 +150,10 @@ public class CustomerServiceTest {
     @POST
     @Path("/create-customer")
     public Response createCustomer(CustomerParam param) {
-      if(createCustomerMode.equals(SUCCESS)) {
+      if (createCustomerMode.equals(SUCCESS)) {
         return Response.ok(fixture("fixture/createCustomerCustomerView.json"), MediaType.APPLICATION_JSON_TYPE.withCharset("utf-8")).build();
       }
-      if(createCustomerMode.equals(BAD_REQUEST)) {
+      if (createCustomerMode.equals(BAD_REQUEST)) {
         return Response.status(Response.Status.BAD_REQUEST).build();
       }
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -158,13 +165,13 @@ public class CustomerServiceTest {
     @POST
     @Path("/customer-sites/{customerId}")
     public Response createSite(@PathParam("customerId") String customerId) {
-      if(createSiteMode.equals(SUCCESS)) {
+      if (createSiteMode.equals(SUCCESS)) {
         return Response.ok(fixture("fixture/createSiteSiteView.json"), MediaType.APPLICATION_JSON_TYPE.withCharset("utf-8")).build();
       }
-      if(createSiteMode.equals(FORBIDDEN)) {
+      if (createSiteMode.equals(FORBIDDEN)) {
         return Response.status(Response.Status.FORBIDDEN).build();
       }
-      if(createSiteMode.equals(BAD_REQUEST)) {
+      if (createSiteMode.equals(BAD_REQUEST)) {
         return Response.status(Response.Status.BAD_REQUEST).build();
       }
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -178,10 +185,10 @@ public class CustomerServiceTest {
     public Response userRole(@NotNull @PathParam("userId") String userId,
                              @NotNull @PathParam("siteRef") String siteRef,
                              UserRoleParam param) {
-      if(updateUserRoleMode.equals(SUCCESS)) {
+      if (updateUserRoleMode.equals(SUCCESS)) {
         return Response.ok().build();
       }
-      if(updateUserRoleMode.equals(BAD_REQUEST)) {
+      if (updateUserRoleMode.equals(BAD_REQUEST)) {
         return Response.status(Response.Status.BAD_REQUEST)
             .entity(ImmutableMap.of("code", Response.Status.BAD_REQUEST, "message", "error"))
             .type(MediaType.APPLICATION_JSON_TYPE)
@@ -228,18 +235,6 @@ public class CustomerServiceTest {
     sub.setCustomerRef(CUSTOMER_ID);
     sub.setJson(newSiteJson);
     return sub;
-  }
-
-  private void resetMockFailService() {
-    failService.resetAll();
-  }
-
-  private int failServiceCount() {
-    return failService.getFailServiceCallCount();
-  }
-
-  private CallbackView.FailReason failServiceLastFailReason() {
-    return failService.getLastFailReason();
   }
 
 }

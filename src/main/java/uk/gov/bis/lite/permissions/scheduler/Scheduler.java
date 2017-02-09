@@ -13,7 +13,7 @@ import org.quartz.TriggerKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
-import uk.gov.bis.lite.permissions.service.ProcessOgelSubmissionService;
+import uk.gov.bis.lite.permissions.service.ProcessSubmissionService;
 
 public class Scheduler implements Managed {
 
@@ -21,16 +21,16 @@ public class Scheduler implements Managed {
 
   private final org.quartz.Scheduler scheduler;
   private final PermissionsAppConfig config;
-  private ProcessOgelSubmissionService processOgelSubmissionService;
+  private ProcessSubmissionService processSubmissionService;
 
-  public static final String JOB_PROCESS_SERVICE_NAME = "processOgelSubmissionService";
+  public static final String JOB_PROCESS_SERVICE_NAME = "processSubmissionService";
   public static final String SUBMISSION_ID = "SUBMISSION_ID";
 
   @Inject
-  public Scheduler(org.quartz.Scheduler scheduler, PermissionsAppConfig config, ProcessOgelSubmissionService processOgelSubmissionService) {
+  public Scheduler(org.quartz.Scheduler scheduler, PermissionsAppConfig config, ProcessSubmissionService processSubmissionService) {
     this.scheduler = scheduler;
     this.config = config;
-    this.processOgelSubmissionService = processOgelSubmissionService;
+    this.processSubmissionService = processSubmissionService;
   }
 
   @Override
@@ -40,7 +40,7 @@ public class Scheduler implements Managed {
     // Set up ProcessScheduledJob
     JobKey key = JobKey.jobKey("ProcessScheduledJob");
     JobDetail detail = newJob(ProcessScheduledJob.class).withIdentity(key).build();
-    detail.getJobDataMap().put(JOB_PROCESS_SERVICE_NAME, processOgelSubmissionService);
+    detail.getJobDataMap().put(JOB_PROCESS_SERVICE_NAME, processSubmissionService);
     CronTrigger trigger = newTrigger()
         .withIdentity(TriggerKey.triggerKey("ProcessScheduledJobTrigger"))
         .withSchedule(cronSchedule(config.getProcessScheduledJobCron()))

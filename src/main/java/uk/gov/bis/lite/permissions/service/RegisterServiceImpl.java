@@ -29,14 +29,14 @@ public class RegisterServiceImpl implements RegisterService {
 
   private OgelSubmissionDao submissionDao;
   private org.quartz.Scheduler scheduler;
-  private ProcessOgelSubmissionService processOgelSubmissionService;
+  private ProcessSubmissionService processSubmissionService;
   private ObjectMapper mapper;
 
   @Inject
-  public RegisterServiceImpl(OgelSubmissionDao submissionDao, org.quartz.Scheduler scheduler, ProcessOgelSubmissionService processOgelSubmissionService) {
+  public RegisterServiceImpl(OgelSubmissionDao submissionDao, org.quartz.Scheduler scheduler, ProcessSubmissionService processSubmissionService) {
     this.submissionDao = submissionDao;
     this.scheduler = scheduler;
-    this.processOgelSubmissionService = processOgelSubmissionService;
+    this.processSubmissionService = processSubmissionService;
     this.mapper = new ObjectMapper();
   }
 
@@ -55,9 +55,9 @@ public class RegisterServiceImpl implements RegisterService {
     } catch (JsonProcessingException e) {
       LOGGER.error("JsonProcessingException", e);
     }
-    if(param.getAdminApproval() != null) {
+    if (param.getAdminApproval() != null) {
       String adminUserId = param.getAdminApproval().getAdminUserId();
-      if(!StringUtils.isBlank(adminUserId)) {
+      if (!StringUtils.isBlank(adminUserId)) {
         sub.setAdminUserId(adminUserId);
       }
     }
@@ -110,7 +110,7 @@ public class RegisterServiceImpl implements RegisterService {
     }
 
     // Check that we do not have a new Customer and an existing Site - this is impossible
-    if(valid && param.hasExistingSite() && param.hasNewCustomer()) {
+    if (valid && param.hasExistingSite() && param.hasNewCustomer()) {
       valid = false;
     }
 
@@ -143,7 +143,7 @@ public class RegisterServiceImpl implements RegisterService {
       }
     }
 
-    if(param.hasExistingSite() && param.hasNewCustomer()) {
+    if (param.hasExistingSite() && param.hasNewCustomer()) {
       info = info + " Cannot have an existing Site for a new Customer. ";
     }
 
@@ -194,7 +194,7 @@ public class RegisterServiceImpl implements RegisterService {
   private void triggerProcessSubmissionJob(int submissionId) {
     JobDetail detail = JobBuilder.newJob(ProcessImmediateJob.class).build();
     JobDataMap dataMap = detail.getJobDataMap();
-    dataMap.put(Scheduler.JOB_PROCESS_SERVICE_NAME, processOgelSubmissionService);
+    dataMap.put(Scheduler.JOB_PROCESS_SERVICE_NAME, processSubmissionService);
     dataMap.put(Scheduler.SUBMISSION_ID, submissionId);
     Trigger trigger = TriggerBuilder.newTrigger()
         .withIdentity(TriggerKey.triggerKey("SubmissionProcessJobTrigger-" + submissionId))

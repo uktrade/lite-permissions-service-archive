@@ -7,21 +7,21 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.bis.lite.permissions.service.ProcessOgelSubmissionService;
+import uk.gov.bis.lite.permissions.service.ProcessSubmissionService;
 
 @DisallowConcurrentExecution
 public class ProcessScheduledJob implements Job {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProcessScheduledJob.class);
-  private ProcessOgelSubmissionService processOgelSubmissionService;
+  private ProcessSubmissionService processSubmissionService;
 
   @Override
   public void execute(JobExecutionContext context) throws JobExecutionException {
     init(context);
-    processOgelSubmissionService.processOgelSubmissions();
+    processSubmissionService.processOgelSubmissions();
   }
 
   private void init(JobExecutionContext context) {
-    processOgelSubmissionService = (ProcessOgelSubmissionService) context.getMergedJobDataMap().get(Scheduler.JOB_PROCESS_SERVICE_NAME);
+    processSubmissionService = (ProcessSubmissionService) context.getMergedJobDataMap().get(Scheduler.JOB_PROCESS_SERVICE_NAME);
   }
 }

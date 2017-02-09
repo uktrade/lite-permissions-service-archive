@@ -1,38 +1,62 @@
 package uk.gov.bis.lite.permissions.service;
 
+import static java.time.temporal.ChronoUnit.MINUTES;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.api.view.CallbackView;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
+import uk.gov.bis.lite.permissions.model.FailEvent;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.util.Util;
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Singleton
-public class ProcessOgelSubmissionServiceImpl implements ProcessOgelSubmissionService {
+public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessOgelSubmissionServiceImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessSubmissionServiceImpl.class);
 
   private OgelSubmissionDao submissionDao;
   private CustomerService customerService;
   private OgelService ogelService;
   private CallbackService callbackService;
-  private FailService failService;
+
+  private int maxMinutesRetryAfterFail;
+
+  private static final Set<CallbackView.FailReason> terminalFailReasons = new HashSet<>(Arrays.asList(new CallbackView.FailReason[]{
+      CallbackView.FailReason.BLACKLISTED,
+      CallbackView.FailReason.PERMISSION_DENIED}
+  ));
+
+  /**
+   * Origin of any FailEvent: CUSTOMER, SITE, USER_ROLE, OGEL_CREATE, CALLBACK, UNKNOWN
+   */
+  public enum Origin {
+    CUSTOMER, SITE, USER_ROLE, OGEL_CREATE, CALLBACK, UNKNOWN;
+  }
+
 
   @Inject
-  public ProcessOgelSubmissionServiceImpl(OgelSubmissionDao submissionDao, CustomerService customerService,
-                                          OgelService ogelService, CallbackService callbackService, FailService failService) {
+  public ProcessSubmissionServiceImpl(OgelSubmissionDao submissionDao, CustomerService customerService,
+                                      OgelService ogelService, CallbackService callbackService,
+                                      @Named("maxMinutesRetryAfterFail") int maxMinutesRetryAfterFail) {
     this.submissionDao = submissionDao;
     this.customerService = customerService;
     this.ogelService = ogelService;
     this.callbackService = callbackService;
-    this.failService = failService;
+    this.maxMinutesRetryAfterFail = maxMinutesRetryAfterFail;
   }
 
   /**
@@ -53,6 +77,7 @@ public class ProcessOgelSubmissionServiceImpl implements ProcessOgelSubmissionSe
       // If not called back we set Update MODE to SCHEDULED
       if (!calledBack) {
         LOGGER.info("Setting submission MODE to SCHEDULED: [" + submissionId + "]");
+        updateForProcessFailure(sub);
         sub.setScheduledMode();
       }
 
@@ -60,7 +85,7 @@ public class ProcessOgelSubmissionServiceImpl implements ProcessOgelSubmissionSe
       submissionDao.update(sub);
 
     } catch (Throwable e) {
-      errorThrown(sub, e, "ProcessOgelSubmissionServiceImpl.processImmediate");
+      errorThrown(sub, e, "ProcessSubmissionServiceImpl.processImmediate");
     }
   }
 
@@ -80,37 +105,45 @@ public class ProcessOgelSubmissionServiceImpl implements ProcessOgelSubmissionSe
   public void doProcessOgelSubmission(OgelSubmission sub) {
 
     OgelSubmission.Stage stage = sub.getStage();
-    if(stage == OgelSubmission.Stage.CREATED) {
+    if (stage == OgelSubmission.Stage.CREATED) {
       stage = progressStage(sub);
       submissionDao.update(sub);
     }
 
-    if(stage == OgelSubmission.Stage.CUSTOMER) {
-      if(processForCustomer(sub)) {
+    if (stage == OgelSubmission.Stage.CUSTOMER) {
+      if (processForCustomer(sub)) {
         stage = progressStage(sub);
-        submissionDao.update(sub);
+      } else {
+        updateForProcessFailure(sub);
       }
+      submissionDao.update(sub);
     }
 
-    if(stage == OgelSubmission.Stage.SITE) {
-      if(processForSite(sub)) {
+    if (stage == OgelSubmission.Stage.SITE) {
+      if (processForSite(sub)) {
         stage = progressStage(sub);
-        submissionDao.update(sub);
+      } else {
+        updateForProcessFailure(sub);
       }
+      submissionDao.update(sub);
     }
 
-    if(stage == OgelSubmission.Stage.USER_ROLE) {
-      if(processForUserRole(sub)) {
+    if (stage == OgelSubmission.Stage.USER_ROLE) {
+      if (processForUserRole(sub)) {
         stage = progressStage(sub);
-        submissionDao.update(sub);
+      } else {
+        updateForProcessFailure(sub);
       }
+      submissionDao.update(sub);
     }
 
-    if(stage == OgelSubmission.Stage.OGEL) {
-      if(processForOgel(sub)) {
+    if (stage == OgelSubmission.Stage.OGEL) {
+      if (processForOgel(sub)) {
         sub.updateStatusToComplete();
-        submissionDao.update(sub);
+      } else {
+        updateForProcessFailure(sub);
       }
+      submissionDao.update(sub);
     }
   }
 
@@ -119,7 +152,7 @@ public class ProcessOgelSubmissionServiceImpl implements ProcessOgelSubmissionSe
    */
   @VisibleForTesting
   public OgelSubmission.Stage progressStage(OgelSubmission sub) {
-    if(hasCompletedCurrentStage(sub)) {
+    if (hasCompletedCurrentStage(sub)) {
       OgelSubmission.Stage nextStage = getNextStage(sub.getStage());
       if (nextStage != null) {
         sub.setStage(nextStage);
@@ -143,7 +176,7 @@ public class ProcessOgelSubmissionServiceImpl implements ProcessOgelSubmissionSe
       try {
         doProcessOgelSubmission(sub);
       } catch (Throwable e) {
-        errorThrown(sub, e, "ProcessOgelSubmissionServiceImpl.processScheduled");
+        errorThrown(sub, e, "ProcessSubmissionServiceImpl.processScheduled");
       }
     }
   }
@@ -156,13 +189,56 @@ public class ProcessOgelSubmissionServiceImpl implements ProcessOgelSubmissionSe
     LOGGER.info("SCHEDULED CALLBACK [" + subs.size() + "]");
     for (OgelSubmission sub : subs) {
       try {
-        if(callbackService.completeCallback(sub)) {
-          submissionDao.update(sub);
+        if (!callbackService.completeCallback(sub)) {
+          updateForProcessFailure(sub);
         }
+        submissionDao.update(sub);
       } catch (Throwable e) {
-        errorThrown(sub, e, "ProcessOgelSubmissionServiceImpl.processScheduled");
+        errorThrown(sub, e, "ProcessSubmissionServiceImpl.processScheduled");
       }
     }
+  }
+
+  /**
+   * Updates OgelSubmission with any FailEvent data
+   */
+  private void updateForProcessFailure(OgelSubmission sub) {
+    if (sub.hasFailEvent()) {
+      FailEvent event = sub.getFailEvent();
+      CallbackView.FailReason failReason = event.getFailReason();
+      Origin origin = event.getOrigin();
+      String message = event.getMessage();
+
+      String failMessage = createFailMessage(failReason, origin, message);
+      LOGGER.error(failMessage);
+
+      if (!sub.hasFail()) {
+        sub.setFirstFailDateTime(); // Set first fail
+      } else {
+        // Check for repeating error
+        if (sub.getFirstFailDateTime().isBefore(LocalDateTime.now().minus(maxMinutesRetryAfterFail, MINUTES))) {
+          LOGGER.info("Repeating Error - setting status to TERMINATED [" + sub.getRequestId() + "]");
+          sub.updateStatusToTerminated();
+        }
+      }
+
+      sub.setFailReason(failReason);
+      sub.setLastFailMessage(failMessage);
+
+      // Check if we have a terminal fail reason
+      if (terminalFailReasons.contains(failReason)) {
+        LOGGER.info("Terminal Fail - setting status to COMPLETE [" + sub.getRequestId() + "]");
+        sub.updateStatusToComplete();
+      }
+    }
+  }
+
+  private String createFailMessage(CallbackView.FailReason failReason, Origin origin, String message) {
+    String failMessage = "FailReason[" + failReason.name() + "] Origin[" + origin.name() + "]";
+    if (!StringUtils.isBlank(message)) {
+      failMessage = failMessage + " - " + message;
+    }
+    return failMessage;
   }
 
   private boolean processForCustomer(OgelSubmission sub) {
@@ -241,7 +317,7 @@ public class ProcessOgelSubmissionServiceImpl implements ProcessOgelSubmissionSe
 
   private void errorThrown(OgelSubmission sub, Throwable e, String info) {
     String stackTrace = Throwables.getStackTraceAsString(e);
-    failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailServiceImpl.Origin.UNKNOWN, stackTrace);
+    sub.setFailEvent(new FailEvent(CallbackView.FailReason.UNCLASSIFIED, Origin.UNKNOWN, stackTrace));
     LOGGER.error(info + ": " + e.getMessage(), e);
   }
 }

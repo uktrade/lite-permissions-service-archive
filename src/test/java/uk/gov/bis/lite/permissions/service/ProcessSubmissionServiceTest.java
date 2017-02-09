@@ -18,12 +18,12 @@ import uk.gov.bis.lite.permissions.mocks.OgelServiceMock;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
 /**
- * Integration tests for ProcessOgelSubmissionService with mocked CustomerService and OgelService
+ * Integration tests for ProcessSubmissionService with mocked CustomerService and OgelService
  * Utilises in memory DB
  */
-public class ProcessOgelSubmissionServiceTest {
+public class ProcessSubmissionServiceTest {
 
-  private static ProcessOgelSubmissionService processOgelSubmissionService;
+  private static ProcessSubmissionService processSubmissionService;
   private static OgelSubmissionDao submissionDao;
   private static CustomerServiceMock customerServiceMock;
   private static OgelServiceMock ogelServiceMock;
@@ -40,10 +40,10 @@ public class ProcessOgelSubmissionServiceTest {
     flyway.migrate();
 
     PermissionsTestApp app = APP_RULE.getApplication();
-    processOgelSubmissionService = app.getInstance(ProcessOgelSubmissionService.class);
+    processSubmissionService = app.getInstance(ProcessSubmissionService.class);
     submissionDao = app.getInstance(OgelSubmissionDao.class);
-    customerServiceMock = (CustomerServiceMock)app.getInstance(CustomerService.class);
-    ogelServiceMock = (OgelServiceMock)app.getInstance(OgelService.class);
+    customerServiceMock = (CustomerServiceMock) app.getInstance(CustomerService.class);
+    ogelServiceMock = (OgelServiceMock) app.getInstance(OgelService.class);
   }
 
   @Test
@@ -56,7 +56,7 @@ public class ProcessOgelSubmissionServiceTest {
     createAndSaveOgelSubmission(SUB_REF);
 
     // Process OgelSubmission
-    processOgelSubmissionService.doProcessOgelSubmission(submissionDao.findBySubmissionRef(SUB_REF));
+    processSubmissionService.doProcessOgelSubmission(submissionDao.findBySubmissionRef(SUB_REF));
 
     // Check OgelSubmission Stage and Status
     OgelSubmission sub = submissionDao.findBySubmissionRef(SUB_REF);
@@ -81,7 +81,7 @@ public class ProcessOgelSubmissionServiceTest {
     createAndSaveOgelSubmission(SUB_REF);
 
     // Process OgelSubmission
-    processOgelSubmissionService.doProcessOgelSubmission(submissionDao.findBySubmissionRef(SUB_REF));
+    processSubmissionService.doProcessOgelSubmission(submissionDao.findBySubmissionRef(SUB_REF));
 
     // Check OgelSubmission Stage and Status
     OgelSubmission sub = submissionDao.findBySubmissionRef(SUB_REF);
@@ -106,7 +106,7 @@ public class ProcessOgelSubmissionServiceTest {
     createAndSaveOgelSubmission(SUB_REF);
 
     // Process OgelSubmission
-    processOgelSubmissionService.doProcessOgelSubmission(submissionDao.findBySubmissionRef(SUB_REF));
+    processSubmissionService.doProcessOgelSubmission(submissionDao.findBySubmissionRef(SUB_REF));
 
     // Check OgelSubmission Stage and Status
     OgelSubmission sub = submissionDao.findBySubmissionRef(SUB_REF);
@@ -131,7 +131,7 @@ public class ProcessOgelSubmissionServiceTest {
     createAndSaveOgelSubmission(SUB_REF);
 
     // Process OgelSubmission
-    processOgelSubmissionService.doProcessOgelSubmission(submissionDao.findBySubmissionRef(SUB_REF));
+    processSubmissionService.doProcessOgelSubmission(submissionDao.findBySubmissionRef(SUB_REF));
 
     // Check OgelSubmission Stage and Status
     OgelSubmission sub = submissionDao.findBySubmissionRef(SUB_REF);
@@ -156,7 +156,7 @@ public class ProcessOgelSubmissionServiceTest {
     createAndSaveOgelSubmission(SUB_REF);
 
     // Process OgelSubmission
-    processOgelSubmissionService.doProcessOgelSubmission(submissionDao.findBySubmissionRef(SUB_REF));
+    processSubmissionService.doProcessOgelSubmission(submissionDao.findBySubmissionRef(SUB_REF));
 
     // Check OgelSubmission Stage and Status
     OgelSubmission sub = submissionDao.findBySubmissionRef(SUB_REF);

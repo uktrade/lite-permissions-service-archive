@@ -9,6 +9,7 @@ import uk.gov.bis.lite.common.spire.client.SpireRequest;
 import uk.gov.bis.lite.common.spire.client.exception.SpireClientException;
 import uk.gov.bis.lite.permissions.api.view.CallbackView;
 import uk.gov.bis.lite.permissions.exception.SpireFailReasonException;
+import uk.gov.bis.lite.permissions.model.FailEvent;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.spire.SpireReferenceClient;
 
@@ -20,12 +21,10 @@ public class OgelServiceImpl implements OgelService {
   private static final Logger LOGGER = LoggerFactory.getLogger(OgelServiceImpl.class);
 
   private SpireReferenceClient createOgelAppReferenceClient;
-  private FailService failService;
 
   @Inject
-  public OgelServiceImpl(SpireReferenceClient createOgelAppReferenceClient, FailService failService) {
+  public OgelServiceImpl(SpireReferenceClient createOgelAppReferenceClient) {
     this.createOgelAppReferenceClient = createOgelAppReferenceClient;
-    this.failService = failService;
   }
 
   public Optional<String> createOgel(OgelSubmission sub) {
@@ -42,12 +41,12 @@ public class OgelServiceImpl implements OgelService {
       if (!StringUtils.isBlank(reference)) {
         return Optional.of(reference);
       } else {
-        failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailServiceImpl.Origin.OGEL_CREATE, "No Spire reference returned");
+        sub.setFailEvent(new FailEvent(CallbackView.FailReason.UNCLASSIFIED, ProcessSubmissionServiceImpl.Origin.OGEL_CREATE, "No Spire reference returned"));
       }
     } catch (SpireFailReasonException e) {
-      failService.failWithMessage(sub, e.getFailReason(), FailServiceImpl.Origin.OGEL_CREATE, e.getMessage());
+      sub.setFailEvent(new FailEvent(e.getFailReason(), ProcessSubmissionServiceImpl.Origin.OGEL_CREATE, e.getMessage()));
     } catch (SpireClientException e) {
-      failService.failWithMessage(sub, CallbackView.FailReason.UNCLASSIFIED, FailServiceImpl.Origin.OGEL_CREATE, e.getMessage());
+      sub.setFailEvent(new FailEvent(CallbackView.FailReason.UNCLASSIFIED, ProcessSubmissionServiceImpl.Origin.OGEL_CREATE, e.getMessage()));
     }
 
     return Optional.empty();

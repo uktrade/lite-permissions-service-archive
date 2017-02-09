@@ -2,12 +2,12 @@ package uk.gov.bis.lite.permissions.mocks;
 
 import com.google.inject.Singleton;
 import uk.gov.bis.lite.permissions.api.view.OgelSubmissionView;
-import uk.gov.bis.lite.permissions.service.OgelSubmissionService;
+import uk.gov.bis.lite.permissions.service.SubmissionService;
 
 import java.util.List;
 
 @Singleton
-public class OgelSubmissionServiceMock implements OgelSubmissionService {
+public class SubmissionServiceMock implements SubmissionService {
 
   private boolean submissionCurrentlyExists = false;
 
