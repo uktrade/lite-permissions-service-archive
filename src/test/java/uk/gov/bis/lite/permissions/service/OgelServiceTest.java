@@ -62,7 +62,7 @@ public class OgelServiceTest {
     OgelSubmission sub = Util.getMockOgelSubmission(USER_ID_ERROR);
     assertThat(ogelService.createOgel(sub)).isNotPresent();
     assertThat(sub.hasFailEvent()).isTrue();
-    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(CallbackView.FailReason.ENDPOINT_ERROR);
+    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(Util.ENDPOINT_ERROR);
     assertThat(sub.getFailEvent().getOrigin()).isEqualTo(OGEL_CREATE);
   }
 
@@ -71,7 +71,7 @@ public class OgelServiceTest {
     OgelSubmission sub = Util.getMockOgelSubmission(USER_ID_USER_LACKS_PRIVILEGES);
     assertThat(ogelService.createOgel(sub)).isNotPresent();
     assertThat(sub.hasFailEvent()).isTrue();
-    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(CallbackView.FailReason.PERMISSION_DENIED);
+    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(Util.PERMISSION_DENIED);
     assertThat(sub.getFailEvent().getOrigin()).isEqualTo(OGEL_CREATE);
   }
 
@@ -80,7 +80,7 @@ public class OgelServiceTest {
     OgelSubmission sub = Util.getMockOgelSubmission(USER_ID_SITE_ALREADY_REGISTERED);
     assertThat(ogelService.createOgel(sub)).isNotPresent();
     assertThat(sub.hasFailEvent()).isTrue();
-    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(CallbackView.FailReason.SITE_ALREADY_REGISTERED);
+    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(Util.SITE_ALREADY_REGISTERED);
     assertThat(sub.getFailEvent().getOrigin()).isEqualTo(OGEL_CREATE);
   }
 
@@ -89,7 +89,7 @@ public class OgelServiceTest {
     OgelSubmission sub = Util.getMockOgelSubmission(USER_ID_BLACKLISTED);
     assertThat(ogelService.createOgel(sub)).isNotPresent();
     assertThat(sub.hasFailEvent()).isTrue();
-    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(CallbackView.FailReason.BLACKLISTED);
+    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(Util.BLACKLISTED);
     assertThat(sub.getFailEvent().getOrigin()).isEqualTo(OGEL_CREATE);
   }
 
@@ -108,7 +108,7 @@ public class OgelServiceTest {
     sub.setUserId(USER_ID_SOAP_FAULT);
     assertThat(ogelService.createOgel(sub)).isNotPresent();
     assertThat(sub.hasFailEvent()).isTrue();
-    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(CallbackView.FailReason.UNCLASSIFIED);
+    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(Util.UNCLASSIFIED);
     assertThat(sub.getFailEvent().getOrigin()).isEqualTo(OGEL_CREATE);
   }
 

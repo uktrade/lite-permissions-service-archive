@@ -11,6 +11,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.bis.lite.permissions.PermissionsTestApp;
+import uk.gov.bis.lite.permissions.Util;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.mocks.CustomerServiceMock;
@@ -53,70 +54,46 @@ public class ProcessSubmissionServiceTest {
 
     // Setup
     resetAllMocks(true);
-    createAndSaveOgelSubmission(SUB_REF);
+    submissionDao.create(Util.getMockSubmission(SUB_REF));
 
     // Process OgelSubmission
     processSubmissionService.doProcessOgelSubmission(submissionDao.findBySubmissionRef(SUB_REF));
 
     // Check OgelSubmission Stage and Status
     OgelSubmission sub = submissionDao.findBySubmissionRef(SUB_REF);
-    assertThat(sub.getStatus()).isEqualTo(OgelSubmission.Status.COMPLETE);
-    assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.OGEL);
+    assertThat(sub.getStatus()).isEqualTo(Util.STATUS_COMPLETE);
+    assertThat(sub.getStage()).isEqualTo(Util.STAGE_OGEL);
 
     // Check call counts to mocked services
     assertEquals(1, customerServiceMock.getCustomerCallCount());
     assertEquals(1, customerServiceMock.getSiteCallCount());
     assertEquals(1, customerServiceMock.getUserRoleCallCount());
     assertEquals(1, ogelServiceMock.getCreateOgelCallCount());
+    assertEquals(1, submissionDao.getScheduledCompleteToCallback().size());
   }
 
   @Test
-  public void runFailOnOgel() {
+  public void runFailOnCustomer() {
 
-    String SUB_REF = "FailOnOgel";
+    String SUB_REF = "FailOnCustomer";
 
     // Setup
     resetAllMocks(true);
-    ogelServiceMock.setCreateOgelSuccess(false);
-    createAndSaveOgelSubmission(SUB_REF);
+    customerServiceMock.setCreateCustomerSuccess(false);
+    submissionDao.create(Util.getMockSubmission(SUB_REF));
 
     // Process OgelSubmission
     processSubmissionService.doProcessOgelSubmission(submissionDao.findBySubmissionRef(SUB_REF));
 
     // Check OgelSubmission Stage and Status
     OgelSubmission sub = submissionDao.findBySubmissionRef(SUB_REF);
-    assertThat(sub.getStatus()).isEqualTo(OgelSubmission.Status.ACTIVE);
-    assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.OGEL);
+    assertThat(sub.getStatus()).isEqualTo(Util.STATUS_ACTIVE);
+    assertThat(sub.getStage()).isEqualTo(Util.STAGE_CUSTOMER);
 
     // Check call counts to mocked services
     assertEquals(1, customerServiceMock.getCustomerCallCount());
-    assertEquals(1, customerServiceMock.getSiteCallCount());
-    assertEquals(1, customerServiceMock.getUserRoleCallCount());
-    assertEquals(1, ogelServiceMock.getCreateOgelCallCount());
-  }
-
-  @Test
-  public void runFailOnUserRole() {
-
-    String SUB_REF = "FailOnUserRole";
-
-    // Setup
-    resetAllMocks(true);
-    customerServiceMock.setUpdateUserRoleSuccess(false);
-    createAndSaveOgelSubmission(SUB_REF);
-
-    // Process OgelSubmission
-    processSubmissionService.doProcessOgelSubmission(submissionDao.findBySubmissionRef(SUB_REF));
-
-    // Check OgelSubmission Stage and Status
-    OgelSubmission sub = submissionDao.findBySubmissionRef(SUB_REF);
-    assertThat(sub.getStatus()).isEqualTo(OgelSubmission.Status.ACTIVE);
-    assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.USER_ROLE);
-
-    // Check call counts to mocked services
-    assertEquals(1, customerServiceMock.getCustomerCallCount());
-    assertEquals(1, customerServiceMock.getSiteCallCount());
-    assertEquals(1, customerServiceMock.getUserRoleCallCount());
+    assertEquals(0, customerServiceMock.getSiteCallCount());
+    assertEquals(0, customerServiceMock.getUserRoleCallCount());
     assertEquals(0, ogelServiceMock.getCreateOgelCallCount());
   }
 
@@ -128,15 +105,15 @@ public class ProcessSubmissionServiceTest {
     // Setup
     resetAllMocks(true);
     customerServiceMock.setCreateSiteSuccess(false);
-    createAndSaveOgelSubmission(SUB_REF);
+    submissionDao.create(Util.getMockSubmission(SUB_REF));
 
     // Process OgelSubmission
     processSubmissionService.doProcessOgelSubmission(submissionDao.findBySubmissionRef(SUB_REF));
 
     // Check OgelSubmission Stage and Status
     OgelSubmission sub = submissionDao.findBySubmissionRef(SUB_REF);
-    assertThat(sub.getStatus()).isEqualTo(OgelSubmission.Status.ACTIVE);
-    assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.SITE);
+    assertThat(sub.getStatus()).isEqualTo(Util.STATUS_ACTIVE);
+    assertThat(sub.getStage()).isEqualTo(Util.STAGE_SITE);
 
     // Check call counts to mocked services
     assertEquals(1, customerServiceMock.getCustomerCallCount());
@@ -146,37 +123,55 @@ public class ProcessSubmissionServiceTest {
   }
 
   @Test
-  public void runFailOnCustomer() {
+  public void runFailOnUserRole() {
 
-    String SUB_REF = "FailOnCustomer";
+    String SUB_REF = "FailOnUserRole";
 
     // Setup
     resetAllMocks(true);
-    customerServiceMock.setCreateCustomerSuccess(false);
-    createAndSaveOgelSubmission(SUB_REF);
+    customerServiceMock.setUpdateUserRoleSuccess(false);
+    submissionDao.create(Util.getMockSubmission(SUB_REF));
 
     // Process OgelSubmission
     processSubmissionService.doProcessOgelSubmission(submissionDao.findBySubmissionRef(SUB_REF));
 
     // Check OgelSubmission Stage and Status
     OgelSubmission sub = submissionDao.findBySubmissionRef(SUB_REF);
-    assertThat(sub.getStatus()).isEqualTo(OgelSubmission.Status.ACTIVE);
-    assertThat(sub.getStage()).isEqualTo(OgelSubmission.Stage.CUSTOMER);
+    assertThat(sub.getStatus()).isEqualTo(Util.STATUS_ACTIVE);
+    assertThat(sub.getStage()).isEqualTo(Util.STAGE_USER_ROLE);
 
     // Check call counts to mocked services
     assertEquals(1, customerServiceMock.getCustomerCallCount());
-    assertEquals(0, customerServiceMock.getSiteCallCount());
-    assertEquals(0, customerServiceMock.getUserRoleCallCount());
+    assertEquals(1, customerServiceMock.getSiteCallCount());
+    assertEquals(1, customerServiceMock.getUserRoleCallCount());
     assertEquals(0, ogelServiceMock.getCreateOgelCallCount());
   }
 
-  private void createAndSaveOgelSubmission(String submissionRef) {
-    OgelSubmission sub = new OgelSubmission("userId", "ogelType");
-    sub.setScheduledMode();
-    sub.setSubmissionRef(submissionRef);
-    sub.setRoleUpdate(true);
-    submissionDao.create(sub);
+  @Test
+  public void runFailOnOgel() {
+
+    String SUB_REF = "FailOnOgel";
+
+    // Setup
+    resetAllMocks(true);
+    ogelServiceMock.setCreateOgelSuccess(false);
+    submissionDao.create(Util.getMockSubmission(SUB_REF));
+
+    // Process OgelSubmission
+    processSubmissionService.doProcessOgelSubmission(submissionDao.findBySubmissionRef(SUB_REF));
+
+    // Check OgelSubmission Stage and Status
+    OgelSubmission sub = submissionDao.findBySubmissionRef(SUB_REF);
+    assertThat(sub.getStatus()).isEqualTo(Util.STATUS_ACTIVE);
+    assertThat(sub.getStage()).isEqualTo(Util.STAGE_OGEL);
+
+    // Check call counts to mocked services
+    assertEquals(1, customerServiceMock.getCustomerCallCount());
+    assertEquals(1, customerServiceMock.getSiteCallCount());
+    assertEquals(1, customerServiceMock.getUserRoleCallCount());
+    assertEquals(1, ogelServiceMock.getCreateOgelCallCount());
   }
+
 
   /**
    * Sets all mock calls to respond with a 'success'

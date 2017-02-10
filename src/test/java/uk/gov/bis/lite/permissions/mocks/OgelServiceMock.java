@@ -2,6 +2,8 @@ package uk.gov.bis.lite.permissions.mocks;
 
 
 import com.google.inject.Singleton;
+import uk.gov.bis.lite.permissions.Util;
+import uk.gov.bis.lite.permissions.model.FailEvent;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.service.OgelService;
 
@@ -14,10 +16,15 @@ public class OgelServiceMock implements OgelService {
 
   private int createOgelCallCount = 0;
 
+  private FailEvent failEvent = null;
+
   @Override
   public Optional<String> createOgel(OgelSubmission sub) {
     createOgelCallCount++;
-    return this.createOgelSuccess ? Optional.of("SPIRE_REF_MOCK") : Optional.empty();
+    if (!createOgelSuccess) {
+      sub.setFailEvent(failEvent);
+    }
+    return this.createOgelSuccess ? Optional.of(Util.SPIRE_REF) : Optional.empty();
   }
 
   public void setCreateOgelSuccess(boolean createOgelSuccess) {
@@ -30,5 +37,13 @@ public class OgelServiceMock implements OgelService {
 
   public void resetCreateOgelCallCount() {
     this.createOgelCallCount = 0;
+  }
+
+  public void resetFailEvent() {
+    this.failEvent = null;
+  }
+
+  public void setFailEvent(FailEvent failEvent) {
+    this.failEvent = failEvent;
   }
 }

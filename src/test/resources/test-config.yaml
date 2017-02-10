@@ -7,7 +7,7 @@ spireClientUrl: https://www.spiretest.trade.gov.uk/spireuat/fox/ispire/
 
 customerServiceUrl: http://localhost:8095
 
-maxMinutesRetryAfterFail: 1
+maxMinutesRetryAfterFail: -1
 
 server:
   type: default

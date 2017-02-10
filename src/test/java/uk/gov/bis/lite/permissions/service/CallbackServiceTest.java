@@ -62,8 +62,8 @@ public class CallbackServiceTest {
     assertThat(callbackService.completeCallback(sub)).isEqualTo(false);
     assertThat(sub.isCalledBack()).isEqualTo(false);
     assertThat(sub.hasFailEvent()).isTrue();
-    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(CallbackView.FailReason.UNCLASSIFIED);
-    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(ProcessSubmissionServiceImpl.Origin.CALLBACK);
+    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(Util.UNCLASSIFIED);
+    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(Util.ORIGIN_CALLBACK);
   }
 
   @Test
@@ -96,7 +96,7 @@ public class CallbackServiceTest {
   @Test
   public void testCallbackViewNotComplete() throws Exception {
     OgelSubmission sub = getMockOgelSubmission();
-    sub.setStatus(OgelSubmission.Status.ACTIVE); // change mocked COMPLETE to ACTIVE
+    sub.setStatus(Util.STATUS_ACTIVE); // change mocked COMPLETE to ACTIVE
 
     CallbackView view = callbackService.getCallbackView(sub);
 
@@ -121,7 +121,7 @@ public class CallbackServiceTest {
     assertEquals(view.getCustomerId(), Util.CUSTOMER_REF);
     assertEquals(view.getSiteId(), Util.SITE_REF);
     assertEquals(view.getRequestId(), Util.SUBMISSION_REF + Util.MOCK_ID);
-    assertEquals(view.getFailReason(), CallbackView.FailReason.PERMISSION_DENIED);
+    assertEquals(view.getFailReason(), Util.PERMISSION_DENIED);
   }
 
   /**

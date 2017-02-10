@@ -10,7 +10,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.bis.lite.customer.api.param.CustomerParam;
 import uk.gov.bis.lite.customer.api.param.UserRoleParam;
-import uk.gov.bis.lite.permissions.api.view.CallbackView;
+import uk.gov.bis.lite.permissions.Util;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
 import javax.validation.constraints.NotNull;
@@ -71,8 +71,8 @@ public class CustomerServiceTest {
     // Test
     assertThat(customerService.updateUserRole(sub)).isFalse();
     assertThat(sub.hasFailEvent()).isTrue();
-    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(CallbackView.FailReason.ENDPOINT_ERROR);
-    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(ProcessSubmissionServiceImpl.Origin.USER_ROLE);
+    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(Util.ENDPOINT_ERROR);
+    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(Util.ORIGIN_USER_ROLE);
   }
 
   @Test
@@ -97,8 +97,8 @@ public class CustomerServiceTest {
     // Test
     assertThat(customerService.getOrCreateCustomer(sub)).isNotPresent();
     assertThat(sub.hasFailEvent()).isTrue();
-    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(CallbackView.FailReason.ENDPOINT_ERROR);
-    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(ProcessSubmissionServiceImpl.Origin.CUSTOMER);
+    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(Util.ENDPOINT_ERROR);
+    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(Util.ORIGIN_CUSTOMER);
   }
 
   @Test
@@ -123,8 +123,8 @@ public class CustomerServiceTest {
     // Test
     assertThat(customerService.createSite(sub)).isNotPresent();
     assertThat(sub.hasFailEvent()).isTrue();
-    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(CallbackView.FailReason.PERMISSION_DENIED);
-    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(ProcessSubmissionServiceImpl.Origin.SITE);
+    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(Util.PERMISSION_DENIED);
+    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(Util.ORIGIN_SITE);
   }
 
   @Test
@@ -137,8 +137,8 @@ public class CustomerServiceTest {
     // Test
     assertThat(customerService.createSite(sub)).isNotPresent();
     assertThat(sub.hasFailEvent()).isTrue();
-    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(CallbackView.FailReason.ENDPOINT_ERROR);
-    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(ProcessSubmissionServiceImpl.Origin.SITE);
+    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(Util.ENDPOINT_ERROR);
+    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(Util.ORIGIN_SITE);
   }
 
   /**

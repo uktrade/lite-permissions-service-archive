@@ -10,6 +10,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.bis.lite.permissions.PermissionsTestApp;
+import uk.gov.bis.lite.permissions.Util;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
@@ -37,7 +38,7 @@ public class SubmissionDaoTest {
   @Test
   public void runSubmissionDaoTest() {
 
-    submissionDao.create(getScheduled(OgelSubmission.Stage.CREATED));
+    submissionDao.create(getScheduled(Util.STAGE_CREATED));
 
     assertThat(submissionDao.getScheduledActive()).hasSize(1);
     assertThat(submissionDao.getScheduledCompleteToCallback()).hasSize(0);
@@ -45,7 +46,7 @@ public class SubmissionDaoTest {
     assertThat(submissionDao.getCancelledSubmissions()).hasSize(0);
     assertThat(submissionDao.getFinishedSubmissions()).hasSize(0);
 
-    submissionDao.create(getScheduled(OgelSubmission.Stage.CUSTOMER));
+    submissionDao.create(getScheduled(Util.STAGE_CUSTOMER));
 
     assertThat(submissionDao.getScheduledActive()).hasSize(2);
     assertThat(submissionDao.getScheduledCompleteToCallback()).hasSize(0);
@@ -53,8 +54,8 @@ public class SubmissionDaoTest {
     assertThat(submissionDao.getCancelledSubmissions()).hasSize(0);
     assertThat(submissionDao.getFinishedSubmissions()).hasSize(0);
 
-    OgelSubmission forComplete = getScheduled(OgelSubmission.Stage.OGEL);
-    forComplete.setStatus(OgelSubmission.Status.COMPLETE);
+    OgelSubmission forComplete = getScheduled(Util.STAGE_OGEL);
+    forComplete.setStatus(Util.STATUS_COMPLETE);
     submissionDao.create(forComplete);
 
     assertThat(submissionDao.getScheduledActive()).hasSize(2);
@@ -63,8 +64,8 @@ public class SubmissionDaoTest {
     assertThat(submissionDao.getCancelledSubmissions()).hasSize(0);
     assertThat(submissionDao.getFinishedSubmissions()).hasSize(0);
 
-    OgelSubmission forCancel = getScheduled(OgelSubmission.Stage.CREATED);
-    forCancel.setStatus(OgelSubmission.Status.TERMINATED);
+    OgelSubmission forCancel = getScheduled(Util.STAGE_CREATED);
+    forCancel.setStatus(Util.STATUS_TERMINATED);
     submissionDao.create(forCancel);
 
     assertThat(submissionDao.getScheduledActive()).hasSize(2);
@@ -73,8 +74,8 @@ public class SubmissionDaoTest {
     assertThat(submissionDao.getCancelledSubmissions()).hasSize(1);
     assertThat(submissionDao.getFinishedSubmissions()).hasSize(0);
 
-    OgelSubmission forFinished = getScheduled(OgelSubmission.Stage.OGEL);
-    forFinished.setStatus(OgelSubmission.Status.COMPLETE);
+    OgelSubmission forFinished = getScheduled(Util.STAGE_OGEL);
+    forFinished.setStatus(Util.STATUS_COMPLETE);
     forFinished.setCalledBack(true);
     submissionDao.create(forFinished);
 
@@ -83,7 +84,6 @@ public class SubmissionDaoTest {
     assertThat(submissionDao.getPendingSubmissions()).hasSize(3);
     assertThat(submissionDao.getCancelledSubmissions()).hasSize(1);
     assertThat(submissionDao.getFinishedSubmissions()).hasSize(1);
-
   }
 
   private OgelSubmission getScheduled(OgelSubmission.Stage stage) {

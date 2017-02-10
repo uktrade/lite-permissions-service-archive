@@ -1,6 +1,8 @@
 package uk.gov.bis.lite.permissions.mocks;
 
 import com.google.inject.Singleton;
+import uk.gov.bis.lite.permissions.Util;
+import uk.gov.bis.lite.permissions.model.FailEvent;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.service.CustomerService;
 
@@ -17,21 +19,32 @@ public class CustomerServiceMock implements CustomerService {
   private int siteCallCount = 0;
   private int uerRoleCallCount = 0;
 
+  private FailEvent failEvent = null;
+
   @Override
   public Optional<String> getOrCreateCustomer(OgelSubmission sub) {
     customerCallCount++;
-    return createCustomerSuccess ? Optional.of("MOCK_SAR") : Optional.empty();
+    if (!createCustomerSuccess) {
+      sub.setFailEvent(failEvent);
+    }
+    return createCustomerSuccess ? Optional.of(Util.CUSTOMER_REF) : Optional.empty();
   }
 
   @Override
   public Optional<String> createSite(OgelSubmission sub) {
     siteCallCount++;
-    return createSiteSuccess ? Optional.of("MOCK_SITE") : Optional.empty();
+    if (!createSiteSuccess) {
+      sub.setFailEvent(failEvent);
+    }
+    return createSiteSuccess ? Optional.of(Util.SITE_REF) : Optional.empty();
   }
 
   @Override
   public boolean updateUserRole(OgelSubmission sub) {
     uerRoleCallCount++;
+    if (!updateUserRoleSuccess) {
+      sub.setFailEvent(failEvent);
+    }
     return updateUserRoleSuccess;
   }
 
@@ -45,6 +58,10 @@ public class CustomerServiceMock implements CustomerService {
     resetCustomerCallCount();
     resetSiteCallCount();
     resetUserRoleCallCount();
+  }
+
+  public void resetFailEvent() {
+    this.failEvent = null;
   }
 
   public void resetCustomerCallCount() {
@@ -81,5 +98,9 @@ public class CustomerServiceMock implements CustomerService {
 
   public int getUserRoleCallCount() {
     return uerRoleCallCount;
+  }
+
+  public void setFailEvent(FailEvent failEvent) {
+    this.failEvent = failEvent;
   }
 }
