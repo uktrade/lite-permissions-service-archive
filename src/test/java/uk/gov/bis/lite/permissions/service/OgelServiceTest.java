@@ -39,6 +39,7 @@ public class OgelServiceTest {
   public WireMockRule wiremockRule = new WireMockRule(PORT);
 
   private OgelService ogelService;
+  private ProcessSubmissionServiceImpl.Origin OGEL_CREATE = ProcessSubmissionServiceImpl.Origin.OGEL_CREATE;
 
   @Before
   public void before() {
@@ -62,7 +63,7 @@ public class OgelServiceTest {
     assertThat(ogelService.createOgel(sub)).isNotPresent();
     assertThat(sub.hasFailEvent()).isTrue();
     assertThat(sub.getFailEvent().getFailReason()).isEqualTo(CallbackView.FailReason.ENDPOINT_ERROR);
-    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(ProcessSubmissionServiceImpl.Origin.OGEL_CREATE);
+    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(OGEL_CREATE);
   }
 
   @Test
@@ -71,7 +72,7 @@ public class OgelServiceTest {
     assertThat(ogelService.createOgel(sub)).isNotPresent();
     assertThat(sub.hasFailEvent()).isTrue();
     assertThat(sub.getFailEvent().getFailReason()).isEqualTo(CallbackView.FailReason.PERMISSION_DENIED);
-    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(ProcessSubmissionServiceImpl.Origin.OGEL_CREATE);
+    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(OGEL_CREATE);
   }
 
   @Test
@@ -80,7 +81,7 @@ public class OgelServiceTest {
     assertThat(ogelService.createOgel(sub)).isNotPresent();
     assertThat(sub.hasFailEvent()).isTrue();
     assertThat(sub.getFailEvent().getFailReason()).isEqualTo(CallbackView.FailReason.SITE_ALREADY_REGISTERED);
-    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(ProcessSubmissionServiceImpl.Origin.OGEL_CREATE);
+    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(OGEL_CREATE);
   }
 
   @Test
@@ -89,7 +90,7 @@ public class OgelServiceTest {
     assertThat(ogelService.createOgel(sub)).isNotPresent();
     assertThat(sub.hasFailEvent()).isTrue();
     assertThat(sub.getFailEvent().getFailReason()).isEqualTo(CallbackView.FailReason.BLACKLISTED);
-    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(ProcessSubmissionServiceImpl.Origin.OGEL_CREATE);
+    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(OGEL_CREATE);
   }
 
   @Test
@@ -98,7 +99,7 @@ public class OgelServiceTest {
     assertThat(ogelService.createOgel(sub)).isNotPresent();
     assertThat(sub.hasFailEvent()).isTrue();
     assertThat(sub.getFailEvent().getFailReason()).isEqualTo(CallbackView.FailReason.ENDPOINT_ERROR);
-    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(ProcessSubmissionServiceImpl.Origin.OGEL_CREATE);
+    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(OGEL_CREATE);
   }
 
   @Test
@@ -108,7 +109,7 @@ public class OgelServiceTest {
     assertThat(ogelService.createOgel(sub)).isNotPresent();
     assertThat(sub.hasFailEvent()).isTrue();
     assertThat(sub.getFailEvent().getFailReason()).isEqualTo(CallbackView.FailReason.UNCLASSIFIED);
-    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(ProcessSubmissionServiceImpl.Origin.OGEL_CREATE);
+    assertThat(sub.getFailEvent().getOrigin()).isEqualTo(OGEL_CREATE);
   }
 
   private SpireReferenceClient provideSpireCreateOgelAppClient(String userName, String password, String url) {

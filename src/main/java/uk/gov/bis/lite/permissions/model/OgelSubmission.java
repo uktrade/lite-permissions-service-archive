@@ -57,9 +57,9 @@ public class OgelSubmission {
   }
 
   /**
-   * ACTIVE      - submission is being processed through stages
-   * COMPLETE    - stage processing has been completed
-   * TERMINATED  - stage processing has been terminated
+   * ACTIVE      - submission is being processed
+   * COMPLETE    - processing has been completed
+   * TERMINATED  - processing has been terminated
    */
   public enum Status {
     ACTIVE, COMPLETE, TERMINATED;
@@ -122,6 +122,10 @@ public class OgelSubmission {
 
   public boolean hasFailEvent() {
     return failEvent != null;
+  }
+
+  public void clearFailEvent() {
+    this.failEvent = null;
   }
 
   public boolean hasAdminUserId() {

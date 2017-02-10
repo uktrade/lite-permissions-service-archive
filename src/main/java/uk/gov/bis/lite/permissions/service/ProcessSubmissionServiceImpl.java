@@ -35,9 +35,10 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
 
   private int maxMinutesRetryAfterFail;
 
-  private static final Set<CallbackView.FailReason> terminalFailReasons = new HashSet<>(Arrays.asList(new CallbackView.FailReason[]{
+  private static final Set<CallbackView.FailReason> setStatusCompleteFailReasons = new HashSet<>(Arrays.asList(new CallbackView.FailReason[]{
       CallbackView.FailReason.BLACKLISTED,
-      CallbackView.FailReason.PERMISSION_DENIED}
+      CallbackView.FailReason.PERMISSION_DENIED,
+      CallbackView.FailReason.SITE_ALREADY_REGISTERED}
   ));
 
   /**
@@ -201,8 +202,10 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
 
   /**
    * Updates OgelSubmission with any FailEvent data
+   * Removes FailEvent once OgelSubmission updated
    */
-  private void updateForProcessFailure(OgelSubmission sub) {
+  @VisibleForTesting
+  void updateForProcessFailure(OgelSubmission sub) {
     if (sub.hasFailEvent()) {
       FailEvent event = sub.getFailEvent();
       CallbackView.FailReason failReason = event.getFailReason();
@@ -225,11 +228,14 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
       sub.setFailReason(failReason);
       sub.setLastFailMessage(failMessage);
 
-      // Check if we have a terminal fail reason
-      if (terminalFailReasons.contains(failReason)) {
-        LOGGER.info("Terminal Fail - setting status to COMPLETE [" + sub.getRequestId() + "]");
+      // Set status to complete with configured fail reason
+      if (setStatusCompleteFailReasons.contains(failReason)) {
+        LOGGER.info("Found setStatusComplete FailReason - setting status to COMPLETE [" + sub.getRequestId() + "]");
         sub.updateStatusToComplete();
       }
+
+      // Remove FailEvent
+      sub.clearFailEvent();
     }
   }
 

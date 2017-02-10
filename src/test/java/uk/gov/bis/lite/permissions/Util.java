@@ -20,6 +20,12 @@ public class Util {
     return sub;
   }
 
+  public static OgelSubmission getMockActiveOgelSubmission() {
+    OgelSubmission sub = getMockOgelSubmission();
+    sub.setStatus(OgelSubmission.Status.ACTIVE);
+    return sub;
+  }
+
   public static OgelSubmission getMockOgelSubmission() {
     OgelSubmission sub = new OgelSubmission(USER_ID, OGEL_TYPE);
     sub.setScheduledMode();
