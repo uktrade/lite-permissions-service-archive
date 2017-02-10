@@ -119,7 +119,7 @@ public class StageProgressionTest {
   public void testWithExistingCustomerAndSiteWithoutRoleUpdate() throws Exception {
     OgelSubmission sub = getStagedWithoutRoleUpdate(CREATED);
     sub.setCustomerRef(CUSTOMER_REF);
-    sub.setSiteRef("siteRef");
+    sub.setSiteRef(SITE_REF);
     service.progressStage(sub);
     assertThat(sub.getStage()).isEqualTo(OGEL);
 
