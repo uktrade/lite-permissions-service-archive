@@ -5,7 +5,6 @@ import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.tweak.ResultSetMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.bis.lite.permissions.api.view.CallbackView;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
 import java.sql.ResultSet;
@@ -37,8 +36,8 @@ public class OgelSubmissionMapper implements ResultSetMapper<OgelSubmission> {
       sub.setFailReason(null);
     } else {
       String failReasonValue = r.getString("FAIL_REASON");
-      if (EnumUtils.isValidEnum(CallbackView.FailReason.class, failReasonValue)) {
-        sub.setFailReason(CallbackView.FailReason.valueOf(failReasonValue));
+      if (EnumUtils.isValidEnum(OgelSubmission.FailReason.class, failReasonValue)) {
+        sub.setFailReason(OgelSubmission.FailReason.valueOf(failReasonValue));
       } else {
         LOGGER.warn("Database FailReason is not valid for Enum: " + failReasonValue);
         sub.setFailReason(null);

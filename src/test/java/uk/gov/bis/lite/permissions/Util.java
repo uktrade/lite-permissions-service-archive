@@ -1,7 +1,6 @@
 package uk.gov.bis.lite.permissions;
 
 
-import uk.gov.bis.lite.permissions.api.view.CallbackView;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.service.ProcessSubmissionServiceImpl;
 
@@ -38,11 +37,11 @@ public class Util {
   public static OgelSubmission.Status STATUS_TERMINATED = OgelSubmission.Status.TERMINATED;
 
   // FailReasons
-  public static CallbackView.FailReason PERMISSION_DENIED = CallbackView.FailReason.PERMISSION_DENIED;
-  public static CallbackView.FailReason BLACKLISTED = CallbackView.FailReason.BLACKLISTED;
-  public static CallbackView.FailReason SITE_ALREADY_REGISTERED = CallbackView.FailReason.SITE_ALREADY_REGISTERED;
-  public static CallbackView.FailReason ENDPOINT_ERROR = CallbackView.FailReason.ENDPOINT_ERROR;
-  public static CallbackView.FailReason UNCLASSIFIED = CallbackView.FailReason.UNCLASSIFIED;
+  public static OgelSubmission.FailReason PERMISSION_DENIED = OgelSubmission.FailReason.PERMISSION_DENIED;
+  public static OgelSubmission.FailReason BLACKLISTED = OgelSubmission.FailReason.BLACKLISTED;
+  public static OgelSubmission.FailReason SITE_ALREADY_REGISTERED = OgelSubmission.FailReason.SITE_ALREADY_REGISTERED;
+  public static OgelSubmission.FailReason ENDPOINT_ERROR = OgelSubmission.FailReason.ENDPOINT_ERROR;
+  public static OgelSubmission.FailReason UNCLASSIFIED = OgelSubmission.FailReason.UNCLASSIFIED;
 
   public static OgelSubmission getMockOgelSubmission(String userId) {
     OgelSubmission sub = getMockOgelSubmission();
@@ -61,6 +60,13 @@ public class Util {
     sub.setScheduledMode();
     sub.setSubmissionRef(submissionRef);
     sub.setRoleUpdate(true);
+    return sub;
+  }
+
+  public static OgelSubmission getMockWithFailReason(OgelSubmission.FailReason failReason) {
+    OgelSubmission sub = getMockOgelSubmission();
+    sub.setFailReason(failReason);
+    sub.setSpireRef(null);
     return sub;
   }
 

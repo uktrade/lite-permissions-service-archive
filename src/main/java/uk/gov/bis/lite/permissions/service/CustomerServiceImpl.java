@@ -16,7 +16,6 @@ import uk.gov.bis.lite.customer.api.view.CustomerView;
 import uk.gov.bis.lite.customer.api.view.SiteView;
 import uk.gov.bis.lite.permissions.api.param.RegisterAddressParam;
 import uk.gov.bis.lite.permissions.api.param.RegisterParam;
-import uk.gov.bis.lite.permissions.api.view.CallbackView;
 import uk.gov.bis.lite.permissions.exception.PermissionServiceException;
 import uk.gov.bis.lite.permissions.model.FailEvent;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
@@ -88,12 +87,12 @@ public class CustomerServiceImpl implements CustomerService {
       if (isOk(response)) {
         return Optional.of(response.readEntity(SiteView.class).getSiteId());
       } else if (isForbidden(response)) {
-        sub.setFailEvent(new FailEvent(CallbackView.FailReason.PERMISSION_DENIED, ProcessSubmissionServiceImpl.Origin.SITE, Util.info(response)));
+        sub.setFailEvent(new FailEvent(OgelSubmission.FailReason.PERMISSION_DENIED, ProcessSubmissionServiceImpl.Origin.SITE, Util.info(response)));
       } else {
-        sub.setFailEvent(new FailEvent(CallbackView.FailReason.ENDPOINT_ERROR, ProcessSubmissionServiceImpl.Origin.SITE, Util.info(response)));
+        sub.setFailEvent(new FailEvent(OgelSubmission.FailReason.ENDPOINT_ERROR, ProcessSubmissionServiceImpl.Origin.SITE, Util.info(response)));
       }
     } catch (ProcessingException e) {
-      sub.setFailEvent(new FailEvent(CallbackView.FailReason.UNCLASSIFIED, ProcessSubmissionServiceImpl.Origin.SITE, Util.info(e)));
+      sub.setFailEvent(new FailEvent(OgelSubmission.FailReason.UNCLASSIFIED, ProcessSubmissionServiceImpl.Origin.SITE, Util.info(e)));
     }
     return Optional.empty();
   }
@@ -113,7 +112,7 @@ public class CustomerServiceImpl implements CustomerService {
     if (isOk(response)) {
       return true;
     } else {
-      sub.setFailEvent(new FailEvent(CallbackView.FailReason.ENDPOINT_ERROR, ProcessSubmissionServiceImpl.Origin.USER_ROLE, Util.info(response)));
+      sub.setFailEvent(new FailEvent(OgelSubmission.FailReason.ENDPOINT_ERROR, ProcessSubmissionServiceImpl.Origin.USER_ROLE, Util.info(response)));
     }
     return false;
   }
@@ -130,10 +129,10 @@ public class CustomerServiceImpl implements CustomerService {
       if (isOk(response)) {
         return Optional.of(response.readEntity(CustomerView.class).getCustomerId());
       } else {
-        sub.setFailEvent(new FailEvent(CallbackView.FailReason.ENDPOINT_ERROR, ProcessSubmissionServiceImpl.Origin.CUSTOMER, Util.info(response)));
+        sub.setFailEvent(new FailEvent(OgelSubmission.FailReason.ENDPOINT_ERROR, ProcessSubmissionServiceImpl.Origin.CUSTOMER, Util.info(response)));
       }
     } catch (ProcessingException e) {
-      sub.setFailEvent(new FailEvent(CallbackView.FailReason.ENDPOINT_ERROR, ProcessSubmissionServiceImpl.Origin.CUSTOMER, Util.info(e)));
+      sub.setFailEvent(new FailEvent(OgelSubmission.FailReason.ENDPOINT_ERROR, ProcessSubmissionServiceImpl.Origin.CUSTOMER, Util.info(e)));
     }
     return Optional.empty();
   }

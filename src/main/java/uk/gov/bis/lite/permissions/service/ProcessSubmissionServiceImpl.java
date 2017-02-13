@@ -10,7 +10,6 @@ import com.google.inject.name.Named;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.bis.lite.permissions.api.view.CallbackView;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.model.FailEvent;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
@@ -35,10 +34,10 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
 
   private int maxMinutesRetryAfterFail;
 
-  private static final Set<CallbackView.FailReason> setStatusCompleteFailReasons = new HashSet<>(Arrays.asList(new CallbackView.FailReason[]{
-      CallbackView.FailReason.BLACKLISTED,
-      CallbackView.FailReason.PERMISSION_DENIED,
-      CallbackView.FailReason.SITE_ALREADY_REGISTERED}
+  private static final Set<OgelSubmission.FailReason> setStatusCompleteFailReasons = new HashSet<>(Arrays.asList(new OgelSubmission.FailReason[]{
+      OgelSubmission.FailReason.BLACKLISTED,
+      OgelSubmission.FailReason.PERMISSION_DENIED,
+      OgelSubmission.FailReason.SITE_ALREADY_REGISTERED}
   ));
 
   /**
@@ -208,7 +207,7 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
   void updateForProcessFailure(OgelSubmission sub) {
     if (sub.hasFailEvent()) {
       FailEvent event = sub.getFailEvent();
-      CallbackView.FailReason failReason = event.getFailReason();
+      OgelSubmission.FailReason failReason = event.getFailReason();
       Origin origin = event.getOrigin();
       String message = event.getMessage();
 
@@ -239,7 +238,7 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
     }
   }
 
-  private String createFailMessage(CallbackView.FailReason failReason, Origin origin, String message) {
+  private String createFailMessage(OgelSubmission.FailReason failReason, Origin origin, String message) {
     String failMessage = "FailReason[" + failReason.name() + "] Origin[" + origin.name() + "]";
     if (!StringUtils.isBlank(message)) {
       failMessage = failMessage + " - " + message;
@@ -323,7 +322,7 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
 
   private void errorThrown(OgelSubmission sub, Throwable e, String info) {
     String stackTrace = Throwables.getStackTraceAsString(e);
-    sub.setFailEvent(new FailEvent(CallbackView.FailReason.UNCLASSIFIED, Origin.UNKNOWN, stackTrace));
+    sub.setFailEvent(new FailEvent(OgelSubmission.FailReason.UNCLASSIFIED, Origin.UNKNOWN, stackTrace));
     LOGGER.error(info + ": " + e.getMessage(), e);
   }
 }

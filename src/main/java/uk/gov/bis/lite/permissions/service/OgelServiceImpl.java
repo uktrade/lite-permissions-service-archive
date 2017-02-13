@@ -41,12 +41,12 @@ public class OgelServiceImpl implements OgelService {
       if (!StringUtils.isBlank(reference)) {
         return Optional.of(reference);
       } else {
-        sub.setFailEvent(new FailEvent(CallbackView.FailReason.UNCLASSIFIED, ProcessSubmissionServiceImpl.Origin.OGEL_CREATE, "No Spire reference returned"));
+        sub.setFailEvent(new FailEvent(OgelSubmission.FailReason.UNCLASSIFIED, ProcessSubmissionServiceImpl.Origin.OGEL_CREATE, "No Spire reference returned"));
       }
     } catch (SpireFailReasonException e) {
       sub.setFailEvent(new FailEvent(e.getFailReason(), ProcessSubmissionServiceImpl.Origin.OGEL_CREATE, e.getMessage()));
     } catch (SpireClientException e) {
-      sub.setFailEvent(new FailEvent(CallbackView.FailReason.UNCLASSIFIED, ProcessSubmissionServiceImpl.Origin.OGEL_CREATE, e.getMessage()));
+      sub.setFailEvent(new FailEvent(OgelSubmission.FailReason.UNCLASSIFIED, ProcessSubmissionServiceImpl.Origin.OGEL_CREATE, e.getMessage()));
     }
 
     return Optional.empty();

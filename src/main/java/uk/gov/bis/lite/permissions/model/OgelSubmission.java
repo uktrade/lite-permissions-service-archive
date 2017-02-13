@@ -25,7 +25,7 @@ public class OgelSubmission {
   private String spireRef;
   private String firstFail;
   private String lastFailMessage;
-  private CallbackView.FailReason failReason;
+  private FailReason failReason;
   private String callbackUrl;
   private boolean calledBack;
   private String json;
@@ -65,6 +65,28 @@ public class OgelSubmission {
     ACTIVE, COMPLETE, TERMINATED;
   }
 
+  /**
+   * FailReasons have mapping to CallbackView.Result
+   */
+  public enum FailReason {
+
+    PERMISSION_DENIED(CallbackView.Result.PERMISSION_DENIED),
+    SITE_ALREADY_REGISTERED(CallbackView.Result.SITE_ALREADY_REGISTERED),
+    BLACKLISTED(CallbackView.Result.BLACKLISTED),
+    ENDPOINT_ERROR(CallbackView.Result.FAILED),
+    UNCLASSIFIED(CallbackView.Result.FAILED);
+
+    private final CallbackView.Result result;
+
+    FailReason(CallbackView.Result result) {
+      this.result = result;
+    }
+
+    public CallbackView.Result toResult() {
+      return result;
+    }
+  }
+
   public OgelSubmission(int id) {
     this.id = id;
   }
@@ -98,9 +120,9 @@ public class OgelSubmission {
   }
 
   /**
-   * OgelSubmission is COMPLETE and we have a SpireRef
+   * OgelSubmission Status is COMPLETE and we have a SpireRef
    */
-  public boolean isCompleteSuccess() {
+  public boolean isCompletedWithSpireRef() {
     return status.equals(Status.COMPLETE) && !StringUtils.isBlank(spireRef);
   }
 
@@ -114,6 +136,10 @@ public class OgelSubmission {
 
   public void terminateProcessing() {
     this.status = Status.TERMINATED;
+  }
+
+  public boolean hasFailReason() {
+    return failReason != null;
   }
 
   public boolean hasFail() {
@@ -293,11 +319,11 @@ public class OgelSubmission {
     this.lastFailMessage = lastFailMessage;
   }
 
-  public CallbackView.FailReason getFailReason() {
+  public FailReason getFailReason() {
     return failReason;
   }
 
-  public void setFailReason(CallbackView.FailReason failReason) {
+  public void setFailReason(FailReason failReason) {
     this.failReason = failReason;
   }
 

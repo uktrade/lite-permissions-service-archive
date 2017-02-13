@@ -40,10 +40,10 @@ public class CallbackServiceImpl implements CallbackService {
           callbackCompleted = true;
           LOGGER.info("CALLBACK completed [" + sub.getRequestId() + "]");
         } else {
-          sub.setFailEvent(new FailEvent(CallbackView.FailReason.UNCLASSIFIED, ProcessSubmissionServiceImpl.Origin.CALLBACK, Util.info(response)));
+          sub.setFailEvent(new FailEvent(OgelSubmission.FailReason.UNCLASSIFIED, ProcessSubmissionServiceImpl.Origin.CALLBACK, Util.info(response)));
         }
       } catch (ProcessingException e) {
-        sub.setFailEvent(new FailEvent(CallbackView.FailReason.UNCLASSIFIED, ProcessSubmissionServiceImpl.Origin.CALLBACK, Util.info(e)));
+        sub.setFailEvent(new FailEvent(OgelSubmission.FailReason.UNCLASSIFIED, ProcessSubmissionServiceImpl.Origin.CALLBACK, Util.info(e)));
       }
     } else {
       LOGGER.warn("OgelSubmission has not completed its processing. Postponing callback");
@@ -54,18 +54,22 @@ public class CallbackServiceImpl implements CallbackService {
   @VisibleForTesting
   CallbackView getCallbackView(OgelSubmission sub) {
     CallbackView view = new CallbackView();
+    view.setRequestId(sub.getRequestId());
     view.setCustomerId(sub.getCustomerRef());
     view.setSiteId(sub.getSiteRef());
-    if (sub.isProcessingCompleted() && sub.isCompleteSuccess()) {
-      view.setRegistrationReference(sub.getSpireRef());
-      view.setStatus(CallbackView.Status.SUCCESS);
+    if (sub.isCompletedWithSpireRef()) {
+      view.setRegistrationReference(sub.getSpireRef()); // set Registration reference
+      view.setResult(CallbackView.Result.SUCCESS);      // set Result to SUCCESS
     } else {
-      view.setStatus(CallbackView.Status.FAILED);
+      if(sub.hasFailReason()) {
+        view.setResult(sub.getFailReason().toResult()); // set Result from FailReason mapping
+      } else {
+        view.setResult(CallbackView.Result.FAILED);     // set Result to FAILED
+      }
     }
-    view.setRequestId(sub.getRequestId());
-    view.setFailReason(sub.getFailReason());
     return view;
   }
+
 
   private Response doCallback(String url, CallbackView param) {
     // TODO remove once development is finished

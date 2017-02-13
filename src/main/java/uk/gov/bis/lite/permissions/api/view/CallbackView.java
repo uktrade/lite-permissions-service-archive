@@ -2,20 +2,14 @@ package uk.gov.bis.lite.permissions.api.view;
 
 public class CallbackView {
 
+  private Result result;
   private String requestId;
-  private Status status;
   private String registrationReference;
-  private FailReason failReason;
-
   private String customerId;
   private String siteId;
 
-  public enum FailReason {
-    PERMISSION_DENIED, SITE_ALREADY_REGISTERED, BLACKLISTED, ENDPOINT_ERROR, UNCLASSIFIED;
-  }
-
-  public enum Status {
-    SUCCESS, FAILED;
+  public enum Result {
+    SUCCESS, PERMISSION_DENIED, SITE_ALREADY_REGISTERED, BLACKLISTED, FAILED;
   }
 
   public String getRequestId() {
@@ -26,12 +20,12 @@ public class CallbackView {
     this.requestId = requestId;
   }
 
-  public Status getStatus() {
-    return status;
+  public Result getResult() {
+    return result;
   }
 
-  public void setStatus(Status status) {
-    this.status = status;
+  public void setResult(Result result) {
+    this.result = result;
   }
 
   public String getRegistrationReference() {
@@ -40,14 +34,6 @@ public class CallbackView {
 
   public void setRegistrationReference(String registrationReference) {
     this.registrationReference = registrationReference;
-  }
-
-  public FailReason getFailReason() {
-    return failReason;
-  }
-
-  public void setFailReason(FailReason failReason) {
-    this.failReason = failReason;
   }
 
   public String getCustomerId() {

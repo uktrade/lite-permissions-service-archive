@@ -16,7 +16,6 @@ import uk.gov.bis.lite.common.spire.client.SpireClientConfig;
 import uk.gov.bis.lite.common.spire.client.SpireRequestConfig;
 import uk.gov.bis.lite.common.spire.client.parser.ReferenceParser;
 import uk.gov.bis.lite.permissions.Util;
-import uk.gov.bis.lite.permissions.api.view.CallbackView;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.spire.OgelErrorNodeErrorHandler;
 import uk.gov.bis.lite.permissions.spire.SpireReferenceClient;
@@ -98,7 +97,7 @@ public class OgelServiceTest {
     OgelSubmission sub = Util.getMockOgelSubmission(USER_ID_INVALID_OGEL_REF);
     assertThat(ogelService.createOgel(sub)).isNotPresent();
     assertThat(sub.hasFailEvent()).isTrue();
-    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(CallbackView.FailReason.ENDPOINT_ERROR);
+    assertThat(sub.getFailEvent().getFailReason()).isEqualTo(OgelSubmission.FailReason.ENDPOINT_ERROR);
     assertThat(sub.getFailEvent().getOrigin()).isEqualTo(OGEL_CREATE);
   }
 

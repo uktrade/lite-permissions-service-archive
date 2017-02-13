@@ -38,24 +38,29 @@ public class CallbackServiceTest {
     callbackService = new CallbackServiceImpl(resources.client());
   }
 
+  /**
+   * CallbackService tests
+   */
+
   @Test
   public void testCallbackSuccess() throws Exception {
+
     // Setup
     setCallbackEndpointSuccess();
-
     OgelSubmission sub = getMockOgelSubmission();
 
     // Test
     assertThat(callbackService.completeCallback(sub)).isEqualTo(true);
     assertThat(sub.isCalledBack()).isEqualTo(true);
     assertThat(sub.hasFailEvent()).isFalse();
+    assertThat(sub.getFailReason()).isNull();
   }
 
   @Test
   public void testCallbackFailure() throws Exception {
+
     // Setup
     setCallbackEndpointFailed();
-
     OgelSubmission sub = getMockOgelSubmission();
 
     // Test
@@ -66,62 +71,81 @@ public class CallbackServiceTest {
     assertThat(sub.getFailEvent().getOrigin()).isEqualTo(Util.ORIGIN_CALLBACK);
   }
 
+  /**
+   * CallbackView tests
+   */
+
   @Test
   public void testCallbackViewSuccess() throws Exception {
+
+    // Setup
     OgelSubmission sub = getMockOgelSubmission();
     CallbackView view = callbackService.getCallbackView(sub);
 
-    assertEquals(view.getStatus(), CallbackView.Status.SUCCESS);
+    // Test
+    assertEquals(view.getResult(), CallbackView.Result.SUCCESS);
     assertEquals(view.getRegistrationReference(), Util.SPIRE_REF);
     assertEquals(view.getCustomerId(), Util.CUSTOMER_REF);
     assertEquals(view.getSiteId(), Util.SITE_REF);
     assertEquals(view.getRequestId(), Util.SUBMISSION_REF + Util.MOCK_ID);
-    assertEquals(view.getFailReason(), null);
   }
 
   @Test
   public void testCallbackViewNoRegistrationReference() throws Exception {
+
+    // Setup
     OgelSubmission sub = getMockOgelSubmission();
     sub.setSpireRef(null); // removed mocked SpireRef
     CallbackView view = callbackService.getCallbackView(sub);
 
-    assertEquals(view.getStatus(), CallbackView.Status.FAILED);
+    // Test
+    assertEquals(view.getResult(), CallbackView.Result.FAILED);
     assertEquals(view.getRegistrationReference(), null);
     assertEquals(view.getCustomerId(), Util.CUSTOMER_REF);
     assertEquals(view.getSiteId(), Util.SITE_REF);
     assertEquals(view.getRequestId(), Util.SUBMISSION_REF + Util.MOCK_ID);
-    assertEquals(view.getFailReason(), null);
   }
 
   @Test
   public void testCallbackViewNotComplete() throws Exception {
+
+    // Setup
     OgelSubmission sub = getMockOgelSubmission();
     sub.setStatus(Util.STATUS_ACTIVE); // change mocked COMPLETE to ACTIVE
 
     CallbackView view = callbackService.getCallbackView(sub);
 
-    assertEquals(view.getStatus(), CallbackView.Status.FAILED);
+    // Test
+    assertEquals(view.getResult(), CallbackView.Result.FAILED);
     assertEquals(view.getRegistrationReference(), null);
     assertEquals(view.getCustomerId(), Util.CUSTOMER_REF);
     assertEquals(view.getSiteId(), Util.SITE_REF);
     assertEquals(view.getRequestId(), Util.SUBMISSION_REF + Util.MOCK_ID);
-    assertEquals(view.getFailReason(), null);
   }
 
   @Test
-  public void testCallbackViewWithFailReason() throws Exception {
+  public void testViewFromFailReason() throws Exception {
+    CallbackView view1 = callbackService.getCallbackView(Util.getMockWithFailReason(OgelSubmission.FailReason.PERMISSION_DENIED));
+    assertEquals(view1.getResult(), CallbackView.Result.PERMISSION_DENIED);
+
+    CallbackView view2 = callbackService.getCallbackView(Util.getMockWithFailReason(OgelSubmission.FailReason.BLACKLISTED));
+    assertEquals(view2.getResult(), CallbackView.Result.BLACKLISTED);
+
+    CallbackView view3 = callbackService.getCallbackView(Util.getMockWithFailReason(OgelSubmission.FailReason.SITE_ALREADY_REGISTERED));
+    assertEquals(view3.getResult(), CallbackView.Result.SITE_ALREADY_REGISTERED);
+
+    CallbackView view4 = callbackService.getCallbackView(Util.getMockWithFailReason(OgelSubmission.FailReason.ENDPOINT_ERROR));
+    assertEquals(view4.getResult(), CallbackView.Result.FAILED);
+
+    CallbackView view5 = callbackService.getCallbackView(Util.getMockWithFailReason(OgelSubmission.FailReason.UNCLASSIFIED));
+    assertEquals(view5.getResult(), CallbackView.Result.FAILED);
+
     OgelSubmission sub = Util.getMockOgelSubmission();
-    sub.setFailReason(CallbackView.FailReason.PERMISSION_DENIED);
-    sub.setSpireRef(null); // removed mocked SpireRef
+    sub.setSpireRef(null); // mock for failure
 
-    CallbackView view = callbackService.getCallbackView(sub);
+    CallbackView view6 = callbackService.getCallbackView(sub);
+    assertEquals(view6.getResult(), CallbackView.Result.FAILED);
 
-    assertEquals(view.getStatus(), CallbackView.Status.FAILED);
-    assertEquals(view.getRegistrationReference(), null);
-    assertEquals(view.getCustomerId(), Util.CUSTOMER_REF);
-    assertEquals(view.getSiteId(), Util.SITE_REF);
-    assertEquals(view.getRequestId(), Util.SUBMISSION_REF + Util.MOCK_ID);
-    assertEquals(view.getFailReason(), Util.PERMISSION_DENIED);
   }
 
   /**
