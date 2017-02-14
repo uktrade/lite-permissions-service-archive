@@ -1,17 +1,21 @@
 package uk.gov.bis.lite.permissions.service;
 
-import uk.gov.bis.lite.permissions.model.OgelSubmission;
+import uk.gov.bis.lite.permissions.api.view.OgelSubmissionView;
+
+import java.util.List;
 
 public interface SubmissionService {
 
+  boolean ogelSubmissionExists(Integer submissionId);
+
   boolean submissionCurrentlyExists(String subRef);
 
-  boolean prepareCustomer(OgelSubmission sub);
+  List<OgelSubmissionView> getOgelSubmissions(String filter);
 
-  boolean prepareSite(OgelSubmission sub);
+  OgelSubmissionView getOgelSubmission(int submissionId);
 
-  boolean prepareRoleUpdate(OgelSubmission sub);
+  void cancelPendingScheduledOgelSubmissions();
 
-  void updateModeIfNotCompleted(int submissionId);
+  void cancelScheduledOgelSubmission(int submissionId);
 
 }

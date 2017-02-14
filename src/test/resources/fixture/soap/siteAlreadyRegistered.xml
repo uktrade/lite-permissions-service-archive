@@ -1,0 +1,8 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.fivium.co.uk/fox/webservices/ispire/SPIRE_CREATE_OGEL_APP">
+  <soap:Header/>
+  <soap:Body>
+    <ns:RESPONSE>
+      <ERROR>SITE_ALREADY_REGISTERED</ERROR>
+    </ns:RESPONSE>
+  </soap:Body>
+</soap:Envelope>

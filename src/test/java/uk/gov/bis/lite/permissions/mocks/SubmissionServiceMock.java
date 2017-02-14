@@ -1,29 +1,42 @@
 package uk.gov.bis.lite.permissions.mocks;
 
-import uk.gov.bis.lite.permissions.model.OgelSubmission;
+import com.google.inject.Singleton;
+import uk.gov.bis.lite.permissions.api.view.OgelSubmissionView;
 import uk.gov.bis.lite.permissions.service.SubmissionService;
 
+import java.util.List;
+
+@Singleton
 public class SubmissionServiceMock implements SubmissionService {
 
   private boolean submissionCurrentlyExists = false;
+
+  @Override
+  public boolean ogelSubmissionExists(Integer submissionId) {
+    return false;
+  }
 
   public boolean submissionCurrentlyExists(String subRef) {
     return submissionCurrentlyExists;
   }
 
-  public boolean prepareCustomer(OgelSubmission sub) {
-    return true;
+  @Override
+  public List<OgelSubmissionView> getOgelSubmissions(String filter) {
+    return null;
   }
 
-  public boolean prepareSite(OgelSubmission sub) {
-    return true;
+  @Override
+  public OgelSubmissionView getOgelSubmission(int submissionId) {
+    return null;
   }
 
-  public boolean prepareRoleUpdate(OgelSubmission sub) {
-    return true;
+  @Override
+  public void cancelPendingScheduledOgelSubmissions() {
+
   }
 
-  public void updateModeIfNotCompleted(int submissionId) {
+  @Override
+  public void cancelScheduledOgelSubmission(int submissionId) {
 
   }
 

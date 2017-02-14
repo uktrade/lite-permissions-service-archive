@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.common.spire.client.SpireRequest;
 import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
-import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.spire.SpireOgelRegistrationClient;
 import uk.gov.bis.lite.permissions.spire.model.SpireOgelRegistration;
 
@@ -65,7 +64,7 @@ public class RegistrationsServiceImpl implements RegistrationsService {
    */
   private OgelRegistrationView.Status getStatus(String arg) {
     OgelRegistrationView.Status status = OgelRegistrationView.Status.UNKNOWN;
-    if(EnumUtils.isValidEnum(OgelRegistrationView.Status.class, arg)) {
+    if (EnumUtils.isValidEnum(OgelRegistrationView.Status.class, arg)) {
       status = OgelRegistrationView.Status.valueOf(arg);
     } else {
       LOGGER.error("Received unknown OgelRegistrationView status: " + arg);

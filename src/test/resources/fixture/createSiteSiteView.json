@@ -1,0 +1,9 @@
+{
+  "siteId": "SITE_ID",
+  "customerId": "CUSTOMER_ID",
+  "siteName": "SITE_NAME",
+  "address": {
+    "plainText": "1,VICTORIA,LONDON",
+    "country": "country"
+  }
+}

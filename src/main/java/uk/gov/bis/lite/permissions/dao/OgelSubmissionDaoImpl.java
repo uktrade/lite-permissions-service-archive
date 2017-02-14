@@ -23,14 +23,6 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
 
   @Override
   @Transaction
-  public OgelSubmission findBySubmissionRef(String submissionRef) {
-    try (final Handle handle = jdbi.open()) {
-      return attach(handle).findBySubmissionRef(submissionRef);
-    }
-  }
-
-  @Override
-  @Transaction
   public OgelSubmission findBySubmissionId(int submissionId) {
     try (final Handle handle = jdbi.open()) {
       return attach(handle).findBySubmissionId(submissionId);
@@ -47,17 +39,25 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
 
   @Override
   @Transaction
-  public List<OgelSubmission> getScheduledToProcess() {
+  public OgelSubmission findBySubmissionRef(String submissionRef) {
     try (final Handle handle = jdbi.open()) {
-      return attach(handle).getScheduledToProcess();
+      return attach(handle).findBySubmissionRef(submissionRef);
     }
   }
 
   @Override
   @Transaction
-  public List<OgelSubmission> getScheduledByStatus(OgelSubmission.Status status) {
+  public List<OgelSubmission> getScheduledActive() {
     try (final Handle handle = jdbi.open()) {
-      return attach(handle).getScheduledByStatus(status.name());
+      return attach(handle).getScheduledActive();
+    }
+  }
+
+  @Override
+  @Transaction
+  public List<OgelSubmission> getScheduledCompleteToCallback() {
+    try (final Handle handle = jdbi.open()) {
+      return attach(handle).getScheduledCompleteToCallback();
     }
   }
 
@@ -79,12 +79,11 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
 
   @Override
   @Transaction
-  public List<OgelSubmission> getCompleteSubmissions() {
+  public List<OgelSubmission> getFinishedSubmissions() {
     try (final Handle handle = jdbi.open()) {
-      return attach(handle).getCompleteSubmissions();
+      return attach(handle).getFinishedSubmissions();
     }
   }
-
 
   @Override
   @Transaction
@@ -103,8 +102,10 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
           sub.getJson(),
           sub.getMode().name(),
           sub.getStatus().name(),
+          sub.getStage().name(),
           sub.isRoleUpdate(),
-          sub.isRoleUpdated());
+          sub.isRoleUpdated(),
+          sub.getAdminUserId());
     }
   }
 
@@ -122,6 +123,7 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
           sub.getSpireRef(),
           sub.getMode().name(),
           sub.getStatus().name(),
+          sub.getStage().name(),
           sub.isRoleUpdated(),
           sub.isCalledBack(),
           sub.getFirstFail(),

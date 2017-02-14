@@ -1,0 +1,20 @@
+{
+  "userId": "12345",
+  "ogelType": "OGEL",
+  "existingCustomer": "CUSTOMER_ID",
+  "adminApproval": {
+    "adminUserId": "12345"
+  },
+  "newSite": {
+    "useCustomerAddress": false,
+    "siteName": "siteName",
+    "address": {
+      "line1": "1",
+      "line2": "VICTORIA STREET",
+      "town": "London",
+      "county": "Greater London",
+      "postcode": "SW1H 0ET",
+      "country": "CTRY0"
+    }
+  }
+}

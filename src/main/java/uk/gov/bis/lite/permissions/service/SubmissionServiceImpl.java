@@ -1,109 +1,100 @@
 package uk.gov.bis.lite.permissions.service;
 
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.bis.lite.permissions.api.view.OgelSubmissionView;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
-@Singleton
 public class SubmissionServiceImpl implements SubmissionService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SubmissionServiceImpl.class);
 
   private OgelSubmissionDao submissionDao;
-  private CustomerService customerService;
+
+  /**
+   * Used to filter OgelSubmission queries
+   */
+  private enum Filter {
+    PENDING, CANCELLED, FINISHED;
+  }
 
   @Inject
-  public SubmissionServiceImpl(OgelSubmissionDao submissionDao, CustomerService customerService) {
+  public SubmissionServiceImpl(OgelSubmissionDao submissionDao) {
     this.submissionDao = submissionDao;
-    this.customerService = customerService;
+  }
+
+
+  public boolean ogelSubmissionExists(Integer submissionId) {
+    return submissionDao.findBySubmissionId(submissionId) != null;
   }
 
   public boolean submissionCurrentlyExists(String subRef) {
     return submissionDao.findRecentBySubmissionRef(subRef) != null;
   }
 
-  public boolean prepareCustomer(OgelSubmission sub) {
-    boolean prepared = true;
-    if (sub.needsCustomer()) {
-      if (!doGetOrCreateCustomer(sub)) {
-        prepared = false;
-      }
+  public List<OgelSubmissionView> getOgelSubmissions(String filter) {
+    List<OgelSubmission> subs = new ArrayList<>();
+    if (Filter.PENDING.name().equalsIgnoreCase(filter)) {
+      subs = submissionDao.getPendingSubmissions();
+    } else if (Filter.CANCELLED.name().equalsIgnoreCase(filter)) {
+      subs = submissionDao.getCancelledSubmissions();
+    } else if (Filter.FINISHED.name().equalsIgnoreCase(filter)) {
+      subs = submissionDao.getFinishedSubmissions();
     }
-    return prepared;
+    return subs.stream().map(this::getOgelSubmissionView).collect(Collectors.toList());
   }
 
-  public boolean prepareSite(OgelSubmission sub) {
-    boolean prepared = true;
-    if (sub.needsSite()) {
-      if (!doCreateSite(sub)) {
-        prepared = false;
-      }
-    }
-    return prepared;
+  public OgelSubmissionView getOgelSubmission(int submissionId) {
+    return getOgelSubmissionView(submissionDao.findBySubmissionId(submissionId));
   }
 
-  public boolean prepareRoleUpdate(OgelSubmission sub) {
-    boolean prepared = true;
-    if (sub.isRoleUpdate() && !sub.isRoleUpdated()) {
-      if (!doUserRoleUpdate(sub)) {
-        prepared = false;
-      }
-    }
-    return prepared;
+  public void cancelPendingScheduledOgelSubmissions() {
+    submissionDao.getPendingSubmissions().forEach(this::cancelScheduled);
+  }
+
+  public void cancelScheduledOgelSubmission(int submissionId) {
+    cancelScheduled(submissionDao.findBySubmissionId(submissionId));
   }
 
   /**
-   * If OgelSubmission has not completed processing or has not yet been 'called back'
-   * then set MODE to 'SCHEDULED'
+   * Only SCHEDULED ogelSubmissions which have not reached the 'callback' stage can be cancelled.
    */
-  public void updateModeIfNotCompleted(int submissionId) {
-    OgelSubmission sub = submissionDao.findBySubmissionId(submissionId);
-    if (!sub.hasCompleted() || !sub.isCalledBack()) {
-      LOGGER.info("Updating MODE to SCHEDULED for: [" + submissionId + "]");
-      sub.changeToScheduledMode();
-      sub.updateStatus();
+  private void cancelScheduled(OgelSubmission sub) {
+    if (sub != null && sub.isModeScheduled() && !sub.isCalledBack()) {
+      sub.terminateProcessing();
       submissionDao.update(sub);
     }
   }
 
-  private boolean doGetOrCreateCustomer(OgelSubmission sub) {
-    Optional<String> sarRef = customerService.getOrCreateCustomer(sub);
-    boolean created = sarRef.isPresent();
-    if (created) {
-      sub.setCustomerRef(sarRef.get());
-      sub.updateStatus();
-      submissionDao.update(sub);
-      LOGGER.info("Updated record with created Customer sarRef: " + sarRef.get());
+  private OgelSubmissionView getOgelSubmissionView(OgelSubmission sub) {
+    OgelSubmissionView view = new OgelSubmissionView();
+    view.setId("" + sub.getId());
+    view.setUserId(sub.getUserId());
+    view.setOgelType(sub.getOgelType());
+    view.setMode(sub.getMode().name());
+    view.setStatus(sub.getStatus().name());
+    view.setSubmissionRef(sub.getSubmissionRef());
+    view.setCustomerRef(sub.getCustomerRef());
+    view.setSiteRef(sub.getSiteRef());
+    view.setSpireRef(sub.getSpireRef());
+    view.setFirstFail(sub.getFirstFail());
+    view.setLastFailMessage(sub.getLastFailMessage());
+    if (sub.getFailReason() != null) {
+      view.setFailReason(sub.getFailReason().name());
     }
-    return created;
-  }
-
-  private boolean doCreateSite(OgelSubmission sub) {
-    Optional<String> siteRef = customerService.createSite(sub);
-    boolean created = siteRef.isPresent();
-    if (created) {
-      sub.setSiteRef(siteRef.get());
-      sub.updateStatus();
-      submissionDao.update(sub);
-      LOGGER.info("Site created. Updated record: " + siteRef.get());
-    }
-    return created;
-  }
-
-  private boolean doUserRoleUpdate(OgelSubmission sub) {
-    boolean updated = customerService.updateUserRole(sub);
-    if (updated) {
-      sub.setRoleUpdated(true);
-      sub.updateStatus();
-      submissionDao.update(sub);
-      LOGGER.info("User role updated. Updated OgelSubmission: " + sub.getUserId() + "/" + sub.getOgelType());
-    }
-    return updated;
+    view.setCallbackUrl(sub.getCallbackUrl());
+    view.setCalledBack(sub.isCalledBack());
+    view.setCreated(sub.getCreated());
+    view.setRoleUpdate(sub.isRoleUpdate());
+    view.setRoleUpdated(sub.isRoleUpdated());
+    view.setJson(sub.getJson());
+    return view;
   }
 
 }

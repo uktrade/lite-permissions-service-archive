@@ -1,5 +1,6 @@
 package uk.gov.bis.lite.permissions.mocks;
 
+import com.google.inject.Singleton;
 import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
 import uk.gov.bis.lite.permissions.service.RegistrationsService;
 
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Singleton
 public class RegistrationsServiceMock implements RegistrationsService {
 
 

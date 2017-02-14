@@ -1,10 +1,13 @@
 package uk.gov.bis.lite.permissions.service;
 
 import uk.gov.bis.lite.permissions.api.param.RegisterParam;
+import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
 public interface RegisterService {
 
-  String register(RegisterParam reg, String callbackUrl);
+  OgelSubmission getOgelSubmission(RegisterParam param);
+
+  String register(OgelSubmission sub, String callbackUrl);
 
   boolean isRegisterParamValid(RegisterParam registerParam);
 

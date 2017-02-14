@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.api.param.RegisterParam;
+import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.service.RegisterService;
 import uk.gov.bis.lite.permissions.service.SubmissionService;
 
@@ -52,7 +53,8 @@ public class RegisterOgelResource {
     }
 
     // Creates and persists an OgelSubmission
-    String requestId = registerService.register(registerParam, callbackUrl);
+    OgelSubmission sub = registerService.getOgelSubmission(registerParam);
+    String requestId = registerService.register(sub, callbackUrl);
 
     LOGGER.info("************ register-ogel : " + requestId);
 

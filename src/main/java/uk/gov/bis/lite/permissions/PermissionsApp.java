@@ -1,5 +1,6 @@
 package uk.gov.bis.lite.permissions;
 
+import com.google.inject.Module;
 import io.dropwizard.Application;
 import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.auth.PrincipalImpl;
@@ -23,11 +24,21 @@ import uk.gov.bis.lite.permissions.util.SimpleAuthenticator;
 public class PermissionsApp extends Application<PermissionsAppConfig> {
 
   private GuiceBundle<PermissionsAppConfig> guiceBundle;
+  private final Module module;
+
+  public PermissionsApp() {
+    this(new GuiceModule());
+  }
+
+  public PermissionsApp(Module module) {
+    super();
+    this.module = module;
+  }
 
   @Override
   public void initialize(Bootstrap<PermissionsAppConfig> bootstrap) {
     guiceBundle = new GuiceBundle.Builder<PermissionsAppConfig>()
-        .modules(new GuiceModule())
+        .modules(module)
         .installers(ResourceInstaller.class, ManagedInstaller.class)
         .extensions(RegisterOgelResource.class, OgelRegistrationResource.class, OgelSubmissionResource.class, Scheduler.class)
         .build();
@@ -50,6 +61,10 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
     flyway.setDataSource(dataSourceFactory.getUrl(), dataSourceFactory.getUser(), dataSourceFactory.getPassword());
     flyway.migrate();
 
+  }
+
+  public GuiceBundle<PermissionsAppConfig> getGuiceBundle() {
+    return guiceBundle;
   }
 
   public static void main(String[] args) throws Exception {

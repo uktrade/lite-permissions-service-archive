@@ -1,0 +1,34 @@
+{
+  "userId": "userId",
+  "ogelType": "ogelType",
+  "adminApproval": {
+    "adminUserId": "adminUserId"
+  },
+  "newCustomer": {
+    "customerName": "customerName",
+    "customerType": "customerType",
+    "registeredAddress": {
+      "line1": "line1",
+      "line2": "line2",
+      "county": "county",
+      "postcode": "postcode",
+      "country": "country"
+    },
+    "chNumber": "chNumber",
+    "chNumberValidated": false,
+    "eoriNumber": "eoriNumber",
+    "eoriNumberValidated": false,
+    "website": "website"
+  },
+  "newSite": {
+    "useCustomerAddress": false,
+    "siteName": "siteName",
+    "address": {
+      "line1": "line1",
+      "line2": "line2",
+      "county": "county",
+      "postcode": "postcode",
+      "country": "country"
+    }
+  }
+}
