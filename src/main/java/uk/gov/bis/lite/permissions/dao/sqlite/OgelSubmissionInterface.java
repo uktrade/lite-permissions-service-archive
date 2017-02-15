@@ -12,7 +12,7 @@ import java.util.List;
 public interface OgelSubmissionInterface {
 
   @SqlUpdate("UPDATE LOCAL_OGEL_SUBMISSION SET CUSTOMER_REF = :customerRef, SITE_REF = :siteRef, SPIRE_REF = :spireRef, " +
-      "MODE = :mode, STATUS = :status, STAGE = :stage, ROLE_UPDATED = :roleUpdated, CALLED_BACK = :calledBack, FIRST_FAIL = :firstFail, " +
+      "MODE = :mode, STATUS = :status, STAGE = :stage, ROLE_UPDATED = :roleUpdated, CALLED_BACK = :calledBack, FIRST_FAIL = :firstFail, LAST_FAIL = :lastFail, " +
       " LAST_FAIL_MESSAGE = :lastFailMessage, FAIL_REASON = :failReason WHERE id = :id")
   void update(@Bind("customerRef") String customerRef,
               @Bind("siteRef") String siteRef,
@@ -23,6 +23,7 @@ public interface OgelSubmissionInterface {
               @Bind("roleUpdated") Boolean roleUpdated,
               @Bind("calledBack") Boolean calledBack,
               @Bind("firstFail") String firstFail,
+              @Bind("lastFail") String lastFail,
               @Bind("lastFailMessage") String lastFailMessage,
               @Bind("failReason") String failReason,
               @Bind("id") int id);

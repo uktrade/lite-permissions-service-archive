@@ -84,6 +84,7 @@ public class SubmissionServiceImpl implements SubmissionService {
     view.setSiteRef(sub.getSiteRef());
     view.setSpireRef(sub.getSpireRef());
     view.setFirstFail(sub.getFirstFail());
+    view.setLastFail(sub.getLastFail());
     view.setLastFailMessage(sub.getLastFailMessage());
     if (sub.getFailReason() != null) {
       view.setFailReason(sub.getFailReason().name());

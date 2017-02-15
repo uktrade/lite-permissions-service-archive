@@ -24,6 +24,7 @@ public class OgelSubmission {
   private String siteRef;
   private String spireRef;
   private String firstFail;
+  private String lastFail;
   private String lastFailMessage;
   private FailReason failReason;
   private String callbackUrl;
@@ -35,7 +36,7 @@ public class OgelSubmission {
 
   private transient FailEvent failEvent = null;
 
-  private static DateTimeFormatter ogelSubmissionDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+  private static DateTimeFormatter ogelSubmissionDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
   /**
    * IMMEDIATE      - submission is being processed immediately, through all stages
@@ -169,6 +170,11 @@ public class OgelSubmission {
   public void setFirstFailDateTime() {
     LocalDateTime now = LocalDateTime.now();
     firstFail = now.format(ogelSubmissionDateFormatter);
+  }
+
+  public void setLastFailDateTime() {
+    LocalDateTime now = LocalDateTime.now();
+    lastFail = now.format(ogelSubmissionDateFormatter);
   }
 
   public void setScheduledMode() {
@@ -349,5 +355,13 @@ public class OgelSubmission {
 
   public void setFailEvent(FailEvent failEvent) {
     this.failEvent = failEvent;
+  }
+
+  public String getLastFail() {
+    return lastFail;
+  }
+
+  public void setLastFail(String lastFail) {
+    this.lastFail = lastFail;
   }
 }

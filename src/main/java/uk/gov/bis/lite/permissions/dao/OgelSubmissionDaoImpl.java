@@ -127,6 +127,7 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
           sub.isRoleUpdated(),
           sub.isCalledBack(),
           sub.getFirstFail(),
+          sub.getLastFail(),
           sub.getLastFailMessage(),
           failReason,
           sub.getId());

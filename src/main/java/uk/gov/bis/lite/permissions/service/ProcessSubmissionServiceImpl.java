@@ -226,6 +226,7 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
 
       sub.setFailReason(failReason);
       sub.setLastFailMessage(failMessage);
+      sub.setLastFailDateTime();
 
       // Set status to complete with configured fail reason
       if (setStatusCompleteFailReasons.contains(failReason)) {
