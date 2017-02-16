@@ -16,6 +16,7 @@ public class OgelSubmissionView {
   private String siteRef;
   private String spireRef;
   private String firstFail;
+  private String lastFail;
   private String lastFailMessage;
   private String failReason;
   private String callbackUrl;
@@ -168,5 +169,13 @@ public class OgelSubmissionView {
 
   public void setJson(String json) {
     this.json = json;
+  }
+
+  public String getLastFail() {
+    return lastFail;
+  }
+
+  public void setLastFail(String lastFail) {
+    this.lastFail = lastFail;
   }
 }
