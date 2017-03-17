@@ -21,7 +21,7 @@ public class ProcessFailureTest {
 
     // maxMinutesRetryAfterFail set to 0 minutes for testRepeatingError test (does not affect other tests)
     service = new ProcessSubmissionServiceImpl(new OgelSubmissionDaoMock(), new CustomerServiceMock(),
-        new OgelServiceMock(), new CallbackServiceMock(), 0);
+        new OgelServiceMock(), new CallbackServiceMock(), 0, 3);
   }
 
   @Test
@@ -101,7 +101,7 @@ public class ProcessFailureTest {
     service.updateForProcessFailure(sub);
 
     assertThat(sub.hasFailEvent()).isFalse();
-    assertThat(sub.getStatus()).isEqualTo(Util.STATUS_TERMINATED);
+    assertThat(sub.getStatus()).isEqualTo(Util.STATUS_COMPLETE);
   }
 
 }

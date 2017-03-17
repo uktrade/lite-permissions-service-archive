@@ -105,7 +105,8 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
           sub.getStage().name(),
           sub.isRoleUpdate(),
           sub.isRoleUpdated(),
-          sub.getAdminUserId());
+          sub.getAdminUserId(),
+          sub.getCallBackFailCount());
     }
   }
 
@@ -130,6 +131,7 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
           sub.getLastFail(),
           sub.getLastFailMessage(),
           failReason,
+          sub.getCallBackFailCount(),
           sub.getId());
     }
   }

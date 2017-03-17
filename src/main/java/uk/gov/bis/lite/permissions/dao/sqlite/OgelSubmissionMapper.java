@@ -32,6 +32,7 @@ public class OgelSubmissionMapper implements ResultSetMapper<OgelSubmission> {
     sub.setFirstFail(r.getString("FIRST_FAIL"));
     sub.setLastFail(r.getString("LAST_FAIL"));
     sub.setLastFailMessage(r.getString("LAST_FAIL_MESSAGE"));
+    sub.setCallBackFailCount(r.getInt("CALLBACK_FAIL_COUNT"));
 
     if (r.getString("FAIL_REASON") == null) {
       sub.setFailReason(null);

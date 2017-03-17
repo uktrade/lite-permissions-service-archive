@@ -136,9 +136,9 @@ public class ProcessSubmissionCallbackTest {
   }
 
   @Test
-  public void runUserRoleRepeatingFailToTerminated() {
+  public void runUserRoleRepeatingFailToCompleted() {
 
-    String SUB_REF = "UserRoleRepeatingFailToTerminated";
+    String SUB_REF = "runUserRoleRepeatingFailToCompleted";
 
     // Setup
     resetAllMocks(true);
@@ -155,11 +155,11 @@ public class ProcessSubmissionCallbackTest {
     // Process OgelSubmission
     processSubmissionService.doProcessOgelSubmission(findBy(SUB_REF));
 
-    // Test Submission is TERMINATED
-    assertThat(findBy(SUB_REF).getStatus()).isEqualTo(Util.STATUS_TERMINATED);
+    // Test Submission is COMPLETED
+    assertThat(findBy(SUB_REF).getStatus()).isEqualTo(Util.STATUS_COMPLETE);
 
-    // Test Submission is NOT in Callbacks
-    assertThat(findCallbacks()).extracting(OgelSubmission::getSubmissionRef).doesNotContain(SUB_REF);
+    // Test Submission is in Callbacks
+    assertThat(findCallbacks()).extracting(OgelSubmission::getSubmissionRef).contains(SUB_REF);
   }
 
   /**
