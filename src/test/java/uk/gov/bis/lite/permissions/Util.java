@@ -49,6 +49,12 @@ public class Util {
     return sub;
   }
 
+  public static OgelSubmission getMockCallbackOgelSubmission() {
+    OgelSubmission sub = getMockOgelSubmission();
+    sub.setStatus(OgelSubmission.Status.COMPLETE);
+    return sub;
+  }
+
   public static OgelSubmission getMockActiveOgelSubmission() {
     OgelSubmission sub = getMockOgelSubmission();
     sub.setStatus(OgelSubmission.Status.ACTIVE);
