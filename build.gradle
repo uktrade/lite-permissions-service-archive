@@ -5,6 +5,7 @@ plugins {
   id 'application'
   id 'org.flywaydb.flyway' version '4.0.1'
   id 'com.github.johnrengelman.shadow' version '1.2.3'
+  id "au.com.dius.pact" version "3.2.4"
 }
 
 group 'uk.gov.bis.lite'
@@ -62,6 +63,8 @@ dependencies {
     exclude group: 'javax.servlet', module: 'javax.servlet-api'
     exclude group: 'junit', module: 'junit'
   }
+
+  testCompile group: 'au.com.dius', name: 'pact-jvm-provider-junit_2.11', version: '3.3.6'
 }
 
 flyway {
@@ -130,4 +133,29 @@ publishing {
       from components.shadow
     }
   }
+}
+
+pact {
+
+  serviceProviders {
+
+    // You can define as many as you need, but each must have a unique name
+    "lite-permission-service" {
+      // All the provider properties are optional, and have sensible defaults (shown below)
+      protocol = 'http'
+      host = 'permissions-service.svc.dev.licensing.service.trade.gov.uk.test'
+      port = 80
+      path = '/'
+
+      // Again, you can define as many consumers for each provider as you need, but each must have a unique name
+      hasPactWith('lite-ogel-registration') {
+
+        // currently supports a file path using file() or a URL using url()
+        pactFile = file('/Users/Tomacpro/Projects/GitHub/lite-ogel-registration/target/pacts/lite-ogel-registration-lite-permission-service.json')
+
+      }
+    }
+
+  }
+
 }
