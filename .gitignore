@@ -1,5 +1,6 @@
 .idea/
 .gradle/
 build/
+target/
 /src/main/resources/config.yaml
 localPermissions.db

@@ -1,22 +1,24 @@
-import java.text.SimpleDateFormat
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath 'au.com.dius:pact-jvm-provider-gradle_2.11:3.3.6'
+  }
+}
 
 plugins {
   id 'java'
   id 'application'
   id 'org.flywaydb.flyway' version '4.0.1'
   id 'com.github.johnrengelman.shadow' version '1.2.3'
-  id "au.com.dius.pact" version "3.2.4"
+  id "au.com.dius.pact" version "3.3.6"
 }
+
+apply plugin: 'maven-publish'
 
 group 'uk.gov.bis.lite'
-
-if (project.hasProperty('projVersion')) {
-  project.version = project.projVersion
-} else {
-  SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMdd.HHmmss")
-  sdf.setTimeZone(new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "UTC"))
-  project.version = sdf.format(new Date()) + "-SNAPSHOT"
-}
+version '1.3'
 
 mainClassName = "uk.gov.bis.lite.permissions.PermissionsApp"
 
@@ -63,8 +65,45 @@ dependencies {
     exclude group: 'javax.servlet', module: 'javax.servlet-api'
     exclude group: 'junit', module: 'junit'
   }
+  // Pact
+  testCompile 'au.com.dius:pact-jvm-consumer-junit_2.11:3.3.6'
+  testCompile 'org.apache.httpcomponents:fluent-hc:4.5'
+}
 
-  testCompile group: 'au.com.dius', name: 'pact-jvm-provider-junit_2.11', version: '3.3.6'
+task apiJar(type: Jar, dependsOn: compileJava) {
+  from sourceSets.main.output.classesDir
+  include 'uk/gov/bis/lite/permissions/api/**/*'
+}
+
+task jarWithSources(type: Jar) {
+  from sourceSets.main.allJava
+  include 'uk/gov/bis/lite/permissions/api/**/*'
+}
+
+publishing {
+  publications {
+
+    mavenJava(MavenPublication) {
+      artifactId 'lite-permissions-service-api'
+      artifact apiJar
+      artifact jarWithSources {
+        classifier "sources"
+      }
+    }
+  }
+}
+
+publishing {
+  repositories {
+    maven {
+      name "snapshots"
+      url "http://nexus.mgmt.licensing.service.trade.gov.uk.test/repository/maven-snapshots/"
+    }
+    maven {
+      name "releases"
+      url "http://nexus.mgmt.licensing.service.trade.gov.uk.test/repository/maven-releases/"
+    }
+  }
 }
 
 flyway {
@@ -87,75 +126,3 @@ build {
 }
 
 run { args 'server', 'src/main/resources/config.yaml' }
-
-
-apply plugin: 'maven-publish'
-
-publishing {
-  repositories {
-    maven {
-      name "snapshots"
-      url "http://nexus.mgmt.licensing.service.trade.gov.uk.test/repository/maven-snapshots/"
-    }
-    maven {
-      name "releases"
-      url "http://nexus.mgmt.licensing.service.trade.gov.uk.test/repository/maven-releases/"
-    }
-    maven {
-      name "lite-builds"
-      url "http://nexus.mgmt.licensing.service.trade.gov.uk.test/repository/lite-builds/"
-    }
-  }
-}
-
-task apiJar(type: Jar, dependsOn: compileJava) {
-  from sourceSets.main.output.classesDir
-  include 'uk/gov/bis/lite/permissions/api/**/*'
-}
-
-task apiJarWithSources(type: Jar) {
-  from sourceSets.main.allJava
-  include 'uk/gov/bis/lite/permissions/api/**/*'
-}
-
-publishing {
-  publications {
-    api(MavenPublication) {
-      artifactId 'lite-permissions-service-api'
-      version '1.3'
-      artifact apiJar
-      artifact apiJarWithSources {
-        classifier "sources"
-      }
-    }
-    service(MavenPublication) {
-      artifactId 'permissions-service'
-      from components.shadow
-    }
-  }
-}
-
-pact {
-
-  serviceProviders {
-
-    // You can define as many as you need, but each must have a unique name
-    "lite-permission-service" {
-      // All the provider properties are optional, and have sensible defaults (shown below)
-      protocol = 'http'
-      host = 'permissions-service.svc.dev.licensing.service.trade.gov.uk.test'
-      port = 80
-      path = '/'
-
-      // Again, you can define as many consumers for each provider as you need, but each must have a unique name
-      hasPactWith('lite-ogel-registration') {
-
-        // currently supports a file path using file() or a URL using url()
-        pactFile = file('/Users/Tomacpro/Projects/GitHub/lite-ogel-registration/target/pacts/lite-ogel-registration-lite-permission-service.json')
-
-      }
-    }
-
-  }
-
-}
