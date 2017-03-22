@@ -67,6 +67,7 @@ dependencies {
   }
   // Pact
   testCompile 'au.com.dius:pact-jvm-consumer-junit_2.11:3.3.6'
+  testCompile 'au.com.dius:pact-jvm-provider-junit_2.11:3.3.6'
   testCompile 'org.apache.httpcomponents:fluent-hc:4.5'
 }
 
@@ -104,6 +105,31 @@ publishing {
       url "http://nexus.mgmt.licensing.service.trade.gov.uk.test/repository/maven-releases/"
     }
   }
+}
+
+pact {
+
+  serviceProviders {
+
+    // You can define as many as you need, but each must have a unique name
+    "lite-permission-service" {
+      // All the provider properties are optional, and have sensible defaults (shown below)
+      protocol = 'http'
+      host = 'permissions-service.svc.dev.licensing.service.trade.gov.uk.test'
+      port = 80
+      path = '/'
+
+      // Again, you can define as many consumers for each provider as you need, but each must have a unique name
+      hasPactWith('lite-ogel-registration') {
+
+        // currently supports a file path using file() or a URL using url()
+        pactFile = file('/Users/Tomacpro/Projects/GitHub/lite-ogel-registration/target/pacts/lite-ogel-registration-lite-permission-service.json')
+
+      }
+    }
+
+  }
+
 }
 
 flyway {
