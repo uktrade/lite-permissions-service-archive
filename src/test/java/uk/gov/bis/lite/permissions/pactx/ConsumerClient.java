@@ -1,4 +1,4 @@
-package uk.gov.bis.lite.permissions.pact;
+package uk.gov.bis.lite.permissions.pactx;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.UrlEscapers;
@@ -28,6 +28,12 @@ public class ConsumerClient {
 
   public int post(String path) throws IOException {
     return Request.Post(url + encodePath(path))
+        .execute().returnResponse().getStatusLine().getStatusCode();
+  }
+
+  public int postWithBody(String path, String body, ContentType mimeType) throws IOException {
+    return Request.Post(url + encodePath(path))
+        .bodyString(body, mimeType)
         .execute().returnResponse().getStatusLine().getStatusCode();
   }
 

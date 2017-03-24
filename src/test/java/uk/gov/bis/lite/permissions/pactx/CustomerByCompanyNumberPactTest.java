@@ -1,4 +1,4 @@
-package uk.gov.bis.lite.permissions.pact;
+package uk.gov.bis.lite.permissions.pactx;
 
 import static groovy.util.GroovyTestCase.assertEquals;
 import static io.dropwizard.testing.FixtureHelpers.fixture;
@@ -21,9 +21,9 @@ public class CustomerByCompanyNumberPactTest {
   private static String path = "/search-customers/registered-number/{chNumber}";
 
   @Rule
-  public PactProviderRule provider = new PactProviderRule("customerServiceCustomerByCompanyNumberProvider", "localhost", 8080, this);
+  public PactProviderRule provider = new PactProviderRule("customer-customer-company-number", "localhost", 8080, this);
 
-  @Pact(provider="customerServiceCustomerByCompanyNumberProvider", consumer="permissionsServiceCustomerByCompanyNumberConsumer")
+  @Pact(provider="customer-customer-company-number", consumer="permissions")
   public PactFragment createFragment(PactDslWithProvider builder) {
     return builder
         .uponReceiving("CustomerByCompanyNumberPactTest test interaction")
@@ -36,7 +36,7 @@ public class CustomerByCompanyNumberPactTest {
   }
 
   @Test
-  @PactVerification("customerServiceCustomerByCompanyNumberProvider")
+  @PactVerification("customer-customer-company-number")
   public void runTest() throws IOException {
     assertEquals(new ConsumerClient(url).getAsJsonString(path), customerView);
   }

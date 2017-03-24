@@ -121,7 +121,7 @@ public class CustomerServiceImpl implements CustomerService {
    * Uses CustomerService to create Customer
    * Returns sarRef if successful, notifies FailService if there is an error
    */
-  private Optional<String> createCustomer(OgelSubmission sub) {
+  public Optional<String> createCustomer(OgelSubmission sub) {
 
     WebTarget target = httpClient.target(customerServiceUrl).path("/create-customer");
     try {

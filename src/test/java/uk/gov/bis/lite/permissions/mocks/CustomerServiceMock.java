@@ -40,6 +40,18 @@ public class CustomerServiceMock implements CustomerService {
   }
 
   @Override
+  public Optional<String> createCustomer(OgelSubmission sub) {
+    /*
+    siteCallCount++;
+    if (!createSiteSuccess) {
+      sub.setFailEvent(failEvent);
+    }
+    return createSiteSuccess ? Optional.of(Util.SITE_REF) : Optional.empty();*/
+
+    return Optional.empty();
+  }
+
+  @Override
   public boolean updateUserRole(OgelSubmission sub) {
     uerRoleCallCount++;
     if (!updateUserRoleSuccess) {

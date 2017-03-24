@@ -1,4 +1,4 @@
-package uk.gov.bis.lite.permissions.pact;
+package uk.gov.bis.lite.permissions.pactx;
 
 import au.com.dius.pact.consumer.Pact;
 import au.com.dius.pact.consumer.PactProviderRule;
@@ -18,9 +18,9 @@ public class UserRoleUpdatePactTest {
   private static String path = "/user-roles/user/{userId}/site/{siteRef}";
 
   @Rule
-  public PactProviderRule provider = new PactProviderRule("customerServiceUserRoleUpdateProvider", "localhost", 8080, this);
+  public PactProviderRule provider = new PactProviderRule("customer-user-role", "localhost", 8080, this);
 
-  @Pact(provider="customerServiceUserRoleUpdateProvider", consumer="permissionsServiceUserRoleUpdateConsumer")
+  @Pact(provider="customer-user-role", consumer="permissions")
   public PactFragment createFragment(PactDslWithProvider builder) {
     return builder
         .given("test state")
@@ -33,7 +33,7 @@ public class UserRoleUpdatePactTest {
   }
 
   @Test
-  @PactVerification("customerServiceUserRoleUpdateProvider")
+  @PactVerification("customer-user-role")
   public void runTest() throws IOException {
     Assert.assertEquals(200, new ConsumerClient(url).post(path));
   }
