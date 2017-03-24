@@ -110,6 +110,12 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
   }
 
   @Provides
+  @javax.inject.Named("maxCallbackFailCount")
+  int provideCallbackFailCount(PermissionsAppConfig config) {
+    return Integer.parseInt(config.getMaxCallbackFailCount());
+  }
+
+  @Provides
   @Named("jdbi")
   public DBI provideDataSourceJdbi(Environment environment, PermissionsAppConfig config) {
     final DBIFactory factory = new DBIFactory();

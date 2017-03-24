@@ -1,6 +1,7 @@
 package uk.gov.bis.lite.permissions.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +22,7 @@ public class ProcessFailureTest {
 
     // maxMinutesRetryAfterFail set to 0 minutes for testRepeatingError test (does not affect other tests)
     service = new ProcessSubmissionServiceImpl(new OgelSubmissionDaoMock(), new CustomerServiceMock(),
-        new OgelServiceMock(), new CallbackServiceMock(), 0);
+        new OgelServiceMock(), new CallbackServiceMock(), 0, 1);
   }
 
   @Test
@@ -101,7 +102,31 @@ public class ProcessFailureTest {
     service.updateForProcessFailure(sub);
 
     assertThat(sub.hasFailEvent()).isFalse();
+    assertThat(sub.getStatus()).isEqualTo(Util.STATUS_COMPLETE);
+  }
+
+  @Test
+  public void testRepeatingCallbackError() throws Exception {
+    OgelSubmission sub = Util.getMockCallbackOgelSubmission();
+    assertEquals(sub.getCallBackFailCount(), 0);
+
+    // maxCallbackFailCount set to 1 so we expect Status to be set to TERMINATED after 2 iterations
+
+    sub.setFailEvent(new FailEvent(Util.UNCLASSIFIED, Util.ORIGIN_CALLBACK, Util.ERROR_MESSAGE));
+    service.updateForCallbackFailure(sub);
+    assertThat(sub.getStatus()).isEqualTo(Util.STATUS_COMPLETE);
+    assertEquals(1, sub.getCallBackFailCount());
+
+    sub.setFailEvent(new FailEvent(Util.UNCLASSIFIED, Util.ORIGIN_CALLBACK, Util.ERROR_MESSAGE));
+    service.updateForCallbackFailure(sub);
+    assertThat(sub.getStatus()).isEqualTo(Util.STATUS_COMPLETE);
+    assertEquals(2, sub.getCallBackFailCount());
+
+    sub.setFailEvent(new FailEvent(Util.UNCLASSIFIED, Util.ORIGIN_CALLBACK, Util.ERROR_MESSAGE));
+    service.updateForCallbackFailure(sub);
     assertThat(sub.getStatus()).isEqualTo(Util.STATUS_TERMINATED);
+    assertEquals(2, sub.getCallBackFailCount());
+
   }
 
 }

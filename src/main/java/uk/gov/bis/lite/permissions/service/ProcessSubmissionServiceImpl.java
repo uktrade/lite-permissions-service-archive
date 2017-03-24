@@ -33,6 +33,7 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
   private CallbackService callbackService;
 
   private int maxMinutesRetryAfterFail;
+  private int maxCallbackFailCount;
 
   private static final Set<OgelSubmission.FailReason> setStatusCompleteFailReasons = new HashSet<>(Arrays.asList(new OgelSubmission.FailReason[]{
       OgelSubmission.FailReason.BLACKLISTED,
@@ -51,12 +52,14 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
   @Inject
   public ProcessSubmissionServiceImpl(OgelSubmissionDao submissionDao, CustomerService customerService,
                                       OgelService ogelService, CallbackService callbackService,
-                                      @Named("maxMinutesRetryAfterFail") int maxMinutesRetryAfterFail) {
+                                      @Named("maxMinutesRetryAfterFail") int maxMinutesRetryAfterFail,
+                                      @Named("maxCallbackFailCount") int maxCallbackFailCount) {
     this.submissionDao = submissionDao;
     this.customerService = customerService;
     this.ogelService = ogelService;
     this.callbackService = callbackService;
     this.maxMinutesRetryAfterFail = maxMinutesRetryAfterFail;
+    this.maxCallbackFailCount = maxCallbackFailCount;
   }
 
   /**
@@ -71,11 +74,17 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
       // Process this OgelSubmission immediately
       doProcessOgelSubmission(sub);
 
-      //
-      boolean calledBack = callbackService.completeCallback(sub);
+      // If no FailEvent we attempt callback
+      boolean updateToScheduled = sub.hasFailEvent();
+      if(!updateToScheduled) {
+        if(!callbackService.completeCallback(sub)) {
+          // We have callback failure so we need to ensure OgelSubmission mode is set to SCHEDULED
+          updateToScheduled = true;
+        }
+      }
 
-      // If not called back we set Update MODE to SCHEDULED
-      if (!calledBack) {
+      // Change mode of OgelSubmission to SCHEDULED if we have had a previous failure
+      if(updateToScheduled) {
         LOGGER.info("Setting submission MODE to SCHEDULED: [" + submissionId + "]");
         updateForProcessFailure(sub);
         sub.setScheduledMode();
@@ -190,12 +199,42 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
     for (OgelSubmission sub : subs) {
       try {
         if (!callbackService.completeCallback(sub)) {
-          updateForProcessFailure(sub);
+          updateForCallbackFailure(sub);
         }
         submissionDao.update(sub);
       } catch (Throwable e) {
         errorThrown(sub, e, "ProcessSubmissionServiceImpl.processScheduled");
       }
+    }
+  }
+
+  /**
+   * Updates OgelSubmission for Callback failures, checks fail count to set to TERMINATED if necessary
+   * Removes FailEvent once OgelSubmission updated
+   */
+  @VisibleForTesting
+  void updateForCallbackFailure(OgelSubmission sub) {
+    if (sub.hasFailEvent()) {
+      FailEvent event = sub.getFailEvent();
+      OgelSubmission.FailReason failReason = event.getFailReason();
+      Origin origin = event.getOrigin();
+      String message = event.getMessage();
+
+      String failMessage = createFailMessage(failReason, origin, message);
+      LOGGER.error(failMessage);
+
+      int currentCallbackFailCount = sub.getCallBackFailCount();
+
+      // Check for repeating error
+      if (currentCallbackFailCount > maxCallbackFailCount) {
+        LOGGER.info("Repeating Callback Error - setting status to TERMINATED [" + sub.getRequestId() + "]");
+        sub.updateStatusToTerminated();
+      } else {
+        sub.setCallBackFailCount(currentCallbackFailCount + 1);
+      }
+
+      // Remove FailEvent
+      sub.clearFailEvent();
     }
   }
 
@@ -219,8 +258,8 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
       } else {
         // Check for repeating error
         if (sub.getFirstFailDateTime().isBefore(LocalDateTime.now().minus(maxMinutesRetryAfterFail, MINUTES))) {
-          LOGGER.info("Repeating Error - setting status to TERMINATED [" + sub.getRequestId() + "]");
-          sub.updateStatusToTerminated();
+          LOGGER.info("Repeating Error - setting status to COMPLETE [" + sub.getRequestId() + "]");
+          sub.updateStatusToComplete();
         }
       }
 

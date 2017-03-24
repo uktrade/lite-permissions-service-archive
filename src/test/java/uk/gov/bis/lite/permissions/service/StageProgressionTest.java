@@ -30,7 +30,7 @@ public class StageProgressionTest {
     CustomerService customerService = new CustomerServiceMock();
     OgelService ogelService = new OgelServiceMock();
     CallbackService callbackService = new CallbackServiceMock();
-    service = new ProcessSubmissionServiceImpl(submissionDao, customerService, ogelService, callbackService, 1);
+    service = new ProcessSubmissionServiceImpl(submissionDao, customerService, ogelService, callbackService, 1, 3);
   }
 
   @Test
