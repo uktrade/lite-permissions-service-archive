@@ -1,0 +1,18 @@
+{
+  "userId": "",
+  "customerName": "customerName",
+  "customerType": "customerType",
+  "website": "website",
+  "companiesHouseNumber": "chNumber",
+  "companiesHouseValidated": false,
+  "eoriNumber": "eoriNumber",
+  "eoriValidated": false,
+  "addressParam": {
+    "line1": "line1",
+    "line2": "line2",
+    "town": "town",
+    "county": "county",
+    "postcode": "postcode",
+    "country": "country"
+  }
+}

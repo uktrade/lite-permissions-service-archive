@@ -12,6 +12,8 @@ public interface CustomerService {
 
   Optional<String> createSite(OgelSubmission sub);
 
+  Optional<String> getCustomerIdByCompanyNumber(String companyNumber);
+
   boolean updateUserRole(OgelSubmission sub);
 
 }

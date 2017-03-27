@@ -51,6 +51,10 @@ public class CustomerServiceMock implements CustomerService {
     return Optional.empty();
   }
 
+  public Optional<String> getCustomerIdByCompanyNumber(String companyNumber) {
+    return Optional.empty();
+  }
+
   @Override
   public boolean updateUserRole(OgelSubmission sub) {
     uerRoleCallCount++;

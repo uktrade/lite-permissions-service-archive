@@ -1,6 +1,7 @@
 package uk.gov.bis.lite.permissions.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -121,6 +122,7 @@ public class CustomerServiceImpl implements CustomerService {
    * Uses CustomerService to create Customer
    * Returns sarRef if successful, notifies FailService if there is an error
    */
+  @VisibleForTesting
   public Optional<String> createCustomer(OgelSubmission sub) {
 
     WebTarget target = httpClient.target(customerServiceUrl).path("/create-customer");
@@ -140,7 +142,8 @@ public class CustomerServiceImpl implements CustomerService {
   /**
    * Uses CustomerService to get CustomerId from the companyNumber
    */
-  private Optional<String> getCustomerIdByCompanyNumber(String companyNumber) {
+  @VisibleForTesting
+  public Optional<String> getCustomerIdByCompanyNumber(String companyNumber) {
     String customerSearchByCompanyNumberPath = "/search-customers/registered-number/{chNumber}";
     WebTarget target = httpClient.target(customerServiceUrl)
         .path(customerSearchByCompanyNumberPath.replace("{chNumber}", companyNumber));
