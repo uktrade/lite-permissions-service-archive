@@ -1,0 +1,367 @@
+{
+    "provider": {
+        "name": "lite-customer-service"
+    },
+    "consumer": {
+        "name": "lite-permissions-service"
+    },
+    "interactions": [
+        {
+            "description": "Create Customer Fail (no userId)",
+            "request": {
+                "method": "POST",
+                "path": "/create-customer",
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": {
+                    "addressParam": {
+                        "country": "country",
+                        "county": "county",
+                        "line1": "line1",
+                        "line2": "line2",
+                        "postcode": "postcode",
+                        "town": "town"
+                    },
+                    "companiesHouseNumber": "chNumber",
+                    "companiesHouseValidated": false,
+                    "customerName": "customerName",
+                    "customerType": "customerType",
+                    "eoriNumber": "eoriNumber",
+                    "eoriValidated": false,
+                    "userId": "",
+                    "website": "website"
+                }
+            },
+            "response": {
+                "status": 400
+            }
+        },
+        {
+            "description": "Create Customer Success",
+            "request": {
+                "method": "POST",
+                "path": "/create-customer",
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": {
+                    "addressParam": {
+                        "country": "country",
+                        "county": "county",
+                        "line1": "line1",
+                        "line2": "line2",
+                        "postcode": "postcode",
+                        "town": "town"
+                    },
+                    "companiesHouseNumber": "chNumber",
+                    "companiesHouseValidated": false,
+                    "customerName": "customerName",
+                    "customerType": "customerType",
+                    "eoriNumber": "eoriNumber",
+                    "eoriValidated": false,
+                    "userId": "userId",
+                    "website": "website"
+                }
+            },
+            "response": {
+                "status": 200,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": {
+                    "applicantType": "wBVGuGKHZqJVhDLpXwIF",
+                    "companyName": "SZcBzUTfAAFqDHVUkQjN",
+                    "companyNumber": "wWlumXWgkJAMhRSjhqpA",
+                    "countryOfOriginCode": "fCtkjpCQobBfUSIcoABl",
+                    "customerId": "dEDvkMHeIwPpsmfEaJAU",
+                    "organisationType": "WkcDRNuJAUFNKCnBuhKT",
+                    "registeredAddress": "EOfxopAtjYjbrZgfYhTJ",
+                    "registrationStatus": "qnlEqUpZDgHvoCkPKUKc",
+                    "shortName": "OGnpivGdXiVpquVUDUvQ",
+                    "websites": [
+                        
+                    ]
+                },
+                "matchingRules": {
+                    "$.body.shortName": {
+                        "match": "type"
+                    },
+                    "$.body.companyNumber": {
+                        "match": "type"
+                    },
+                    "$.body.companyName": {
+                        "match": "type"
+                    },
+                    "$.body.applicantType": {
+                        "match": "type"
+                    },
+                    "$.body.countryOfOriginCode": {
+                        "match": "type"
+                    },
+                    "$.body.customerId": {
+                        "match": "type"
+                    },
+                    "$.body.organisationType": {
+                        "match": "type"
+                    },
+                    "$.body.registeredAddress": {
+                        "match": "type"
+                    },
+                    "$.body.registrationStatus": {
+                        "match": "type"
+                    }
+                }
+            }
+        },
+        {
+            "description": "Create Site Fail (no userId)",
+            "request": {
+                "method": "POST",
+                "path": "/customer-sites/CUSTOMER_ID",
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "query": "userId=",
+                "body": {
+                    "addressParam": {
+                        "country": "AoGOphRQhwvlyeoTlUGu",
+                        "county": "QkkoOsCqgeCCPEQYehxn",
+                        "line1": "iTwzNtvfjeMdhoPPMVVr",
+                        "line2": "UhsfjtmZvHrsxdYgnFil",
+                        "postcode": "oVOuEciWEeuKbsnwogJV",
+                        "town": "rSELcMkyNjmkYrBwTuRH"
+                    },
+                    "siteName": "vycElhkALwQcTNqeplKw"
+                },
+                "matchingRules": {
+                    "$.body.addressParam.county": {
+                        "match": "type"
+                    },
+                    "$.body.addressParam.line1": {
+                        "match": "type"
+                    },
+                    "$.body.addressParam.line2": {
+                        "match": "type"
+                    },
+                    "$.body.addressParam.postcode": {
+                        "match": "type"
+                    },
+                    "$.body.siteName": {
+                        "match": "type"
+                    },
+                    "$.body.addressParam.country": {
+                        "match": "type"
+                    },
+                    "$.body.addressParam.town": {
+                        "match": "type"
+                    }
+                }
+            },
+            "response": {
+                "status": 400
+            }
+        },
+        {
+            "description": "Create Site Success",
+            "request": {
+                "method": "POST",
+                "path": "/customer-sites/CUSTOMER_ID",
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "query": "userId=userId",
+                "body": {
+                    "addressParam": {
+                        "country": "LrxdWouaTrywFXnuAkbh",
+                        "county": "wiFBFDhelohnpVuyYmqS",
+                        "line1": "jilgMTTCVgfcmCHBncoD",
+                        "line2": "azvyadVkbeJReHahiWvq",
+                        "postcode": "uxRuKVnOEbexcjqMSWHG",
+                        "town": "nWkyVCIvxrrjRdEJlLSR"
+                    },
+                    "siteName": "tjxEizpNKUXMqFiGrObH"
+                },
+                "matchingRules": {
+                    "$.body.addressParam.county": {
+                        "match": "type"
+                    },
+                    "$.body.addressParam.line1": {
+                        "match": "type"
+                    },
+                    "$.body.addressParam.line2": {
+                        "match": "type"
+                    },
+                    "$.body.addressParam.postcode": {
+                        "match": "type"
+                    },
+                    "$.body.siteName": {
+                        "match": "type"
+                    },
+                    "$.body.addressParam.country": {
+                        "match": "type"
+                    },
+                    "$.body.addressParam.town": {
+                        "match": "type"
+                    }
+                }
+            },
+            "response": {
+                "status": 200,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": {
+                    "address": {
+                        "country": "kimRiTQoLhJKFvXtRPZm",
+                        "plainText": "UKiKtaztaIHNvvwjbdQe"
+                    },
+                    "customerId": "ciqgSApQLPdPsdrsCUBj",
+                    "siteId": "vIawiENhvbPTHEnDqrgJ",
+                    "siteName": "URtXqLoGJvPgIpTZmDGv"
+                },
+                "matchingRules": {
+                    "$.body.address.plainText": {
+                        "match": "type"
+                    },
+                    "$.body.address.country": {
+                        "match": "type"
+                    },
+                    "$.body.siteId": {
+                        "match": "type"
+                    },
+                    "$.body.customerId": {
+                        "match": "type"
+                    },
+                    "$.body.siteName": {
+                        "match": "type"
+                    }
+                }
+            }
+        },
+        {
+            "description": "Customer by CompanyNumber Fail",
+            "request": {
+                "method": "GET",
+                "path": "/search-customers/registered-number/COMPANY_NUMBER_FAIL"
+            },
+            "response": {
+                "status": 404
+            }
+        },
+        {
+            "description": "Customer by CompanyNumber Success",
+            "request": {
+                "method": "GET",
+                "path": "/search-customers/registered-number/COMPANY_NUMBER_SUCCESS"
+            },
+            "response": {
+                "status": 200,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": {
+                    "applicantType": "RctNjydxLpGhHFyghoEo",
+                    "companyName": "ANSAmLkSBGTLxPCnvoQp",
+                    "companyNumber": "XIQUIGBJDRFkAmfEdDeB",
+                    "countryOfOriginCode": "hSilgHeUefgDZnSSxeXB",
+                    "customerId": "GGxuSelMAZPKdQibaHtw",
+                    "organisationType": "YoVBhLtgOsvHiCBnSZvh",
+                    "registeredAddress": "BvDIpjCNrSsZBDoedDYm",
+                    "registrationStatus": "okOPbLxpVINEoOUKxUyH",
+                    "shortName": "CBAKRPOXCUSxyrIcXniz",
+                    "websites": [
+                        
+                    ]
+                },
+                "matchingRules": {
+                    "$.body.shortName": {
+                        "match": "type"
+                    },
+                    "$.body.companyNumber": {
+                        "match": "type"
+                    },
+                    "$.body.companyName": {
+                        "match": "type"
+                    },
+                    "$.body.applicantType": {
+                        "match": "type"
+                    },
+                    "$.body.countryOfOriginCode": {
+                        "match": "type"
+                    },
+                    "$.body.customerId": {
+                        "match": "type"
+                    },
+                    "$.body.organisationType": {
+                        "match": "type"
+                    },
+                    "$.body.registeredAddress": {
+                        "match": "type"
+                    },
+                    "$.body.registrationStatus": {
+                        "match": "type"
+                    }
+                }
+            }
+        },
+        {
+            "description": "Update UserRole Fail",
+            "request": {
+                "method": "POST",
+                "path": "/user-roles/user/USER_ID_FAIL/site/SITE_REF_FAIL",
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": {
+                    "adminUserId": "IxlDldGZssAHSAMcZSxf",
+                    "roleType": "ADMIN"
+                },
+                "matchingRules": {
+                    "$.body.adminUserId": {
+                        "match": "type"
+                    },
+                    "$.body.roleType": {
+                        "match": "type"
+                    }
+                }
+            },
+            "response": {
+                "status": 400
+            }
+        },
+        {
+            "description": "Update UserRole Success",
+            "request": {
+                "method": "POST",
+                "path": "/user-roles/user/USER_ID_SUCCESS/site/SITE_REF_SUCCESS",
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": {
+                    "adminUserId": "aeVwAlDIIpFaDETBCCrT",
+                    "roleType": "ADMIN"
+                },
+                "matchingRules": {
+                    "$.body.adminUserId": {
+                        "match": "type"
+                    },
+                    "$.body.roleType": {
+                        "match": "type"
+                    }
+                }
+            },
+            "response": {
+                "status": 200
+            }
+        }
+    ],
+    "metadata": {
+        "pact-specification": {
+            "version": "2.0.0"
+        },
+        "pact-jvm": {
+            "version": "3.3.6"
+        }
+    }
+}
