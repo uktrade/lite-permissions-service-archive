@@ -6,7 +6,7 @@ import uk.gov.bis.lite.permissions.config.GuiceModule;
 public class TestCustomerApplication extends PermissionsApp {
 
   public TestCustomerApplication() {
-    super(Modules.override(new GuiceModule()).with(new GuiceTestModule()));
+    super(Modules.override(new GuiceModule()).with(new GuicePactModule()));
   }
 
   public <T> T getInstance(Class<T> type) {

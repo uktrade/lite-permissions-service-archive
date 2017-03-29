@@ -11,10 +11,13 @@ import java.util.stream.Collectors;
 @Singleton
 public class RegistrationsServiceMock implements RegistrationsService {
 
-
   private List<OgelRegistrationView> mockRegistrations = new ArrayList<>();
   private boolean noResults = false;
   private String mockRegistrationTag;
+
+  public RegistrationsServiceMock() {
+    this("1234", 1);
+  }
 
   public RegistrationsServiceMock(String mockRegistrationTag, int numberOfCustomers) {
     this.mockRegistrationTag = mockRegistrationTag;
@@ -25,6 +28,11 @@ public class RegistrationsServiceMock implements RegistrationsService {
     for (int i = 1; i < numberOfRegistrations + 1; i++) {
       OgelRegistrationView view = new OgelRegistrationView();
       view.setRegistrationReference(mockRegistrationTag + i);
+      view.setCustomerId("CUST" + i);
+      view.setStatus(OgelRegistrationView.Status.UNKNOWN);
+      view.setSiteId("SITE" + i);
+      view.setOgelType("OGEL_TYPE");
+      view.setRegistrationDate("DATE");
       mockRegistrations.add(view);
     }
   }
