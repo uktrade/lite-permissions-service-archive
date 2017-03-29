@@ -1,9 +1,6 @@
 {
   "userId": "userId",
   "ogelType": "ogelType",
-  "adminApproval": {
-    "adminUserId": "adminUserId"
-  },
   "newCustomer": {
     "customerName": "customerName",
     "customerType": "customerType",
