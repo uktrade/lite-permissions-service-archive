@@ -1,9 +1,0 @@
-{
-  "siteId": "siteId",
-  "customerId": "customerId",
-  "siteName": "siteName",
-  "address": {
-    "plainText": "plainText",
-    "country": "country"
-  }
-}
