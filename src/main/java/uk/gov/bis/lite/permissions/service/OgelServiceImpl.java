@@ -6,8 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.common.spire.client.SpireRequest;
-import uk.gov.bis.lite.common.spire.client.exception.SpireClientException;
-import uk.gov.bis.lite.permissions.api.view.CallbackView;
 import uk.gov.bis.lite.permissions.exception.SpireFailReasonException;
 import uk.gov.bis.lite.permissions.model.FailEvent;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
@@ -45,7 +43,7 @@ public class OgelServiceImpl implements OgelService {
       }
     } catch (SpireFailReasonException e) {
       sub.setFailEvent(new FailEvent(e.getFailReason(), ProcessSubmissionServiceImpl.Origin.OGEL_CREATE, e.getMessage()));
-    } catch (SpireClientException e) {
+    } catch (Throwable e) {
       sub.setFailEvent(new FailEvent(OgelSubmission.FailReason.UNCLASSIFIED, ProcessSubmissionServiceImpl.Origin.OGEL_CREATE, e.getMessage()));
     }
 

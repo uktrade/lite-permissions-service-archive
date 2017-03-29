@@ -31,6 +31,9 @@ public class PermissionsAppConfig extends Configuration {
   @NotEmpty
   private String maxMinutesRetryAfterFail;
 
+  @NotEmpty
+  private String maxCallbackFailCount;
+
   @Valid
   @NotNull
   @JsonProperty("database")
@@ -80,5 +83,9 @@ public class PermissionsAppConfig extends Configuration {
 
   public String getAdminPassword() {
     return adminPassword;
+  }
+
+  public String getMaxCallbackFailCount() {
+    return maxCallbackFailCount;
   }
 }

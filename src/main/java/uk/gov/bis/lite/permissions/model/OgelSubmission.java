@@ -29,6 +29,7 @@ public class OgelSubmission {
   private FailReason failReason;
   private String callbackUrl;
   private boolean calledBack;
+  private int callBackFailCount = 0;
   private String json;
   private String created;
   private boolean roleUpdate;
@@ -363,5 +364,13 @@ public class OgelSubmission {
 
   public void setLastFail(String lastFail) {
     this.lastFail = lastFail;
+  }
+
+  public int getCallBackFailCount() {
+    return callBackFailCount;
+  }
+
+  public void setCallBackFailCount(int callBackFailCount) {
+    this.callBackFailCount = callBackFailCount;
   }
 }

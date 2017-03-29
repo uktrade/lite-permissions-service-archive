@@ -13,7 +13,7 @@ public interface OgelSubmissionInterface {
 
   @SqlUpdate("UPDATE LOCAL_OGEL_SUBMISSION SET CUSTOMER_REF = :customerRef, SITE_REF = :siteRef, SPIRE_REF = :spireRef, " +
       "MODE = :mode, STATUS = :status, STAGE = :stage, ROLE_UPDATED = :roleUpdated, CALLED_BACK = :calledBack, FIRST_FAIL = :firstFail, LAST_FAIL = :lastFail, " +
-      " LAST_FAIL_MESSAGE = :lastFailMessage, FAIL_REASON = :failReason WHERE id = :id")
+      " LAST_FAIL_MESSAGE = :lastFailMessage, FAIL_REASON = :failReason, CALLBACK_FAIL_COUNT = :callbackFailCount WHERE id = :id")
   void update(@Bind("customerRef") String customerRef,
               @Bind("siteRef") String siteRef,
               @Bind("spireRef") String spireRef,
@@ -26,11 +26,12 @@ public interface OgelSubmissionInterface {
               @Bind("lastFail") String lastFail,
               @Bind("lastFailMessage") String lastFailMessage,
               @Bind("failReason") String failReason,
+              @Bind("callbackFailCount") int callbackFailCount,
               @Bind("id") int id);
 
   @SqlUpdate("INSERT INTO LOCAL_OGEL_SUBMISSION (USER_ID, OGEL_TYPE, SUBMISSION_REF, CUSTOMER_REF, SITE_REF, SPIRE_REF, " +
-      "CALLBACK_URL, CALLED_BACK, JSON, MODE, STATUS, STAGE, ROLE_UPDATE, ROLE_UPDATED, ADMIN_USER_ID) VALUES (:userId, :ogelType, :submissionRef, :customerRef, :siteRef, " +
-      " :spireRef, :callbackUrl, :calledBack, :json, :mode, :status, :stage, :roleUpdate, :roleUpdated, :adminUserId)")
+      "CALLBACK_URL, CALLED_BACK, JSON, MODE, STATUS, STAGE, ROLE_UPDATE, ROLE_UPDATED, ADMIN_USER_ID, CALLBACK_FAIL_COUNT) VALUES (:userId, :ogelType, :submissionRef, :customerRef, :siteRef, " +
+      " :spireRef, :callbackUrl, :calledBack, :json, :mode, :status, :stage, :roleUpdate, :roleUpdated, :adminUserId, :callbackFailCount)")
   @GetGeneratedKeys
   int insert(@Bind("userId") String userId,
              @Bind("ogelType") String ogelType,
@@ -46,7 +47,8 @@ public interface OgelSubmissionInterface {
              @Bind("stage") String stage,
              @Bind("roleUpdate") Boolean roleUpdate,
              @Bind("roleUpdated") Boolean roleUpdated,
-             @Bind("adminUserId") String adminUserId);
+             @Bind("adminUserId") String adminUserId,
+             @Bind("callbackFailCount") int callbackFailCount);
 
   @SqlQuery("SELECT * FROM LOCAL_OGEL_SUBMISSION WHERE MODE = 'SCHEDULED' AND STATUS = 'ACTIVE'")
   @Mapper(OgelSubmissionMapper.class)
