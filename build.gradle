@@ -113,7 +113,7 @@ pact {
     pactDirectory = './pacts'
     //pactBrokerUrl = 'http://localhost'
     pactBrokerUrl = 'http://pact-broker.mgmt.licensing.service.trade.gov.uk.test/'
-    version = '1.0.2'
+    version = '1.0.3'
   }
 
 }

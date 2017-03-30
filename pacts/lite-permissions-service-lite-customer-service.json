@@ -7,7 +7,7 @@
     },
     "interactions": [
         {
-            "description": "Create Customer Fail (no userId)",
+            "description": "create customer fail",
             "request": {
                 "method": "POST",
                 "path": "/create-customer",
@@ -35,10 +35,11 @@
             },
             "response": {
                 "status": 400
-            }
+            },
+            "providerState": "create customer fail"
         },
         {
-            "description": "Create Customer Success",
+            "description": "create customer success",
             "request": {
                 "method": "POST",
                 "path": "/create-customer",
@@ -70,15 +71,15 @@
                     "Content-Type": "application/json"
                 },
                 "body": {
-                    "applicantType": "wBVGuGKHZqJVhDLpXwIF",
-                    "companyName": "SZcBzUTfAAFqDHVUkQjN",
-                    "companyNumber": "wWlumXWgkJAMhRSjhqpA",
-                    "countryOfOriginCode": "fCtkjpCQobBfUSIcoABl",
-                    "customerId": "dEDvkMHeIwPpsmfEaJAU",
-                    "organisationType": "WkcDRNuJAUFNKCnBuhKT",
-                    "registeredAddress": "EOfxopAtjYjbrZgfYhTJ",
-                    "registrationStatus": "qnlEqUpZDgHvoCkPKUKc",
-                    "shortName": "OGnpivGdXiVpquVUDUvQ",
+                    "applicantType": "cYNaSRdozpJKltfNnpkY",
+                    "companyName": "qHwsIxsSGXgqmmJMLeZP",
+                    "companyNumber": "bDbrUBPnJAQyLGJjjWdM",
+                    "countryOfOriginCode": "GugIhSXQufiSwAJusWzx",
+                    "customerId": "pKfzYBwHYCoJJvJAaXPw",
+                    "organisationType": "rSOqHBtCAoQBSzUbvaXv",
+                    "registeredAddress": "mfwDltPYejQzVKXTcwNm",
+                    "registrationStatus": "ipEMcuxzkpPqEbwQLzNR",
+                    "shortName": "BSOlruQcEwgojrqXGmBM",
                     "websites": [
                         
                     ]
@@ -112,10 +113,11 @@
                         "match": "type"
                     }
                 }
-            }
+            },
+            "providerState": "create customer success"
         },
         {
-            "description": "Create Site Fail (no userId)",
+            "description": "create site fail",
             "request": {
                 "method": "POST",
                 "path": "/customer-sites/CUSTOMER_ID",
@@ -125,14 +127,14 @@
                 "query": "userId=",
                 "body": {
                     "addressParam": {
-                        "country": "AoGOphRQhwvlyeoTlUGu",
-                        "county": "QkkoOsCqgeCCPEQYehxn",
-                        "line1": "iTwzNtvfjeMdhoPPMVVr",
-                        "line2": "UhsfjtmZvHrsxdYgnFil",
-                        "postcode": "oVOuEciWEeuKbsnwogJV",
-                        "town": "rSELcMkyNjmkYrBwTuRH"
+                        "country": "sfJKYocwcYUgGzyxTFaq",
+                        "county": "eKVnOUceULVPeoWiHIFR",
+                        "line1": "iOLHzdJPMnrjwprRuQkD",
+                        "line2": "djKckevKfTjDQvVoFoSb",
+                        "postcode": "AeJaksCoHlJcgiqDpXFJ",
+                        "town": "ZtSacFKDLxTijlZjOxJw"
                     },
-                    "siteName": "vycElhkALwQcTNqeplKw"
+                    "siteName": "YNCSZtrOqlfHKWWGNBuT"
                 },
                 "matchingRules": {
                     "$.body.addressParam.county": {
@@ -160,10 +162,11 @@
             },
             "response": {
                 "status": 400
-            }
+            },
+            "providerState": "create site fail"
         },
         {
-            "description": "Create Site Success",
+            "description": "create site success",
             "request": {
                 "method": "POST",
                 "path": "/customer-sites/CUSTOMER_ID",
@@ -173,14 +176,14 @@
                 "query": "userId=userId",
                 "body": {
                     "addressParam": {
-                        "country": "LrxdWouaTrywFXnuAkbh",
-                        "county": "wiFBFDhelohnpVuyYmqS",
-                        "line1": "jilgMTTCVgfcmCHBncoD",
-                        "line2": "azvyadVkbeJReHahiWvq",
-                        "postcode": "uxRuKVnOEbexcjqMSWHG",
-                        "town": "nWkyVCIvxrrjRdEJlLSR"
+                        "country": "sIQyXboJEsiydGanZYuy",
+                        "county": "PzYlwSocORpdNEULvafM",
+                        "line1": "cKAcFdnfPgnrIbevKXkA",
+                        "line2": "EDERnUExNKqVjImRCyPv",
+                        "postcode": "NfmulmWFFzHfGVQYWIZF",
+                        "town": "IZaFulVCTcsTSfHQDckx"
                     },
-                    "siteName": "tjxEizpNKUXMqFiGrObH"
+                    "siteName": "dKCAdRaVmADLsyYrMnUS"
                 },
                 "matchingRules": {
                     "$.body.addressParam.county": {
@@ -213,12 +216,12 @@
                 },
                 "body": {
                     "address": {
-                        "country": "kimRiTQoLhJKFvXtRPZm",
-                        "plainText": "UKiKtaztaIHNvvwjbdQe"
+                        "country": "YKfkaPMEmsGSxSlurHdZ",
+                        "plainText": "YvjbPgpikXBvglPqMnxG"
                     },
-                    "customerId": "ciqgSApQLPdPsdrsCUBj",
-                    "siteId": "vIawiENhvbPTHEnDqrgJ",
-                    "siteName": "URtXqLoGJvPgIpTZmDGv"
+                    "customerId": "KROEXXRKnXVrVkvcdshh",
+                    "siteId": "FrjyPxoikGlwRDYasesd",
+                    "siteName": "dUgPVJtgKgCvfFtvnsmx"
                 },
                 "matchingRules": {
                     "$.body.address.plainText": {
@@ -237,20 +240,22 @@
                         "match": "type"
                     }
                 }
-            }
+            },
+            "providerState": "create site success"
         },
         {
-            "description": "Customer by CompanyNumber Fail",
+            "description": "customer by company number fail",
             "request": {
                 "method": "GET",
                 "path": "/search-customers/registered-number/COMPANY_NUMBER_FAIL"
             },
             "response": {
                 "status": 404
-            }
+            },
+            "providerState": "customer by company number fail"
         },
         {
-            "description": "Customer by CompanyNumber Success",
+            "description": "customer by company number success",
             "request": {
                 "method": "GET",
                 "path": "/search-customers/registered-number/COMPANY_NUMBER_SUCCESS"
@@ -261,15 +266,15 @@
                     "Content-Type": "application/json"
                 },
                 "body": {
-                    "applicantType": "RctNjydxLpGhHFyghoEo",
-                    "companyName": "ANSAmLkSBGTLxPCnvoQp",
-                    "companyNumber": "XIQUIGBJDRFkAmfEdDeB",
-                    "countryOfOriginCode": "hSilgHeUefgDZnSSxeXB",
-                    "customerId": "GGxuSelMAZPKdQibaHtw",
-                    "organisationType": "YoVBhLtgOsvHiCBnSZvh",
-                    "registeredAddress": "BvDIpjCNrSsZBDoedDYm",
-                    "registrationStatus": "okOPbLxpVINEoOUKxUyH",
-                    "shortName": "CBAKRPOXCUSxyrIcXniz",
+                    "applicantType": "WwJmagFzdsYZMYBgNYta",
+                    "companyName": "OSadKUbpCZCOGaqCSdPg",
+                    "companyNumber": "aaqgxCSOfPfVpEWIJbRL",
+                    "countryOfOriginCode": "BbLYaEqvTbpKEvDimPbP",
+                    "customerId": "zNcDtmGCZOFMYyaPmHHs",
+                    "organisationType": "hEzSzPTsEZrslyTomvAh",
+                    "registeredAddress": "mdGohZKAUprTbUnANfzk",
+                    "registrationStatus": "rOAxlWgjTkBWCpMXojAU",
+                    "shortName": "ZtJLTfmcUDSGXPMMvibQ",
                     "websites": [
                         
                     ]
@@ -303,10 +308,11 @@
                         "match": "type"
                     }
                 }
-            }
+            },
+            "providerState": "customer by company number success"
         },
         {
-            "description": "Update UserRole Fail",
+            "description": "update user role fail",
             "request": {
                 "method": "POST",
                 "path": "/user-roles/user/USER_ID_FAIL/site/SITE_REF_FAIL",
@@ -314,7 +320,7 @@
                     "Content-Type": "application/json"
                 },
                 "body": {
-                    "adminUserId": "IxlDldGZssAHSAMcZSxf",
+                    "adminUserId": "fozzvmEZAdnSeThsyzDM",
                     "roleType": "ADMIN"
                 },
                 "matchingRules": {
@@ -328,10 +334,11 @@
             },
             "response": {
                 "status": 400
-            }
+            },
+            "providerState": "update user role fail"
         },
         {
-            "description": "Update UserRole Success",
+            "description": "update user role success",
             "request": {
                 "method": "POST",
                 "path": "/user-roles/user/USER_ID_SUCCESS/site/SITE_REF_SUCCESS",
@@ -339,7 +346,7 @@
                     "Content-Type": "application/json"
                 },
                 "body": {
-                    "adminUserId": "aeVwAlDIIpFaDETBCCrT",
+                    "adminUserId": "jJsCyyLRwAJVEzvOpRFx",
                     "roleType": "ADMIN"
                 },
                 "matchingRules": {
@@ -353,7 +360,8 @@
             },
             "response": {
                 "status": 200
-            }
+            },
+            "providerState": "update user role success"
         }
     ],
     "metadata": {
