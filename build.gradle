@@ -3,7 +3,7 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath 'au.com.dius:pact-jvm-provider-gradle_2.11:3.3.6'
+    classpath 'au.com.dius:pact-jvm-provider-gradle_2.11:3.3.7'
   }
 }
 
@@ -12,7 +12,7 @@ plugins {
   id 'application'
   id 'org.flywaydb.flyway' version '4.0.1'
   id 'com.github.johnrengelman.shadow' version '1.2.3'
-  id "au.com.dius.pact" version "3.3.6"
+  id "au.com.dius.pact" version "3.3.7"
 }
 
 apply plugin: 'maven-publish'
