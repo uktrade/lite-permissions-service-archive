@@ -1,12 +1,12 @@
 package uk.gov.bis.lite.permissions.pact;
 
 
-import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import au.com.dius.pact.consumer.Pact;
 import au.com.dius.pact.consumer.PactProviderRule;
 import au.com.dius.pact.consumer.PactVerification;
+import au.com.dius.pact.consumer.dsl.DslPart;
 import au.com.dius.pact.consumer.dsl.PactDslJsonBody;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.model.PactFragment;
@@ -17,10 +17,12 @@ import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.service.CustomerService;
 import uk.gov.bis.lite.permissions.service.CustomerServiceImpl;
 
+import java.util.Optional;
+
 import javax.ws.rs.client.ClientBuilder;
 
 /**
- * CustomerCustomerPactTest - creates Pact file: lie-permissions-service-lite-customer-service.json
+ * CustomerCustomerPactTest
  */
 public class CustomerCustomerPactTest extends CustomerBasePactTest {
 
@@ -28,11 +30,7 @@ public class CustomerCustomerPactTest extends CustomerBasePactTest {
 
   private static final String COMPANY_NUMBER_SUCCESS = "COMPANY_NUMBER_SUCCESS";
   private static final String COMPANY_NUMBER_FAIL = "COMPANY_NUMBER_FAIL";
-
-  // Customer Fixtures
-  // Currently cannot use DSL because it fails to match properly for userId (with and without)
-  private static String mockCustomerParam = fixture("fixture/pact/customerParam.json");
-  private static String mockCustomerParamNoUserId = fixture("fixture/pact/customerParamNoUserId.json");
+  private static final String CUSTOMER_ID_VALUE = "CUSTOMER_ID_VALUE";
 
   @Rule
   public PactProviderRule mockProvider = new PactProviderRule(PROVIDER, this);
@@ -43,37 +41,57 @@ public class CustomerCustomerPactTest extends CustomerBasePactTest {
   }
 
   @Pact(provider = PROVIDER, consumer = CONSUMER)
-  public PactFragment createFragment(PactDslWithProvider builder) {
+  public PactFragment createCustomerSuccess(PactDslWithProvider builder) {
 
     return builder
-        .given("create customer success")
-        .uponReceiving("create customer success")
+        .given("new customer is valid")
+        .uponReceiving("request to create a new customer")
           .path("/create-customer")
           .headers(headers())
           .method("POST")
-          .body(mockCustomerParam)
+          .body(customerParamPactDsl())
           .willRespondWith()
             .headers(headers())
             .status(200)
-            .body(customerView())
-        .given("create customer fail")
-        .uponReceiving("create customer fail")
+            .body(customerViewPactDsl())
+        .toFragment();
+  }
+
+  @Pact(provider = PROVIDER, consumer = CONSUMER)
+  public PactFragment createCustomerFail(PactDslWithProvider builder) {
+
+    return builder
+        .given("new customer is invalid")
+        .uponReceiving("request to create a new customer")
           .path("/create-customer")
           .headers(headers())
           .method("POST")
-          .body(mockCustomerParamNoUserId)
           .willRespondWith()
             .status(400)
-        .given("customer by company number success")
-        .uponReceiving("customer by company number success")
+        .toFragment();
+  }
+
+  @Pact(provider = PROVIDER, consumer = CONSUMER)
+  public PactFragment customerByCompanyNumberSuccess(PactDslWithProvider builder) {
+
+    return builder
+        .given("customer successfully retrieved")
+        .uponReceiving("request to get customer")
           .path("/search-customers/registered-number/" + COMPANY_NUMBER_SUCCESS)
           .method("GET")
           .willRespondWith()
             .status(200)
             .headers(headers())
-            .body(customerView())
-        .given("customer by company number fail")
-        .uponReceiving("customer by company number fail")
+            .body(customerViewPactDsl())
+        .toFragment();
+  }
+
+  @Pact(provider = PROVIDER, consumer = CONSUMER)
+  public PactFragment customerByCompanyNumberFail(PactDslWithProvider builder) {
+
+    return builder
+        .given("customer not found")
+        .uponReceiving("request to get customer")
           .path("/search-customers/registered-number/" + COMPANY_NUMBER_FAIL)
           .method("GET")
           .willRespondWith()
@@ -82,38 +100,58 @@ public class CustomerCustomerPactTest extends CustomerBasePactTest {
   }
 
   @Test
-  @PactVerification(PROVIDER)
-  public void testCustomerServicePact() throws Exception {
-
-    // Create Customer Success
-    OgelSubmission subSuccess = getOgelSubmission(getRegisterParam(fixture(FIXTURE_REGISTER_PARAM_NEW)));
-    assertThat(customerService.createCustomer(subSuccess)).isPresent();
-
-    // Create Customer Fail (no userId)
-    OgelSubmission subFail = getOgelSubmission(getRegisterParam(fixture(FIXTURE_REGISTER_PARAM_NEW)));
-    subFail.setUserId("");
-    assertThat(customerService.createCustomer(subFail)).isNotPresent();
-
-    // Customer by CompanyNumber Success
-    assertThat(customerService.getCustomerIdByCompanyNumber(COMPANY_NUMBER_SUCCESS)).isPresent();
-
-    // Customer by CompanyNumber NoFound
-    assertThat(customerService.getCustomerIdByCompanyNumber(COMPANY_NUMBER_FAIL)).isNotPresent();
-
+  @PactVerification(value = PROVIDER, fragment = "createCustomerSuccess")
+  public void testCreateCustomerSuccessServicePact() throws Exception {
+    Optional<String> customerRefOpt = customerService.createCustomer(ogelSubmission());
+    assertThat(customerRefOpt).isPresent();
+    assertThat(customerRefOpt.get()).isEqualTo(CUSTOMER_ID_VALUE);
   }
 
-  private PactDslJsonBody customerView() {
+  @Test
+  @PactVerification(value = PROVIDER, fragment = "createCustomerFail")
+  public void testCreateCustomerFailServicePact() throws Exception {
+    OgelSubmission sub = ogelSubmission();
+    sub.setUserId("");
+    assertThat(customerService.createCustomer(sub)).isNotPresent();
+  }
+
+  @Test
+  @PactVerification(value = PROVIDER, fragment = "customerByCompanyNumberSuccess")
+  public void testCustomerByCompanyNumberSuccessServicePact() throws Exception {
+    Optional<String> customerRefOpt = customerService.getCustomerIdByCompanyNumber(COMPANY_NUMBER_SUCCESS);
+    assertThat(customerRefOpt).isPresent();
+    assertThat(customerRefOpt.get()).isEqualTo(CUSTOMER_ID_VALUE);
+  }
+
+  @Test
+  @PactVerification(value = PROVIDER, fragment = "customerByCompanyNumberFail")
+  public void testCustomerByCompanyNumberFailServicePact() throws Exception {
+    assertThat(customerService.getCustomerIdByCompanyNumber(COMPANY_NUMBER_FAIL)).isNotPresent();
+  }
+
+  private PactDslJsonBody customerViewPactDsl() {
     return new PactDslJsonBody()
-        .stringType("customerId")
-        .stringType("companyName")
-        .stringType("companyNumber")
-        .stringType("shortName")
-        .stringType("organisationType")
-        .stringType("registrationStatus")
-        .stringType("registeredAddress")
-        .stringType("applicantType")
-        .stringType("countryOfOriginCode")
-        .array("websites").closeArray()
+        .stringType("customerId", CUSTOMER_ID_VALUE)
         .asBody();
+  }
+
+  private DslPart customerParamPactDsl() {
+    return new PactDslJsonBody()
+        .stringType("userId", "userId")
+        .stringType("customerName", "customerName")
+        .stringType("customerType", "customerType")
+        .stringType("website", "website")
+        .stringType("companiesHouseNumber", "chNumber")
+        .booleanType("companiesHouseValidated", false)
+        .stringType("eoriNumber", "eoriNumber")
+        .booleanType("eoriValidated", false)
+        .object("addressParam")
+        .stringType("line1", "line1")
+        .stringType("line2", "line2")
+        .stringType("town", "town")
+        .stringType("county", "county")
+        .stringType("postcode", "postcode")
+        .stringType("country", "country")
+        .closeObject();
   }
 }

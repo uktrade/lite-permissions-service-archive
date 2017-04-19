@@ -9,14 +9,14 @@ import org.flywaydb.core.Flyway;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import uk.gov.bis.lite.permissions.PermissionsTestApp;
-import uk.gov.bis.lite.permissions.Util;
+import uk.gov.bis.lite.permissions.TestPermissionsApp;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.mocks.CustomerServiceMock;
 import uk.gov.bis.lite.permissions.mocks.OgelServiceMock;
 import uk.gov.bis.lite.permissions.model.FailEvent;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
+import uk.gov.bis.lite.permissions.Util;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class ProcessSubmissionCallbackTest {
   private static OgelServiceMock ogelServiceMock;
 
   @ClassRule
-  public static final DropwizardAppRule<PermissionsAppConfig> APP_RULE = new DropwizardAppRule<>(PermissionsTestApp.class,
+  public static final DropwizardAppRule<PermissionsAppConfig> APP_RULE = new DropwizardAppRule<>(TestPermissionsApp.class,
       ResourceHelpers.resourceFilePath("test-config.yaml"));
 
   @BeforeClass
@@ -43,7 +43,7 @@ public class ProcessSubmissionCallbackTest {
     flyway.setDataSource(dsf.getUrl(), dsf.getUser(), dsf.getPassword());
     flyway.migrate();
 
-    PermissionsTestApp app = APP_RULE.getApplication();
+    TestPermissionsApp app = APP_RULE.getApplication();
     ogelServiceMock = (OgelServiceMock) app.getInstance(OgelService.class);
     processSubmissionService = app.getInstance(ProcessSubmissionService.class);
     submissionDao = app.getInstance(OgelSubmissionDao.class);

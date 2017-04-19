@@ -1,5 +1,7 @@
 package uk.gov.bis.lite.permissions.pact;
 
+import static io.dropwizard.testing.FixtureHelpers.fixture;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -38,6 +40,10 @@ class CustomerBasePactTest {
       e.printStackTrace();
     }
     return param;
+  }
+
+  OgelSubmission ogelSubmission() {
+    return getOgelSubmission(getRegisterParam(fixture(FIXTURE_REGISTER_PARAM_NEW)));
   }
 
   /**

@@ -3,10 +3,13 @@ package uk.gov.bis.lite.permissions;
 import com.google.inject.util.Modules;
 import uk.gov.bis.lite.permissions.config.GuiceModule;
 
-public class TestCustomerApplication extends PermissionsApp {
+/**
+ * Use for integration tests - see ProcessSubmissionServiceTest
+ */
+public class TestPermissionsApp extends PermissionsApp {
 
-  public TestCustomerApplication() {
-    super(Modules.override(new GuiceModule()).with(new GuicePactModule()));
+  public TestPermissionsApp() {
+    super(Modules.override(new GuiceModule()).with(new TestGuiceModule()));
   }
 
   public <T> T getInstance(Class<T> type) {

@@ -1,7 +1,6 @@
 package uk.gov.bis.lite.permissions.pact;
 
 
-import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import au.com.dius.pact.consumer.Pact;
@@ -17,6 +16,8 @@ import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.service.CustomerService;
 import uk.gov.bis.lite.permissions.service.CustomerServiceImpl;
 
+import java.util.Optional;
+
 import javax.ws.rs.client.ClientBuilder;
 
 /**
@@ -29,6 +30,7 @@ public class CustomerSitePactTest extends CustomerBasePactTest {
   private static final String CUSTOMER_ID = "CUSTOMER_ID";
   private final static String PROVIDER = "lite-customer-service";
   private final static String CONSUMER = "lite-permissions-service";
+  private static final String SITE_ID_VALUE = "SITE_ID_VALUE";
 
   @Rule
   public PactProviderRule mockProvider = new PactProviderRule(PROVIDER, this);
@@ -39,50 +41,61 @@ public class CustomerSitePactTest extends CustomerBasePactTest {
   }
 
   @Pact(provider = PROVIDER, consumer = CONSUMER)
-  public PactFragment createFragment(PactDslWithProvider builder) {
+  public PactFragment createSiteSuccess(PactDslWithProvider builder) {
 
     return builder
-        .given("create site success")
-        .uponReceiving("create site success")
+        .given("new site is valid")
+        .uponReceiving("request to create a new site")
           .path("/customer-sites/" + CUSTOMER_ID)
           .headers(headers())
           .method("POST")
           .query("userId=userId")
-          .body(siteParam())
+          .body(siteParamPactDsl())
             .willRespondWith()
               .headers(headers())
               .status(200)
-              .body(siteView())
-        .given("create site fail")
-        .uponReceiving("create site fail")
+              .body(siteViewPactDsl())
+        .toFragment();
+  }
+
+
+  @Pact(provider = PROVIDER, consumer = CONSUMER)
+  public PactFragment createSiteFail(PactDslWithProvider builder) {
+
+    return builder
+        .given("new site is invalid")
+        .uponReceiving("request to create a new site")
           .path("/customer-sites/" + CUSTOMER_ID)
           .headers(headers())
           .method("POST")
           .query("userId=")
-          .body(siteParam())
+          .body(siteParamPactDsl())
             .willRespondWith()
             .status(400)
         .toFragment();
   }
 
   @Test
-  @PactVerification(PROVIDER)
-  public void testCustomerServicePact() throws Exception {
-
-    // Create Site Success
-    OgelSubmission subSuccess = getOgelSubmission(getRegisterParam(fixture(FIXTURE_REGISTER_PARAM_NEW)));
-    subSuccess.setCustomerRef(CUSTOMER_ID);
-    assertThat(customerService.createSite(subSuccess)).isPresent();
-
-    // Create Site Fail (no userId)
-    OgelSubmission subFail = getOgelSubmission(getRegisterParam(fixture(FIXTURE_REGISTER_PARAM_NEW)));
-    subFail.setCustomerRef(CUSTOMER_ID);
-    subFail.setUserId("");
-    assertThat(customerService.createSite(subFail)).isNotPresent();
-
+  @PactVerification(value = PROVIDER, fragment = "createSiteSuccess")
+  public void testCreateSiteSuccessServicePact() throws Exception {
+    OgelSubmission sub = ogelSubmission();
+    sub.setCustomerRef(CUSTOMER_ID);
+    Optional<String> refOpt = customerService.createSite(sub);
+    assertThat(refOpt).isPresent();
+    assertThat(refOpt.get()).isEqualTo(SITE_ID_VALUE);
   }
 
-  private PactDslJsonBody siteParam() {
+
+  @Test
+  @PactVerification(value = PROVIDER, fragment = "createSiteFail")
+  public void testCreateSiteFailServicePact() throws Exception {
+    OgelSubmission sub = ogelSubmission();
+    sub.setCustomerRef(CUSTOMER_ID);
+    sub.setUserId("");
+    assertThat(customerService.createSite(sub)).isNotPresent();
+  }
+
+  private PactDslJsonBody siteParamPactDsl() {
     return new PactDslJsonBody()
         .stringType("siteName")
         .object("addressParam")
@@ -96,15 +109,9 @@ public class CustomerSitePactTest extends CustomerBasePactTest {
         .asBody();
   }
 
-  private PactDslJsonBody siteView() {
+  private PactDslJsonBody siteViewPactDsl() {
     return new PactDslJsonBody()
-        .stringType("siteId")
-        .stringType("customerId")
-        .stringType("siteName")
-        .object("address")
-        .stringType("plainText")
-        .stringType("country")
-        .closeObject()
+        .stringType("siteId", SITE_ID_VALUE)
         .asBody();
   }
 }

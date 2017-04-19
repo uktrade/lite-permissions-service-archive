@@ -19,6 +19,9 @@ import uk.gov.bis.lite.permissions.service.CustomerServiceImpl;
 
 import javax.ws.rs.client.ClientBuilder;
 
+/**
+ * CustomerUserRolePactTest
+ */
 public class CustomerUserRolePactTest extends CustomerBasePactTest {
 
   private CustomerService customerService;
@@ -40,7 +43,7 @@ public class CustomerUserRolePactTest extends CustomerBasePactTest {
   }
 
   @Pact(provider = PROVIDER, consumer = CONSUMER)
-  public PactFragment createFragment(PactDslWithProvider builder) {
+  public PactFragment updateUserRoleSuccess(PactDslWithProvider builder) {
 
     return builder
         .given("update user role success")
@@ -48,41 +51,48 @@ public class CustomerUserRolePactTest extends CustomerBasePactTest {
           .path("/user-roles/user/" + USER_ID_SUCCESS + "/site/" + SITE_REF_SUCCESS)
           .headers(headers())
           .method("POST")
-          .body(userRoleParam())
+          .body(userRoleParamPactDsl())
             .willRespondWith()
               .status(200)
+        .toFragment();
+  }
+
+  @Pact(provider = PROVIDER, consumer = CONSUMER)
+  public PactFragment updateUserRoleFail(PactDslWithProvider builder) {
+
+    return builder
         .given("update user role fail")
         .uponReceiving("update user role fail")
           .path("/user-roles/user/" + USER_ID_FAIL + "/site/" + SITE_REF_FAIL)
           .headers(headers())
           .method("POST")
-          .body(userRoleParam())
+          .body(userRoleParamPactDsl())
             .willRespondWith()
               .status(400)
         .toFragment();
   }
 
   @Test
-  @PactVerification(PROVIDER)
-  public void testCustomerServicePact() throws Exception {
-
-    // Update UserRole Success
-    OgelSubmission subSuccess = getOgelSubmission(getRegisterParam(fixture(FIXTURE_REGISTER_PARAM_EXISTING)));
-    subSuccess.setAdminUserId(ADMIN_USER_ID);
-    subSuccess.setSiteRef(SITE_REF_SUCCESS);
-    subSuccess.setUserId(USER_ID_SUCCESS);
-    assertThat(customerService.updateUserRole(subSuccess)).isTrue();
-
-    // Update UserRole Fail
-    OgelSubmission subFail = getOgelSubmission(getRegisterParam(fixture(FIXTURE_REGISTER_PARAM_EXISTING)));
-    subFail.setAdminUserId(ADMIN_USER_ID);
-    subFail.setSiteRef(SITE_REF_FAIL);
-    subFail.setUserId(USER_ID_FAIL);
-    assertThat(customerService.updateUserRole(subFail)).isFalse();
-
+  @PactVerification(value = PROVIDER, fragment = "updateUserRoleSuccess")
+  public void testUpdateUserRoleSuccessServicePact() throws Exception {
+    OgelSubmission sub = getOgelSubmission(getRegisterParam(fixture(FIXTURE_REGISTER_PARAM_EXISTING)));
+    sub.setAdminUserId(ADMIN_USER_ID);
+    sub.setSiteRef(SITE_REF_SUCCESS);
+    sub.setUserId(USER_ID_SUCCESS);
+    assertThat(customerService.updateUserRole(sub)).isTrue();
   }
 
-  private PactDslJsonBody userRoleParam() {
+  @Test
+  @PactVerification(value = PROVIDER, fragment = "updateUserRoleFail")
+  public void testUpdateUserRoleFailServicePact() throws Exception {
+    OgelSubmission sub = getOgelSubmission(getRegisterParam(fixture(FIXTURE_REGISTER_PARAM_EXISTING)));
+    sub.setAdminUserId(ADMIN_USER_ID);
+    sub.setSiteRef(SITE_REF_FAIL);
+    sub.setUserId(USER_ID_FAIL);
+    assertThat(customerService.updateUserRole(sub)).isFalse();
+  }
+
+  private PactDslJsonBody userRoleParamPactDsl() {
     // Requires 'ADMIN' value because API UserRoleParam param contains enum RoleType [ADMIN, SUBMITTER, PREPARER]
     return new PactDslJsonBody()
         .stringType("adminUserId")
