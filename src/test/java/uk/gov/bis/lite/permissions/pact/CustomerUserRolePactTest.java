@@ -29,10 +29,8 @@ public class CustomerUserRolePactTest extends CustomerBasePactTest {
   private final static String PROVIDER = "lite-customer-service";
 
   private static final String ADMIN_USER_ID = "ADMIN_USER_ID";
-  private static final String USER_ID_SUCCESS = "USER_ID_SUCCESS";
-  private static final String SITE_REF_SUCCESS = "SITE_REF_SUCCESS";
-  private static final String USER_ID_FAIL = "USER_ID_FAIL";
-  private static final String SITE_REF_FAIL = "SITE_REF_FAIL";
+  private static final String USER_ID = "USER123";
+  private static final String SITE_REF = "SITE123";
 
   @Rule
   public PactProviderRule mockProvider = new PactProviderRule(PROVIDER, this);
@@ -48,7 +46,7 @@ public class CustomerUserRolePactTest extends CustomerBasePactTest {
     return builder
         .given("user role update request is valid")
         .uponReceiving("request to update user role")
-          .path("/user-roles/user/" + USER_ID_SUCCESS + "/site/" + SITE_REF_SUCCESS)
+          .path("/user-roles/user/" + USER_ID + "/site/" + SITE_REF)
           .headers(headers())
           .method("POST")
           .body(userRoleParamPactDsl())
@@ -63,7 +61,7 @@ public class CustomerUserRolePactTest extends CustomerBasePactTest {
     return builder
         .given("user role update request is invalid")
         .uponReceiving("request to update user role")
-          .path("/user-roles/user/" + USER_ID_FAIL + "/site/" + SITE_REF_FAIL)
+          .path("/user-roles/user/" + USER_ID + "/site/" + SITE_REF)
           .headers(headers())
           .method("POST")
           .body(userRoleParamPactDsl())
@@ -75,21 +73,21 @@ public class CustomerUserRolePactTest extends CustomerBasePactTest {
   @Test
   @PactVerification(value = PROVIDER, fragment = "updateUserRoleSuccess")
   public void testUpdateUserRoleSuccessServicePact() throws Exception {
-    OgelSubmission sub = getOgelSubmission(getRegisterParam(fixture(FIXTURE_REGISTER_PARAM_EXISTING)));
-    sub.setAdminUserId(ADMIN_USER_ID);
-    sub.setSiteRef(SITE_REF_SUCCESS);
-    sub.setUserId(USER_ID_SUCCESS);
-    assertThat(customerService.updateUserRole(sub)).isTrue();
+    assertThat(customerService.updateUserRole(getOgelSubmission())).isTrue();
   }
 
   @Test
   @PactVerification(value = PROVIDER, fragment = "updateUserRoleFail")
   public void testUpdateUserRoleFailServicePact() throws Exception {
+    assertThat(customerService.updateUserRole(getOgelSubmission())).isFalse();
+  }
+
+  private OgelSubmission getOgelSubmission() {
     OgelSubmission sub = getOgelSubmission(getRegisterParam(fixture(FIXTURE_REGISTER_PARAM_EXISTING)));
     sub.setAdminUserId(ADMIN_USER_ID);
-    sub.setSiteRef(SITE_REF_FAIL);
-    sub.setUserId(USER_ID_FAIL);
-    assertThat(customerService.updateUserRole(sub)).isFalse();
+    sub.setSiteRef(SITE_REF);
+    sub.setUserId(USER_ID);
+    return sub;
   }
 
   private PactDslJsonBody userRoleParamPactDsl() {
