@@ -26,6 +26,7 @@ public class TestGuiceModule extends GuiceModule {
   @Override
   protected void configure() {
     bind(OgelSubmissionDao.class).to(OgelSubmissionDaoImpl.class);
+
     bind(RegisterService.class).to(RegisterServiceImpl.class);
     bind(RegistrationsService.class).to(RegistrationsServiceImpl.class);
     bind(SubmissionService.class).to(SubmissionServiceImpl.class);

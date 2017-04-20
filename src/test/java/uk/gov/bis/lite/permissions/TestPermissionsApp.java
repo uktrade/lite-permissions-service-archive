@@ -12,8 +12,4 @@ public class TestPermissionsApp extends PermissionsApp {
     super(Modules.override(new GuiceModule()).with(new TestGuiceModule()));
   }
 
-  public <T> T getInstance(Class<T> type) {
-    return getGuiceBundle().getInjector().getInstance(type);
-  }
-
 }

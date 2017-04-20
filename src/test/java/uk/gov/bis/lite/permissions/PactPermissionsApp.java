@@ -9,8 +9,4 @@ public class PactPermissionsApp extends PermissionsApp {
     super(Modules.override(new GuiceModule()).with(new PactGuiceModule()));
   }
 
-  public <T> T getInstance(Class<T> type) {
-    return getGuiceBundle().getInjector().getInstance(type);
-  }
-
 }
