@@ -46,8 +46,8 @@ public class CustomerUserRolePactTest extends CustomerBasePactTest {
   public PactFragment updateUserRoleSuccess(PactDslWithProvider builder) {
 
     return builder
-        .given("update user role success")
-        .uponReceiving("update user role success")
+        .given("user role update request is valid")
+        .uponReceiving("request to update user role")
           .path("/user-roles/user/" + USER_ID_SUCCESS + "/site/" + SITE_REF_SUCCESS)
           .headers(headers())
           .method("POST")
@@ -61,8 +61,8 @@ public class CustomerUserRolePactTest extends CustomerBasePactTest {
   public PactFragment updateUserRoleFail(PactDslWithProvider builder) {
 
     return builder
-        .given("update user role fail")
-        .uponReceiving("update user role fail")
+        .given("user role update request is invalid")
+        .uponReceiving("request to update user role")
           .path("/user-roles/user/" + USER_ID_FAIL + "/site/" + SITE_REF_FAIL)
           .headers(headers())
           .method("POST")
