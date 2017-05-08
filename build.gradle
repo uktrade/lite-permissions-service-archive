@@ -45,7 +45,7 @@ dependencies {
   compile 'org.flywaydb:flyway-core:4.0.1'
 
   // Lite dependencies
-  compile 'uk.gov.bis.lite:spire-client:1.2'
+  compile 'uk.gov.bis.lite:spire-client:1.3'
   compile 'uk.gov.bis.lite:lite-customer-service-api:1.1'
   compile 'uk.gov.bis.lite:jersey-correlation-id:1.0'
 
