@@ -38,7 +38,7 @@ public class CallbackServiceImpl implements CallbackService {
         if (isOk(response)) {
           sub.setCalledBack(true);
           callbackCompleted = true;
-          LOGGER.info("CALLBACK completed [" + sub.getRequestId() + "]");
+          LOGGER.info("CALLBACK completed SubID[{}]", sub.getId());
         } else {
           sub.setFailEvent(new FailEvent(OgelSubmission.FailReason.UNCLASSIFIED, ProcessSubmissionServiceImpl.Origin.CALLBACK, Util.info(response)));
         }
@@ -46,7 +46,8 @@ public class CallbackServiceImpl implements CallbackService {
         sub.setFailEvent(new FailEvent(OgelSubmission.FailReason.UNCLASSIFIED, ProcessSubmissionServiceImpl.Origin.CALLBACK, Util.info(e)));
       }
     } else {
-      LOGGER.warn("OgelSubmission has not completed its processing. Postponing callback");
+      String subId = sub != null ? Integer.toString(sub.getId()) : "";
+      LOGGER.warn("OgelSubmission has not completed its processing. Postponing callback SubID[{}]", subId);
     }
     return callbackCompleted;
   }
@@ -72,8 +73,6 @@ public class CallbackServiceImpl implements CallbackService {
 
 
   private Response doCallback(String url, CallbackView param) {
-    // TODO remove once development is finished
-    //url = "http://localhost:8123/callback"; // temp for development
     LOGGER.info("Attempting callback [" + url + "] ...");
     return httpClient.target(url).request().post(Entity.json(param));
   }

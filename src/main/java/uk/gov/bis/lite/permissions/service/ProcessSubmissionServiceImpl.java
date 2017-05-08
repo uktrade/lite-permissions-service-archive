@@ -66,7 +66,7 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
    * Process OgelSubmission through all stages - set Mode to SCHEDULED if process cannot be completed
    */
   public void processImmediate(int submissionId) {
-    LOGGER.info("IMMEDIATE [" + submissionId + "]");
+    LOGGER.info("IMMEDIATE SubID[{}]", submissionId);
 
     OgelSubmission sub = submissionDao.findBySubmissionId(submissionId);
     try {
@@ -85,7 +85,7 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
 
       // Change mode of OgelSubmission to SCHEDULED if we have had a previous failure
       if(updateToScheduled) {
-        LOGGER.info("Setting submission MODE to SCHEDULED: [" + submissionId + "]");
+        LOGGER.info("Setting submission MODE to SCHEDULED: SubID[{}]", submissionId);
         updateForProcessFailure(sub);
         sub.setScheduledMode();
       }
@@ -180,7 +180,7 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
    */
   private void processScheduled() {
     List<OgelSubmission> subs = submissionDao.getScheduledActive();
-    LOGGER.info("SCHEDULED ACTIVE [" + subs.size() + "]");
+    LOGGER.info("SCHEDULED ACTIVE Size[{}]", subs.size());
     for (OgelSubmission sub : subs) {
       try {
         doProcessOgelSubmission(sub);
@@ -195,7 +195,7 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
    */
   private void processCallbacks() {
     List<OgelSubmission> subs = submissionDao.getScheduledCompleteToCallback();
-    LOGGER.info("SCHEDULED CALLBACK [" + subs.size() + "]");
+    LOGGER.info("SCHEDULED CALLBACK Size[{}]", subs.size());
     for (OgelSubmission sub : subs) {
       try {
         if (!callbackService.completeCallback(sub)) {
@@ -221,13 +221,13 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
       String message = event.getMessage();
 
       String failMessage = createFailMessage(failReason, origin, message);
-      LOGGER.error(failMessage);
+      LOGGER.error("{} SubID[{}]", failMessage, sub.getId());
 
       int currentCallbackFailCount = sub.getCallBackFailCount();
 
       // Check for repeating error
       if (currentCallbackFailCount > maxCallbackFailCount) {
-        LOGGER.info("Repeating Callback Error - setting status to TERMINATED [" + sub.getRequestId() + "]");
+        LOGGER.info("Repeating Callback Error - setting status to TERMINATED SubID[{}]", sub.getId());
         sub.updateStatusToTerminated();
       } else {
         sub.setCallBackFailCount(currentCallbackFailCount + 1);
@@ -251,14 +251,14 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
       String message = event.getMessage();
 
       String failMessage = createFailMessage(failReason, origin, message);
-      LOGGER.error(failMessage);
+      LOGGER.error("{} SubID[{}]", failMessage, sub.getId());
 
       if (!sub.hasFail()) {
         sub.setFirstFailDateTime(); // Set first fail
       } else {
         // Check for repeating error
         if (sub.getFirstFailDateTime().isBefore(LocalDateTime.now().minus(maxMinutesRetryAfterFail, MINUTES))) {
-          LOGGER.info("Repeating Error - setting status to COMPLETE [" + sub.getRequestId() + "]");
+          LOGGER.info("Repeating Error - setting status to COMPLETE SubID[{}]", sub.getId());
           sub.updateStatusToComplete();
         }
       }
@@ -269,7 +269,7 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
 
       // Set status to complete with configured fail reason
       if (setStatusCompleteFailReasons.contains(failReason)) {
-        LOGGER.info("Found setStatusComplete FailReason - setting status to COMPLETE [" + sub.getRequestId() + "]");
+        LOGGER.info("Found setStatusComplete FailReason - setting status to COMPLETE SubID[{}]", sub.getId());
         sub.updateStatusToComplete();
       }
 
@@ -290,7 +290,7 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
     Optional<String> sarRef = customerService.getOrCreateCustomer(sub);
     if (sarRef.isPresent()) {
       sub.setCustomerRef(sarRef.get());
-      LOGGER.info("[" + sub.getId() + "] OgelSubmission CUSTOMER created: " + sarRef.get());
+      LOGGER.info("SubID[{}] OgelSubmission CUSTOMER created SarRef[{}]", sub.getId(), sarRef.get());
       return true;
     }
     return false;
@@ -300,7 +300,7 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
     Optional<String> siteRef = customerService.createSite(sub);
     if (siteRef.isPresent()) {
       sub.setSiteRef(siteRef.get());
-      LOGGER.info("[" + sub.getId() + "] OgelSubmission SITE created: " + siteRef.get());
+      LOGGER.info("SubID[{}] OgelSubmission SITE created SiteRef[{}]", sub.getId(), siteRef.get());
       return true;
     }
     return false;
@@ -310,7 +310,7 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
     boolean updated = customerService.updateUserRole(sub);
     if (updated) {
       sub.setRoleUpdated(true);
-      LOGGER.info("[" + sub.getId() + "] OgelSubmission USER_ROLE updated: " + sub.getUserId() + "/" + sub.getOgelType());
+      LOGGER.info("SubID[{}] OgelSubmission USER_ROLE updated UserID[{}] OgelType[{}]", sub.getId(), sub.getUserId(), sub.getOgelType());
       return true;
     }
     return false;
@@ -320,7 +320,7 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
     Optional<String> spireRef = ogelService.createOgel(sub);
     if (spireRef.isPresent()) {
       sub.setSpireRef(spireRef.get());
-      LOGGER.info("[" + sub.getId() + "] OgelSubmission OGEL created: " + spireRef.get());
+      LOGGER.info("SubID[{}] OgelSubmission OGEL created SpireRef[{}]", sub.getId(), spireRef.get());
       return true;
     }
     return false;
@@ -363,6 +363,6 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
   private void errorThrown(OgelSubmission sub, Throwable e, String info) {
     String stackTrace = Throwables.getStackTraceAsString(e);
     sub.setFailEvent(new FailEvent(OgelSubmission.FailReason.UNCLASSIFIED, Origin.UNKNOWN, stackTrace));
-    LOGGER.error(info + ": " + e.getMessage(), e);
+    LOGGER.error(info + ": " + e.getMessage() + " SubID[" + sub.getId() + "]", e);
   }
 }

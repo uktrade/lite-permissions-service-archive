@@ -202,7 +202,7 @@ public class RegisterServiceImpl implements RegisterService {
     try {
       scheduler.scheduleJob(detail, trigger);
     } catch (SchedulerException e) {
-      LOGGER.error("SchedulerException", e);
+      LOGGER.error("SchedulerException SubID[" + submissionId + "]", e);
     }
   }
 

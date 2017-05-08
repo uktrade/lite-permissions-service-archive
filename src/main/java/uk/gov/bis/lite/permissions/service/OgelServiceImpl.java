@@ -44,7 +44,7 @@ public class OgelServiceImpl implements OgelService {
     } catch (SpireFailReasonException e) {
       sub.setFailEvent(new FailEvent(e.getFailReason(), ProcessSubmissionServiceImpl.Origin.OGEL_CREATE, e.getMessage()));
     } catch (Exception e) {
-      LOGGER.error("Error occurred in OGEL application Spire client", e);
+      LOGGER.error("Error occurred in OGEL application Spire client SubID[" + sub.getId() + "]", e);
       sub.setFailEvent(new FailEvent(OgelSubmission.FailReason.UNCLASSIFIED, ProcessSubmissionServiceImpl.Origin.OGEL_CREATE, e.getMessage()));
     }
 

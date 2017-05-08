@@ -151,7 +151,7 @@ public class CustomerServiceImpl implements CustomerService {
         return Optional.of(customer.getCustomerId());
       }
     } catch (ProcessingException e) {
-      LOGGER.warn("Exception getCustomerIdByCompanyNumber: " + Throwables.getStackTraceAsString(e));
+      LOGGER.warn("Exception getCustomerIdByCompanyNumber [" + companyNumber + "]:", e);
     }
     return Optional.empty();
   }
@@ -221,7 +221,7 @@ public class CustomerServiceImpl implements CustomerService {
     try {
       param = objectMapper.readValue(json, RegisterParam.class);
     } catch (IOException e) {
-      String info = "Unable to deserialize Json for OgelSubmission id: " + sub.getId();
+      String info = "Unable to deserialize Json for OgelSubmission SubID[" + sub.getId() + "]";
       LOGGER.error(info);
       throw new PermissionServiceException(info);
     }
