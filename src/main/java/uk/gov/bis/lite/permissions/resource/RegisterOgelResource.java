@@ -56,7 +56,7 @@ public class RegisterOgelResource {
     OgelSubmission sub = registerService.getOgelSubmission(registerParam);
     String requestId = registerService.register(sub, callbackUrl);
 
-    LOGGER.info("************ register-ogel : " + requestId);
+    LOGGER.info("************ register-ogel : {}", requestId);
 
     // Return with new requestId (submissionRef + submissionId)
     return goodSubmissionRequest(requestId);

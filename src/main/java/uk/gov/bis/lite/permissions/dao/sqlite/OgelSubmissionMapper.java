@@ -41,7 +41,7 @@ public class OgelSubmissionMapper implements ResultSetMapper<OgelSubmission> {
       if (EnumUtils.isValidEnum(OgelSubmission.FailReason.class, failReasonValue)) {
         sub.setFailReason(OgelSubmission.FailReason.valueOf(failReasonValue));
       } else {
-        LOGGER.warn("Database FailReason is not valid for Enum: " + failReasonValue);
+        LOGGER.warn("Database FailReason is not valid for Enum: {}", failReasonValue);
         sub.setFailReason(null);
       }
     }

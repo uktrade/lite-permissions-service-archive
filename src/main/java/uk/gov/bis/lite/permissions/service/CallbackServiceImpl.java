@@ -73,7 +73,7 @@ public class CallbackServiceImpl implements CallbackService {
 
 
   private Response doCallback(String url, CallbackView param) {
-    LOGGER.info("Attempting callback [" + url + "] ...");
+    LOGGER.info("Attempting callback [{}] ...", url);
     return httpClient.target(url).request().post(Entity.json(param));
   }
 
