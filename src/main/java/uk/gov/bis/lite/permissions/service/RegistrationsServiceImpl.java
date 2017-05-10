@@ -67,7 +67,7 @@ public class RegistrationsServiceImpl implements RegistrationsService {
     if (EnumUtils.isValidEnum(OgelRegistrationView.Status.class, arg)) {
       status = OgelRegistrationView.Status.valueOf(arg);
     } else {
-      LOGGER.error("Received unknown OgelRegistrationView status: " + arg);
+      LOGGER.error("Received unknown OgelRegistrationView status: {}", arg);
     }
     return status;
   }

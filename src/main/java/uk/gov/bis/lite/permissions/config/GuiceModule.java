@@ -19,6 +19,7 @@ import uk.gov.bis.lite.common.jersey.filter.ClientCorrelationIdFilter;
 import uk.gov.bis.lite.common.spire.client.SpireClientConfig;
 import uk.gov.bis.lite.common.spire.client.SpireRequestConfig;
 import uk.gov.bis.lite.common.spire.client.parser.ReferenceParser;
+import uk.gov.bis.lite.permissions.client.JerseyLoggingFilter;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDaoImpl;
 import uk.gov.bis.lite.permissions.service.CallbackService;
@@ -80,7 +81,8 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
     builder.setApacheHttpClientBuilder(clientBuilder);
 
     Client client = builder.build("jerseyClient");
-    client.register(ClientCorrelationIdFilter.class);
+    client.register(ClientCorrelationIdFilter.class, 1);
+    client.register(JerseyLoggingFilter.class, 2);
     return client;
   }
 

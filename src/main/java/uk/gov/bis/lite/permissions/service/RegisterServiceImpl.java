@@ -70,7 +70,7 @@ public class RegisterServiceImpl implements RegisterService {
    * Returns the requestId associated with the submission
    */
   public String register(OgelSubmission sub, String callbackUrl) {
-    LOGGER.info("Registering OgelSubmission: " + sub.getUserId() + "/" + sub.getOgelType());
+    LOGGER.info("Registering OgelSubmission UserID[{}] OgelType[{}]", sub.getUserId(), sub.getOgelType());
 
     // Persist OgelSubmission
     sub.setCallbackUrl(callbackUrl);
@@ -202,7 +202,7 @@ public class RegisterServiceImpl implements RegisterService {
     try {
       scheduler.scheduleJob(detail, trigger);
     } catch (SchedulerException e) {
-      LOGGER.error("SchedulerException", e);
+      LOGGER.error("SchedulerException SubID[" + submissionId + "]", e);
     }
   }
 
