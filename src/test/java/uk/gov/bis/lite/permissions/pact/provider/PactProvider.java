@@ -1,4 +1,4 @@
-package uk.gov.bis.lite.permissions.pact;
+package uk.gov.bis.lite.permissions.pact.provider;
 
 import static io.dropwizard.testing.ResourceHelpers.resourceFilePath;
 
