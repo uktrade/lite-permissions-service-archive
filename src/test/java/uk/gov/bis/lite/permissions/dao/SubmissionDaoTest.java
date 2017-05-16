@@ -9,10 +9,10 @@ import org.flywaydb.core.Flyway;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import uk.gov.bis.lite.permissions.PermissionsTestApp;
-import uk.gov.bis.lite.permissions.Util;
+import uk.gov.bis.lite.permissions.TestPermissionsApp;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
+import uk.gov.bis.lite.permissions.Util;
 
 /**
  * Integration test for OgelSubmissionDao
@@ -22,7 +22,7 @@ public class SubmissionDaoTest {
   private static OgelSubmissionDao submissionDao;
 
   @ClassRule
-  public static final DropwizardAppRule<PermissionsAppConfig> APP_RULE = new DropwizardAppRule<>(PermissionsTestApp.class,
+  public static final DropwizardAppRule<PermissionsAppConfig> APP_RULE = new DropwizardAppRule<>(TestPermissionsApp.class,
       ResourceHelpers.resourceFilePath("test-config.yaml"));
 
   @BeforeClass
@@ -31,7 +31,7 @@ public class SubmissionDaoTest {
     DataSourceFactory dsf = APP_RULE.getConfiguration().getDataSourceFactory();
     flyway.setDataSource(dsf.getUrl(), dsf.getUser(), dsf.getPassword());
     flyway.migrate();
-    PermissionsTestApp app = APP_RULE.getApplication();
+    TestPermissionsApp app = APP_RULE.getApplication();
     submissionDao = app.getInstance(OgelSubmissionDao.class);
   }
 

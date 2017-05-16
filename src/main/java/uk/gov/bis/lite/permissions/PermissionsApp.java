@@ -35,6 +35,10 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
     this.module = module;
   }
 
+  public <T> T getInstance(Class<T> type) {
+    return getGuiceBundle().getInjector().getInstance(type);
+  }
+
   @Override
   public void initialize(Bootstrap<PermissionsAppConfig> bootstrap) {
     guiceBundle = new GuiceBundle.Builder<PermissionsAppConfig>()

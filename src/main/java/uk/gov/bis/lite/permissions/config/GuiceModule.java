@@ -89,14 +89,15 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
   @Override
   protected void configure() {
     bind(OgelSubmissionDao.class).to(OgelSubmissionDaoImpl.class);
+
     bind(RegisterService.class).to(RegisterServiceImpl.class);
     bind(RegistrationsService.class).to(RegistrationsServiceImpl.class);
     bind(SubmissionService.class).to(SubmissionServiceImpl.class);
-
     bind(CallbackService.class).to(CallbackServiceImpl.class);
+    bind(ProcessSubmissionService.class).to(ProcessSubmissionServiceImpl.class);
+
     bind(CustomerService.class).to(CustomerServiceImpl.class);
     bind(OgelService.class).to(OgelServiceImpl.class);
-    bind(ProcessSubmissionService.class).to(ProcessSubmissionServiceImpl.class);
   }
 
   @Provides

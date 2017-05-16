@@ -1,0 +1,9 @@
+{
+  "userId": "userId",
+  "ogelType": "ogelType",
+  "adminApproval": {
+    "adminUserId": "adminUserId"
+  },
+  "existingCustomer": "existingCustomer",
+  "existingSite": "existingSite"
+}
