@@ -1,3 +1,5 @@
+import java.text.SimpleDateFormat
+
 buildscript {
   repositories {
     mavenCentral()
@@ -18,7 +20,14 @@ plugins {
 apply plugin: 'maven-publish'
 
 group 'uk.gov.bis.lite'
-version '1.3'
+
+if (project.hasProperty('projVersion')) {
+  project.version = project.projVersion
+} else {
+  SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMdd.HHmmss")
+  sdf.setTimeZone(new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "UTC"))
+  project.version = sdf.format(new Date()) + "-SNAPSHOT"
+}
 
 mainClassName = "uk.gov.bis.lite.permissions.PermissionsApp"
 
@@ -66,55 +75,17 @@ dependencies {
     exclude group: 'junit', module: 'junit'
   }
   // Pact
-  testCompile 'au.com.dius:pact-jvm-consumer-junit_2.11:3.3.6'
-  testCompile 'au.com.dius:pact-jvm-provider-junit_2.11:3.3.6'
+  testCompile 'au.com.dius:pact-jvm-consumer-junit_2.11:3.3.7'
+  testCompile 'au.com.dius:pact-jvm-provider-junit_2.11:3.3.7'
   testCompile 'org.apache.httpcomponents:fluent-hc:4.5'
 }
 
-task apiJar(type: Jar, dependsOn: compileJava) {
-  from sourceSets.main.output.classesDir
-  include 'uk/gov/bis/lite/permissions/api/**/*'
-}
-
-task jarWithSources(type: Jar) {
-  from sourceSets.main.allJava
-  include 'uk/gov/bis/lite/permissions/api/**/*'
-}
-
-publishing {
-  publications {
-
-    mavenJava(MavenPublication) {
-      artifactId 'lite-permissions-service-api'
-      artifact apiJar
-      artifact jarWithSources {
-        classifier "sources"
-      }
-    }
-  }
-}
-
-publishing {
-  repositories {
-    maven {
-      name "snapshots"
-      url "http://nexus.mgmt.licensing.service.trade.gov.uk.test/repository/maven-snapshots/"
-    }
-    maven {
-      name "releases"
-      url "http://nexus.mgmt.licensing.service.trade.gov.uk.test/repository/maven-releases/"
-    }
-  }
-}
-
 pact {
-
   publish {
     pactDirectory = 'target/pacts'
     pactBrokerUrl = 'http://pact-broker.mgmt.licensing.service.trade.gov.uk.test/'
     version = '1.0.3'
   }
-
 }
 
 flyway {
@@ -137,3 +108,48 @@ build {
 }
 
 run { args 'server', 'src/main/resources/config.yaml' }
+
+
+publishing {
+  repositories {
+    maven {
+      name "snapshots"
+      url "http://nexus.mgmt.licensing.service.trade.gov.uk.test/repository/maven-snapshots/"
+    }
+    maven {
+      name "releases"
+      url "http://nexus.mgmt.licensing.service.trade.gov.uk.test/repository/maven-releases/"
+    }
+    maven {
+      name "lite-builds"
+      url "http://nexus.mgmt.licensing.service.trade.gov.uk.test/repository/lite-builds/"
+    }
+  }
+}
+
+task apiJar(type: Jar, dependsOn: compileJava) {
+  from sourceSets.main.output.classesDir
+  include 'uk/gov/bis/lite/permissions/api/**/*'
+}
+
+task apiJarWithSources(type: Jar) {
+  from sourceSets.main.allJava
+  include 'uk/gov/bis/lite/permissions/api/**/*'
+}
+
+publishing {
+  publications {
+    api(MavenPublication) {
+      artifactId 'lite-permissions-service-api'
+      version '1.3'
+      artifact apiJar
+      artifact apiJarWithSources {
+        classifier "sources"
+      }
+    }
+    service(MavenPublication) {
+      artifactId 'permissions-service'
+      from components.shadow
+    }
+  }
+}
