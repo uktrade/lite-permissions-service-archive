@@ -2,7 +2,6 @@ package uk.gov.bis.lite.permissions.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -205,7 +204,7 @@ public class CustomerServiceImpl implements CustomerService {
    */
   private UserRoleParam getUserRoleParam(OgelSubmission sub) {
     UserRoleParam userRoleParam = new UserRoleParam();
-    userRoleParam.setRoleType(UserRoleParam.RoleType.ADMIN);
+    userRoleParam.setRoleType(UserRoleParam.RoleType.PREPARER);
     userRoleParam.setAdminUserId(sub.getAdminUserId());
     return userRoleParam;
   }
