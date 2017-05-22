@@ -22,7 +22,8 @@ node('jdk8') {
   }
   stage('Docker build'){
     build job: 'new-docker-build', parameters: [[$class: 'StringParameterValue', name: 'SERVICE_NAME', value: serviceName], [$class: 'StringParameterValue', name: 'BUILD_VERSION', value: params.BUILD_VERSION], [$class: 'StringParameterValue', name: 'DOCKERFILE_PATH', value: '.']]
-  }  stage('Dev deploy'){
+  }
+  stage('Dev deploy'){
     build job: 'new-release-job', parameters: [
       [$class: 'StringParameterValue', name: 'IMAGE_NAME', value: 'svc/permissions-service'],
       [$class: 'StringParameterValue', name: 'BUILD_VERSION', value: params.BUILD_VERSION],
