@@ -1,10 +1,10 @@
 processScheduledJobCron: 0/10 * * * * ?  # every 10 seconds
 
-spireClientUserName: bisuat.api@test.com
-spireClientPassword: sp1reUAT
-spireClientUrl: https://www.spiretest.trade.gov.uk/spireuat/fox/ispire/
+spireClientUserName: spire_user
+spireClientPassword: spire_password
+spireClientUrl: http://service-mocking.svc.dev.licensing.service.trade.gov.uk.test/spire/fox/ispire/
 
-customerServiceUrl: http://localhost:8095
+customerServiceUrl: http://customer-service.svc.dev.licensing.service.trade.gov.uk.test
 
 maxMinutesRetryAfterFail: 1
 maxCallbackFailCount: 5
@@ -13,10 +13,10 @@ server:
   type: default
   applicationConnectors:
     - type: http
-      port: 8093
+      port: 8080
   adminConnectors:
     - type: http
-      port: 8094
+      port: 8081
 
 logging:
   level: INFO
