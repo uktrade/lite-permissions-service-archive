@@ -22,6 +22,9 @@ import uk.gov.bis.lite.permissions.scheduler.ProcessImmediateJob;
 import uk.gov.bis.lite.permissions.scheduler.Scheduler;
 import uk.gov.bis.lite.permissions.util.Util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Singleton
 public class RegisterServiceImpl implements RegisterService {
 
@@ -95,62 +98,51 @@ public class RegisterServiceImpl implements RegisterService {
    * Determines whether the RegisterParam is valid or not
    */
   public boolean isRegisterParamValid(RegisterParam param) {
-
-    // Check mandatory, customer and site fields are valid
-    boolean valid = param.mandatoryFieldsOk() && param.customerFieldsOk() && param.siteFieldsOk();
-
-    // If valid we also check if site address/name is valid
-    if (valid && param.hasNewSite()) {
-      RegisterParam.RegisterSiteParam siteParam = param.getNewSite();
-      if (param.hasNewCustomer()) {
-        if (StringUtils.isBlank(siteParam.getSiteName())) {
-          valid = false;
-        } else if (siteParam.isUseCustomerAddress()) {
-            valid = registerAddressParamValid(param.getNewCustomer().getRegisteredAddress());
-        } else {
-            valid = registerAddressParamValid(siteParam.getAddress());
-        }
-      }
-    }
-
-    // Check that we do not have a new Customer and an existing Site - this is impossible
-    if (valid && param.hasExistingSite() && param.hasNewCustomer()) {
-      valid = false;
-    }
-
-    return valid;
+    List<String> invalidParamMsg = checkValidRegisterParam(param);
+    return !(invalidParamMsg.size() > 0);
   }
 
   /**
    * Return information on any validity errors within RegisterParam
    */
   public String getRegisterParamValidationInfo(RegisterParam param) {
+    return checkValidRegisterParam(param).toString();
+  }
 
+  /**
+   * RegisterParam validation
+   */
+  private List<String> checkValidRegisterParam(RegisterParam param) {
+    List<String> invalidParamMsg = new ArrayList<>();
+
+    // Check mandatory, customer and site fields are valid
     String info = !param.mandatoryFieldsOk() ? "Fields are mandatory: userId, ogelType. " : "";
     String customerCheck = !param.customerFieldsOk() ? "Must have existing Customer or new Customer fields. " : "";
     String siteCheck = !param.siteFieldsOk() ? "Must have existing Site or new Site fields. " : "";
     info = info + customerCheck + siteCheck;
 
-    if (param.hasNewSite()) {
+    if (info.isEmpty() && param.hasNewSite()) {
       RegisterParam.RegisterSiteParam siteParam = param.getNewSite();
       if (param.hasNewCustomer()) {
         if (StringUtils.isBlank(siteParam.getSiteName())) {
           info = info + " New Site must have a site name ('siteName'). ";
-        } else if (siteParam.isUseCustomerAddress()) {
-            if (!registerAddressParamValid(param.getNewCustomer().getRegisteredAddress())) {
-              info = info + " New Site must specify the country and one other address component. ";
-            }
+        }
+        if (siteParam.isUseCustomerAddress()) {
+          if (!registerAddressParamValid(param.getNewCustomer().getRegisteredAddress())) {
+            info = info + " New Site must specify the country and one other address component. ";
+          }
         } else if (!registerAddressParamValid(siteParam.getAddress())) {
           info = info + " New Site must specify the country and one other address component. ";
         }
       }
     }
-
     if (param.hasExistingSite() && param.hasNewCustomer()) {
       info = info + " Cannot have an existing Site for a new Customer. ";
     }
-
-    return info;
+    if (info.length() > 0) {
+      invalidParamMsg.add(info);
+    }
+    return invalidParamMsg;
   }
 
   /**
