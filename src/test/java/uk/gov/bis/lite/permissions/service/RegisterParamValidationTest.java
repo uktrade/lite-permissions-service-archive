@@ -32,6 +32,8 @@ public class RegisterParamValidationTest {
 
     // Valid
     assertThat(service.isRegisterParamValid(getRegisterParam(fixture(PATH + "valid.json")))).isEqualTo(true);
+    assertThat(service.isRegisterParamValid(getRegisterParam(fixture(PATH + "validNewSiteWithSiteName1.json")))).isEqualTo(true);
+    assertThat(service.isRegisterParamValid(getRegisterParam(fixture(PATH + "validNewSiteWithSiteName2.json")))).isEqualTo(true);
 
     // Invalid
     assertThat(service.isRegisterParamValid(getRegisterParam(fixture(PATH + "invalidNewCustomerExistingSite.json")))).isEqualTo(false);
@@ -42,6 +44,8 @@ public class RegisterParamValidationTest {
     assertThat(service.isRegisterParamValid(getRegisterParam(fixture(PATH + "invalidNewSite1.json")))).isEqualTo(false);
     assertThat(service.isRegisterParamValid(getRegisterParam(fixture(PATH + "invalidNewSite2.json")))).isEqualTo(false);
     assertThat(service.isRegisterParamValid(getRegisterParam(fixture(PATH + "invalidNewSite3.json")))).isEqualTo(false);
+    assertThat(service.isRegisterParamValid(getRegisterParam(fixture(PATH + "invalidNewSiteWithoutSiteName1.json")))).isEqualTo(false);
+    assertThat(service.isRegisterParamValid(getRegisterParam(fixture(PATH + "invalidNewSiteWithoutSiteName2.json")))).isEqualTo(false);
   }
 
   private RegisterParam getRegisterParam(String json) {
