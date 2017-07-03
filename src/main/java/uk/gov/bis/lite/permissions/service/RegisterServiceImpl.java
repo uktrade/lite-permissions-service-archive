@@ -102,10 +102,14 @@ public class RegisterServiceImpl implements RegisterService {
     // If valid we also check if site address/name is valid
     if (valid && param.hasNewSite()) {
       RegisterParam.RegisterSiteParam siteParam = param.getNewSite();
-      if (siteParam.isUseCustomerAddress() && param.hasNewCustomer()) {
-        valid = registerAddressParamValid(param.getNewCustomer().getRegisteredAddress());
-      } else {
-        valid = !StringUtils.isBlank(siteParam.getSiteName()) && registerAddressParamValid(siteParam.getAddress());
+      if (param.hasNewCustomer()) {
+        if (StringUtils.isBlank(siteParam.getSiteName())) {
+          valid = false;
+        } else if (siteParam.isUseCustomerAddress()) {
+            valid = registerAddressParamValid(param.getNewCustomer().getRegisteredAddress());
+        } else {
+            valid = registerAddressParamValid(siteParam.getAddress());
+        }
       }
     }
 
@@ -129,15 +133,14 @@ public class RegisterServiceImpl implements RegisterService {
 
     if (param.hasNewSite()) {
       RegisterParam.RegisterSiteParam siteParam = param.getNewSite();
-      if (siteParam.isUseCustomerAddress() && param.hasNewCustomer()) {
-        if (!registerAddressParamValid(param.getNewCustomer().getRegisteredAddress())) {
-          info = info + " New Site must specify the country and one other address component. ";
-        }
-      } else {
+      if (param.hasNewCustomer()) {
         if (StringUtils.isBlank(siteParam.getSiteName())) {
           info = info + " New Site must have a site name ('siteName'). ";
-        }
-        if (!registerAddressParamValid(siteParam.getAddress())) {
+        } else if (siteParam.isUseCustomerAddress()) {
+            if (!registerAddressParamValid(param.getNewCustomer().getRegisteredAddress())) {
+              info = info + " New Site must specify the country and one other address component. ";
+            }
+        } else if (!registerAddressParamValid(siteParam.getAddress())) {
           info = info + " New Site must specify the country and one other address component. ";
         }
       }
