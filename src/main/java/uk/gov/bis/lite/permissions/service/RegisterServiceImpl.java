@@ -106,7 +106,7 @@ public class RegisterServiceImpl implements RegisterService {
    * Return information on any validity errors within RegisterParam
    */
   public String getRegisterParamValidationInfo(RegisterParam param) {
-    return checkValidRegisterParam(param).toString();
+    return String.join(", ", checkValidRegisterParam(param));
   }
 
   /**
@@ -117,32 +117,32 @@ public class RegisterServiceImpl implements RegisterService {
 
     // Check mandatory, customer and site fields are valid
     if (!param.mandatoryFieldsOk()) {
-      invalidParamMsg.add("Fields are mandatory: userId, ogelType.");
+      invalidParamMsg.add("Fields are mandatory: userId, ogelType");
     }
     if (!param.customerFieldsOk()) {
-      invalidParamMsg.add("Must have existing Customer or new Customer fields.");
+      invalidParamMsg.add("Must have existing Customer or new Customer fields");
     }
     if (!param.siteFieldsOk()) {
-      invalidParamMsg.add("Must have existing Site or new Site fields.");
+      invalidParamMsg.add("Must have existing Site or new Site fields");
     }
 
     if (invalidParamMsg.isEmpty() && param.hasNewSite()) {
       RegisterParam.RegisterSiteParam siteParam = param.getNewSite();
       if (param.hasNewCustomer()) {
         if (StringUtils.isBlank(siteParam.getSiteName())) {
-          invalidParamMsg.add("New Site must have a site name ('siteName').");
+          invalidParamMsg.add("New Site must have a site name ('siteName')");
         }
         if (siteParam.isUseCustomerAddress()) {
           if (!registerAddressParamValid(param.getNewCustomer().getRegisteredAddress())) {
-            invalidParamMsg.add("New Site must specify the country and one other address component.");
+            invalidParamMsg.add("New Site must specify the country and one other address component");
           }
         } else if (!registerAddressParamValid(siteParam.getAddress())) {
-          invalidParamMsg.add("New Site must specify the country and one other address component.");
+          invalidParamMsg.add("New Site must specify the country and one other address component");
         }
       }
     }
     if (param.hasExistingSite() && param.hasNewCustomer()) {
-      invalidParamMsg.add(" Cannot have an existing Site for a new Customer.");
+      invalidParamMsg.add(" Cannot have an existing Site for a new Customer");
     }
     return invalidParamMsg;
   }
