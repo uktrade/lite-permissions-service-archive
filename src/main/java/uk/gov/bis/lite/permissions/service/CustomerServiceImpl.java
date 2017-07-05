@@ -35,8 +35,6 @@ public class CustomerServiceImpl implements CustomerService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CustomerServiceImpl.class);
 
-  private static final String DEFAULT_SITE_NAME = "Main Site";
-
   private String customerServiceUrl;
   private Client httpClient;
   private ObjectMapper objectMapper;
@@ -190,7 +188,7 @@ public class CustomerServiceImpl implements CustomerService {
   private SiteParam getSiteParam(OgelSubmission sub) {
     RegisterParam param = getRegisterParam(sub);
     RegisterParam.RegisterSiteParam regSiteParam = param.getNewSite();
-    String siteName = regSiteParam.getSiteName() != null ? regSiteParam.getSiteName() : DEFAULT_SITE_NAME;
+    String siteName = regSiteParam.getSiteName();
     RegisterAddressParam regAddressParam = regSiteParam.isUseCustomerAddress() ? param.getNewCustomer().getRegisteredAddress() : regSiteParam.getAddress();
 
     SiteParam siteParam = new SiteParam();
