@@ -2,7 +2,7 @@ processScheduledJobCron: 59 59 23 31 12 ? 2099  # 5am 31st February
 
 spireClientUserName: bisuat.api@test.com
 spireClientPassword: sp1reUAT
-spireClientUrl: https://www.spiretest.trade.gov.uk/spireuat/fox/ispire/
+spireClientUrl: http://localhost:9000/spireuat/fox/ispire/
 
 customerServiceUrl: http://localhost:8095
 
