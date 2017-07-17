@@ -14,12 +14,16 @@ import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.flywaydb.core.Flyway;
 import org.glassfish.jersey.client.JerseyClientBuilder;
+import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
+import uk.gov.bis.lite.permissions.api.view.OgelSubmissionView;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
 
 import java.util.List;
@@ -34,6 +38,8 @@ public class PermissionsServiceIntegrationTest {
   private static final String SPIRE_FIXTURES = "fixture/integration/spire/";
   private static final String OGEL_REG_URL = "http://localhost:8080/ogel-registrations/user/";
   private static final String REGISTER_OGEL = "http://localhost:8080/register-ogel";
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(PermissionsServiceIntegrationTest.class);
 
   @ClassRule
   public static final WireMockRule wireMockRule = new WireMockRule(9000);
@@ -97,8 +103,21 @@ public class PermissionsServiceIntegrationTest {
         .request()
         .post(Entity.entity(fixture("fixture/integration/register/registerOgelNewCustomer.json"), MediaType.APPLICATION_JSON_TYPE));
 
-//    Thread.sleep(5000);
+    Thread.sleep(5000);
     assertThat(response.getStatus()).isEqualTo(200);
+
+    HttpAuthenticationFeature feature = HttpAuthenticationFeature.basic("user", "password");
+
+    Response ogelSubmissionResponce = JerseyClientBuilder
+        .createClient()
+        .register(feature)
+        .target("http://localhost:8080/ogel-submissions/1")
+        .request()
+        .get();
+
+    assertThat(ogelSubmissionResponce.getStatus()).isEqualTo(200);
+    OgelSubmissionView actual = ogelSubmissionResponce.readEntity(OgelSubmissionView.class);
+    assertThat(actual.getSpireRef().equals("GBOGE2017/12345"));
   }
 
   @Test
