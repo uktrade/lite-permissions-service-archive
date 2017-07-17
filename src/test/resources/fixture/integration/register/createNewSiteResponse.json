@@ -1,0 +1,9 @@
+{
+  "customerId": "SAR1",
+  "siteId": "SITE12018",
+  "siteName": "siteName",
+  "address" : {
+    "plainText": "RUPRECHT DIRAC\nRUPRECHT DECSTATION PAULIE\nLENA\nBLOWPIPE\nZK31 0OB",
+    "country": "CTR0"
+  }
+}
