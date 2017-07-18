@@ -88,6 +88,10 @@ public class PermissionsServiceIntegrationTest {
             .withStatus(200)
             .withHeader("Content-Type", "text/xml")
             .withBody(fixture("fixture/integration/spire/createOgelRegResponse.xml"))));
+
+    //submission status complete. now callback
+    wireMockRule.stubFor(post(urlEqualTo("/callback"))
+        .willReturn(aResponse().withStatus(200)));
   }
 
   @Before
@@ -98,38 +102,33 @@ public class PermissionsServiceIntegrationTest {
     flyway.migrate();
   }
 
-
   @Test
   public void registerOgelSuccessImmediate() throws Exception{
     Response response = JerseyClientBuilder.createClient()
         .target(REGISTER_OGEL_URL)
-        .queryParam("callbackUrl","http://localhost:8080/")
+        .queryParam("callbackUrl","http://localhost:9000/callback")
         .request()
         .post(Entity.entity(fixture("fixture/integration/registerOgel/registerOgelNewCustomer.json"), MediaType.APPLICATION_JSON_TYPE));
 
     Thread.sleep(5000);
     assertThat(response.getStatus()).isEqualTo(200);
 
-    HttpAuthenticationFeature feature = HttpAuthenticationFeature.basic("user", "password");
-
-    Response ogelSubmissionResponce = JerseyClientBuilder
+    Response ogelSubmissionResponse = JerseyClientBuilder
         .createClient()
-        .register(feature)
+        .register(HttpAuthenticationFeature.basic("user", "password"))
         .target(OGEL_SUBMISSION_URL+SUB_ID)
         .request()
         .get();
 
-    assertThat(ogelSubmissionResponce.getStatus()).isEqualTo(200);
+    assertThat(ogelSubmissionResponse.getStatus()).isEqualTo(200);
 
-    OgelSubmissionView actual = ogelSubmissionResponce.readEntity(OgelSubmissionView.class);
-
-    assertThat(actual.getSpireRef().equals("TEST2017/12345"));
-    assertThat(actual.getCustomerRef().equals("SAR1"));
-    assertThat(actual.getSiteRef().equals("SITE12018"));
-    assertThat(actual.getStatus().equals("EXTANT"));
-    assertThat(actual.getUserId().equals("testUser"));
-
-    Thread.sleep(10000);
+    OgelSubmissionView actual = ogelSubmissionResponse.readEntity(OgelSubmissionView.class);
+    assertThat(actual.getSpireRef()).isEqualTo("TEST2017/12345");
+    assertThat(actual.getCustomerRef()).isEqualTo("SAR1");
+    assertThat(actual.getSiteRef()).isEqualTo("SITE12018");
+    assertThat(actual.getStatus()).isEqualTo("COMPLETE");
+    assertThat(actual.getUserId()).isEqualTo("testUser");
+    assertThat(actual.getOgelType()).isEqualTo("ogelType");
   }
 
   @Test
@@ -140,15 +139,16 @@ public class PermissionsServiceIntegrationTest {
         .get();
 
     List<OgelRegistrationView> actualResponse = response.readEntity(new GenericType<List<OgelRegistrationView>>(){});
-    OgelRegistrationView ogelResponse = actualResponse.stream()
+    OgelRegistrationView ogelRegistrationReponse = actualResponse.stream()
         .findFirst()
         .get();
 
     assertThat(response.getStatus()).isEqualTo(200);
-    assertThat(ogelResponse.getOgelType().equals("DUMMY_OGL"));
-    assertThat(ogelResponse.getStatus().equals("EXTANT"));
-    assertThat(ogelResponse.getCustomerId().equals("DUMMY_SAR_REF"));
-    assertThat(ogelResponse.getRegistrationReference().equals("DUMMY_REGISTRATION_REF"));
+    assertThat(ogelRegistrationReponse.getOgelType()).isEqualTo("DUMMY_OGL");
+    assertThat(ogelRegistrationReponse.getStatus().toString()).isEqualTo("EXTANT");
+    assertThat(ogelRegistrationReponse.getCustomerId()).isEqualTo("DUMMY_SAR_REF");
+    assertThat(ogelRegistrationReponse.getSiteId()).isEqualTo("DUMMY_SAR_SITE");
+    assertThat(ogelRegistrationReponse.getRegistrationReference()).isEqualTo("DUMMY_REGISTRATION_REF");
   }
 
   @Test
