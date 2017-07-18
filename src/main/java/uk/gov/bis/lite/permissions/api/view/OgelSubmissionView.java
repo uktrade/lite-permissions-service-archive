@@ -24,11 +24,11 @@ public class OgelSubmissionView {
   private String created;
   private boolean roleUpdate;
   private boolean roleUpdated;
-  private String json;
+  private Object json;
 
   @JsonRawValue
-  public String getJson() {
-    return json;
+  public Object getJson() {
+    return json.toString();
   }
 
   public String getId() {
@@ -167,7 +167,7 @@ public class OgelSubmissionView {
     this.roleUpdated = roleUpdated;
   }
 
-  public void setJson(String json) {
+  public void setJson(Object json) {
     this.json = json;
   }
 
