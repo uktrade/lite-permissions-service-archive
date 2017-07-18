@@ -3,7 +3,7 @@
   <soap:Header/>
   <soap:Body>
     <ns:RESPONSE>
-      <REGISTRATION_REF>GBOGE2017/12345</REGISTRATION_REF>
+      <REGISTRATION_REF>TEST2017/12345</REGISTRATION_REF>
     </ns:RESPONSE>
   </soap:Body>
 </soap:Envelope>
