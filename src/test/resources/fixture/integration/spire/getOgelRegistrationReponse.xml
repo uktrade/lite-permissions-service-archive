@@ -1,0 +1,18 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+               xmlns:ns="http://www.fivium.co.uk/fox/webservices/ispire/SPIRE_OGEL_REGISTRATIONS">
+  <soap:Header/>
+  <soap:Body>
+    <ns:getOgelRegsResponse>
+      <OGEL_REGISTRATION_LIST>
+        <OGEL_REGISTRATION>
+          <OGEL_TYPE_REF>DUMMY_OGL</OGEL_TYPE_REF>
+          <SAR_REF>DUMMY_SAR_REF</SAR_REF>
+          <SITE_REF>DUMMY_SAR_SITE</SITE_REF>
+          <REGISTRATION_REF>DUMMY_REGISTRATION_REF</REGISTRATION_REF>
+          <REGISTRATION_DATE>2010-01-26</REGISTRATION_DATE>
+          <STATUS>EXTANT</STATUS>
+        </OGEL_REGISTRATION>
+      </OGEL_REGISTRATION_LIST>
+    </ns:getOgelRegsResponse>
+  </soap:Body>
+</soap:Envelope>

@@ -1,0 +1,15 @@
+{
+  "customerId":"SAR1",
+  "companyName":"COMPANY1",
+  "companyNumber":"GB6788",
+  "shortName":"COMP1",
+  "organisationType":"Trading Company",
+  "registrationStatus":"REGISTERED",
+  "registeredAddress":"HIGH STREET",
+  "applicantType":"ORGANISATION",
+  "countryOfOriginCode":"0",
+  "websites":[
+    "www.gov.uk"
+  ]
+}
+
