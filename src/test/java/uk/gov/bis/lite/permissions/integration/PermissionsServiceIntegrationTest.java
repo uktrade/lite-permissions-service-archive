@@ -1,16 +1,6 @@
-package uk.gov.bis.lite.permissions;
+package uk.gov.bis.lite.permissions.integration;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.containing;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalToXml;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static io.dropwizard.testing.ResourceHelpers.resourceFilePath;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -25,10 +15,10 @@ import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.JerseyInvocation;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import uk.gov.bis.lite.permissions.PermissionsApp;
 import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
 import uk.gov.bis.lite.permissions.api.view.OgelSubmissionView;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
@@ -56,53 +46,6 @@ public class PermissionsServiceIntegrationTest {
   public final DropwizardAppRule<PermissionsAppConfig> RULE =
       new DropwizardAppRule<>(PermissionsApp.class, resourceFilePath("service-test.yaml"));
 
-  @BeforeClass
-  public static void setUpMocks() {
-    wireMockRule.stubFor(post(urlEqualTo("/spireuat/fox/ispire/SPIRE_OGEL_REGISTRATIONS"))
-        .withRequestBody(containing(USER_ID))
-        .willReturn(aResponse()
-            .withStatus(200)
-            .withHeader("Content-Type", "text/xml")
-            .withBody(fixture("fixture/integration/spire/getOgelRegistrationReponse.xml"))));
-
-    // return customer not found for new customer
-    wireMockRule.stubFor(get(urlEqualTo("/search-customers/registered-number/GB6788"))
-    .willReturn(aResponse()
-    .withStatus(400)));
-
-    // create new customer with new sarRef
-    wireMockRule.stubFor(post(urlEqualTo("/create-customer"))
-        .willReturn(aResponse()
-            .withStatus(200)
-            .withHeader("Content-Type", "application/json")
-            .withBody(fixture("fixture/integration/registerOgel/createNewCustomerResponse.json"))));
-
-    // after successful create-customer proceed to createSite and respond with valid siteId/siteRef
-    wireMockRule.stubFor(post(urlEqualTo("/customer-sites/SAR1?userId=adminUserId"))
-        .willReturn(aResponse()
-            .withStatus(200)
-            .withHeader("Content-Type", "application/json")
-            .withBody(fixture("fixture/integration/registerOgel/createNewSiteResponse.json"))));
-
-    // update userRole
-    wireMockRule.stubFor(post(urlEqualTo("/user-roles/user/testUser/site/SITE12018"))
-        .willReturn(aResponse()
-            .withStatus(200)
-            .withHeader("Content-Type", "application/json")
-            .withBody(fixture("fixture/integration/registerOgel/userRoleResponse.json"))));
-
-    //return registration_ref on sucessful spire call to create OGEL
-    wireMockRule.stubFor(post(urlEqualTo("/spireuat/fox/ispire/SPIRE_CREATE_OGEL_APP"))
-        .willReturn(aResponse()
-            .withStatus(200)
-            .withHeader("Content-Type", "text/xml")
-            .withBody(fixture("fixture/integration/spire/createOgelRegResponse.xml"))));
-
-    //submission status complete. now callback
-    wireMockRule.stubFor(post(urlEqualTo("/callback"))
-        .willReturn(aResponse().withStatus(200)));
-  }
-
   @Before
   public void setupDatabase() {
     DataSourceFactory f = RULE.getConfiguration().getDataSourceFactory();
@@ -112,10 +55,11 @@ public class PermissionsServiceIntegrationTest {
   }
 
   @Test
-  public void registerOgelSuccessImmediate() throws Exception{
+  public void registerOgelSuccessImmediate() throws Exception {
+    initRegisterOgelStubs();
     Response response = JerseyClientBuilder.createClient()
         .target(REGISTER_OGEL_URL)
-        .queryParam("callbackUrl","http://localhost:9000/callback")
+        .queryParam("callbackUrl", "http://localhost:9000/callback")
         .request()
         .post(Entity.entity(fixture("fixture/integration/registerOgel/registerOgelNewCustomer.json"), MediaType.APPLICATION_JSON_TYPE));
 
@@ -124,7 +68,7 @@ public class PermissionsServiceIntegrationTest {
     JerseyInvocation.Builder ogelSubmissionRequest = JerseyClientBuilder
         .createClient()
         .register(HttpAuthenticationFeature.basic("user", "password"))
-        .target(OGEL_SUBMISSION_URL+SUB_ID)
+        .target(OGEL_SUBMISSION_URL + SUB_ID)
         .request();
 
     await().with().pollInterval(1, SECONDS).atMost(30, SECONDS).until(() -> ogelSubmissionRequest
@@ -145,15 +89,28 @@ public class PermissionsServiceIntegrationTest {
     assertThat(actual.getUserId()).isEqualTo("testUser");
     assertThat(actual.getOgelType()).isEqualTo("ogelType");
 
-    verify(postRequestedFor(urlEqualTo("/spireuat/fox/ispire/SPIRE_CREATE_OGEL_APP"))
-        .withRequestBody(equalToXml(fixture("fixture/integration/spire/createOgelRegRequest.xml"))));
-    verify(postRequestedFor(urlEqualTo("/callback")));
+    verify(postRequestedFor(urlEqualTo("/create-customer"))
+        .withRequestBody(containing("testUser")));
+    verify(postRequestedFor(urlEqualTo("/customer-sites/SAR1?userId=adminUserId"))
+        .withRequestBody(containing("siteName")));
+    verify(postRequestedFor(urlEqualTo("/user-roles/user/testUser/site/SITE12018"))
+        .withRequestBody(containing("adminUserId")));
+    verify(postRequestedFor(urlEqualTo("/callback"))
+        .withRequestBody(containing("SUCCESS"))
+        .withRequestBody(containing("TEST2017/12345")));
   }
 
   @Test
   public void getOgelRegistrationsValidUser() {
+    stubFor(post(urlEqualTo("/spireuat/fox/ispire/SPIRE_OGEL_REGISTRATIONS"))
+        .withRequestBody(containing(USER_ID))
+        .willReturn(aResponse()
+            .withStatus(200)
+            .withHeader("Content-Type", "text/xml")
+            .withBody(fixture("fixture/integration/spire/getOgelRegistrationReponse.xml"))));
+
     Response response = JerseyClientBuilder.createClient()
-        .target(OGEL_REG_URL+ USER_ID)
+        .target(OGEL_REG_URL + USER_ID)
         .request()
         .get();
 
@@ -168,18 +125,60 @@ public class PermissionsServiceIntegrationTest {
     assertThat(ogelRegistrationReponse.getCustomerId()).isEqualTo("DUMMY_SAR_REF");
     assertThat(ogelRegistrationReponse.getSiteId()).isEqualTo("DUMMY_SAR_SITE");
     assertThat(ogelRegistrationReponse.getRegistrationReference()).isEqualTo("DUMMY_REGISTRATION_REF");
-
-    verify(postRequestedFor(urlEqualTo("/spireuat/fox/ispire/SPIRE_OGEL_REGISTRATIONS"))
-        .withRequestBody(equalToXml(fixture("fixture/integration/spire/getOgelRegistrationsValidUserRequest.xml"))));
   }
 
   @Test
   public void getOgelRegistrationInvalidUser() {
+    stubFor(post(urlEqualTo("/spireuat/fox/ispire/SPIRE_OGEL_REGISTRATIONS"))
+        .withRequestBody(containing(INVALID_USER_ID))
+        .willReturn(aResponse()
+            .withStatus(500)));
+
     Response response = JerseyClientBuilder.createClient()
-        .target(OGEL_REG_URL+ INVALID_USER_ID)
+        .target(OGEL_REG_URL + INVALID_USER_ID)
         .request()
         .get();
 
     assertThat(response.getStatus()).isEqualTo(500);
+  }
+
+  private void initRegisterOgelStubs() {
+    // return customer not found for new customer
+    stubFor(get(urlEqualTo("/search-customers/registered-number/GB6788"))
+        .willReturn(aResponse()
+            .withStatus(400)));
+
+    // create new customer with new sarRef
+    stubFor(post(urlEqualTo("/create-customer"))
+        .willReturn(aResponse()
+            .withStatus(200)
+            .withHeader("Content-Type", "application/json")
+            .withBody(fixture("fixture/integration/registerOgel/createNewCustomerResponse.json"))));
+
+    // after successful create-customer proceed to createSite and respond with valid siteId/siteRef
+    stubFor(post(urlEqualTo("/customer-sites/SAR1?userId=adminUserId"))
+        .willReturn(aResponse()
+            .withStatus(200)
+            .withHeader("Content-Type", "application/json")
+            .withBody(fixture("fixture/integration/registerOgel/createNewSiteResponse.json"))));
+
+    // update userRole
+    stubFor(post(urlEqualTo("/user-roles/user/testUser/site/SITE12018"))
+        .willReturn(aResponse()
+            .withStatus(200)
+            .withHeader("Content-Type", "application/json")
+            .withBody(fixture("fixture/integration/registerOgel/userRoleResponse.json"))));
+
+
+    //return registration_ref on sucessful spire call to create OGEL
+    stubFor(post(urlEqualTo("/spireuat/fox/ispire/SPIRE_CREATE_OGEL_APP"))
+        .willReturn(aResponse()
+            .withStatus(200)
+            .withHeader("Content-Type", "text/xml")
+            .withBody(fixture("fixture/integration/spire/createOgelRegResponse.xml"))));
+
+    //submission status complete. now callback
+    stubFor(post(urlEqualTo("/callback"))
+        .willReturn(aResponse().withStatus(200)));
   }
 }
