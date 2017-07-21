@@ -1,1 +1,4 @@
-{"adminUserId":"adminUserId","roleType":"PREPARER"}
+{
+  "adminUserId":"adminUserId",
+  "roleType":"PREPARER"
+}

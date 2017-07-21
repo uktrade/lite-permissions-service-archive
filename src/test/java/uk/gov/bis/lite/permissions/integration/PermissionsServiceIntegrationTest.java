@@ -2,6 +2,8 @@ package uk.gov.bis.lite.permissions.integration;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToXml;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
@@ -97,15 +99,15 @@ public class PermissionsServiceIntegrationTest {
     assertThat(actual.getOgelType()).isEqualTo("ogelType");
 
     verify(postRequestedFor(urlEqualTo("/create-customer"))
-        .withRequestBody(containing(fixture("fixture/integration/registerOgel/createNewCustomerRequest.json"))));
+        .withRequestBody(equalToJson(fixture("fixture/integration/registerOgel/createNewCustomerRequest.json"))));
     verify(postRequestedFor(urlEqualTo("/customer-sites/SAR1?userId=adminUserId"))
-        .withRequestBody(containing(fixture("fixture/integration/registerOgel/createNewSiteRequest.json"))));
+        .withRequestBody(equalToJson(fixture("fixture/integration/registerOgel/createNewSiteRequest.json"))));
     verify(postRequestedFor(urlEqualTo("/user-roles/user/testUser/site/SITE12018"))
-        .withRequestBody(containing(fixture("fixture/integration/registerOgel/updateUserRoleRequest.json"))));
+        .withRequestBody(equalToJson(fixture("fixture/integration/registerOgel/updateUserRoleRequest.json"))));
     verify(postRequestedFor(urlEqualTo("/spireuat/fox/ispire/SPIRE_CREATE_OGEL_APP"))
-        .withRequestBody(containing(fixture("fixture/integration/spire/createOgelRegRequest.xml"))));
+        .withRequestBody(equalToXml(fixture("fixture/integration/spire/createOgelRegRequest.xml"))));
     verify(postRequestedFor(urlEqualTo("/callback"))
-        .withRequestBody(containing(fixture("fixture/integration/registerOgel/callBackRequest.json"))));
+        .withRequestBody(equalToJson(fixture("fixture/integration/registerOgel/callBackRequest.json"))));
   }
 
   @Test
@@ -135,7 +137,7 @@ public class PermissionsServiceIntegrationTest {
     assertThat(ogelRegistrationReponse.getRegistrationReference()).isEqualTo("DUMMY_REGISTRATION_REF");
 
     verify(postRequestedFor(urlEqualTo("/spireuat/fox/ispire/SPIRE_OGEL_REGISTRATIONS"))
-        .withRequestBody(containing(fixture("fixture/integration/spire/getOgelRegistrationsValidUserRequest.xml"))));
+        .withRequestBody(equalToXml(fixture("fixture/integration/spire/getOgelRegistrationsValidUserRequest.xml"))));
   }
 
   @Test
@@ -153,7 +155,7 @@ public class PermissionsServiceIntegrationTest {
     assertThat(response.getStatus()).isEqualTo(500);
 
     verify(postRequestedFor(urlEqualTo("/spireuat/fox/ispire/SPIRE_OGEL_REGISTRATIONS"))
-        .withRequestBody(containing(fixture("fixture/integration/spire/getOgelRegistrationsInvalidUserRequest.xml"))));
+        .withRequestBody(equalToXml(fixture("fixture/integration/spire/getOgelRegistrationsInvalidUserRequest.xml"))));
   }
 
   private void initRegisterOgelStubs() {

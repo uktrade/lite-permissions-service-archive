@@ -1,1 +1,17 @@
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:spir="http://www.fivium.co.uk/fox/webservices/ispire/SPIRE_CREATE_OGEL_APP"><SOAP-ENV:Header/><SOAP-ENV:Body><OGEL_DETAILS><VERSION_NO>1.0</VERSION_NO><WUA_ID>testUser</WUA_ID><SAR_REF>SAR1</SAR_REF><SITE_REF>SITE12018</SITE_REF><OGL_TYPE_LIST><OGL_TYPE><TYPE>ogelType</TYPE></OGL_TYPE></OGL_TYPE_LIST></OGEL_DETAILS></SOAP-ENV:Body></SOAP-ENV:Envelope>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+                   xmlns:spir="http://www.fivium.co.uk/fox/webservices/ispire/SPIRE_CREATE_OGEL_APP">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+    <OGEL_DETAILS>
+      <VERSION_NO>1.0</VERSION_NO>
+      <WUA_ID>testUser</WUA_ID>
+      <SAR_REF>SAR1</SAR_REF>
+      <SITE_REF>SITE12018</SITE_REF>
+      <OGL_TYPE_LIST>
+        <OGL_TYPE>
+          <TYPE>ogelType</TYPE>
+        </OGL_TYPE>
+      </OGL_TYPE_LIST>
+    </OGEL_DETAILS>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
