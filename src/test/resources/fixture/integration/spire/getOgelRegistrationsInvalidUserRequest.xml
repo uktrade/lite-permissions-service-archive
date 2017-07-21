@@ -1,0 +1,1 @@
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:spir="http://www.fivium.co.uk/fox/webservices/ispire/SPIRE_OGEL_REGISTRATIONS"><SOAP-ENV:Header/><SOAP-ENV:Body><spir:getOgelRegs><userId>111000</userId></spir:getOgelRegs></SOAP-ENV:Body></SOAP-ENV:Envelope>
