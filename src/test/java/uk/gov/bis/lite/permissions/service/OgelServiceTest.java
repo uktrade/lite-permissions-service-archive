@@ -9,8 +9,8 @@ import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.bis.lite.common.spire.client.SpireClientConfig;
 import uk.gov.bis.lite.common.spire.client.SpireRequestConfig;
@@ -23,25 +23,25 @@ import uk.gov.bis.lite.permissions.spire.SpireReferenceClient;
 
 public class OgelServiceTest {
 
-  private String USER_ID_SUCCESS = "USER_ID_SUCCESS";
-  private String USER_ID_SOAP_FAULT = "USER_ID_SOAP_FAULT";
-  private String USER_ID_ERROR = "USER_ID_ERROR";
-  private String USER_ID_USER_LACKS_PRIVILEGES = "USER_ID_USER_LACKS_PRIVILEGES";
-  private String USER_ID_BLACKLISTED = "USER_ID_BLACKLISTED";
-  private String USER_ID_SITE_ALREADY_REGISTERED = "USER_ID_SITE_ALREADY_REGISTERED";
-  private String USER_ID_INVALID_OGEL_REF = "USER_ID_INVALID_OGEL_REF";
+  private static String USER_ID_SUCCESS = "USER_ID_SUCCESS";
+  private static String USER_ID_SOAP_FAULT = "USER_ID_SOAP_FAULT";
+  private static String USER_ID_ERROR = "USER_ID_ERROR";
+  private static String USER_ID_USER_LACKS_PRIVILEGES = "USER_ID_USER_LACKS_PRIVILEGES";
+  private static String USER_ID_BLACKLISTED = "USER_ID_BLACKLISTED";
+  private static String USER_ID_SITE_ALREADY_REGISTERED = "USER_ID_SITE_ALREADY_REGISTERED";
+  private static String USER_ID_INVALID_OGEL_REF = "USER_ID_INVALID_OGEL_REF";
 
-  private int PORT = 8080;
-  private String MOCK_SPIRE_URL = "http://localhost:" + PORT + "/spireuat/fox/ispire/";
+  private static int PORT = 8080;
+  private static String MOCK_SPIRE_URL = "http://localhost:" + PORT + "/spireuat/fox/ispire/";
 
-  @Rule
-  public WireMockRule wiremockRule = new WireMockRule(PORT);
+  @ClassRule
+  public static WireMockRule wiremockRule = new WireMockRule(PORT);
 
-  private OgelService ogelService;
-  private ProcessSubmissionServiceImpl.Origin OGEL_CREATE = ProcessSubmissionServiceImpl.Origin.OGEL_CREATE;
+  private static OgelService ogelService;
+  private static ProcessSubmissionServiceImpl.Origin OGEL_CREATE = ProcessSubmissionServiceImpl.Origin.OGEL_CREATE;
 
-  @Before
-  public void before() {
+  @BeforeClass
+  public static void before() {
     SpireReferenceClient client = provideSpireCreateOgelAppClient("username", "password", MOCK_SPIRE_URL);
     ogelService = new OgelServiceImpl(client);
 
@@ -111,7 +111,7 @@ public class OgelServiceTest {
     assertThat(sub.getFailEvent().getOrigin()).isEqualTo(OGEL_CREATE);
   }
 
-  private SpireReferenceClient provideSpireCreateOgelAppClient(String userName, String password, String url) {
+  private static SpireReferenceClient provideSpireCreateOgelAppClient(String userName, String password, String url) {
     return new SpireReferenceClient(
         new ReferenceParser("REGISTRATION_REF"),
         new SpireClientConfig(userName, password, url),
@@ -119,7 +119,7 @@ public class OgelServiceTest {
         new OgelErrorNodeErrorHandler());
   }
 
-  private void initStubs() {
+  private static void initStubs() {
 
     String OGEL_URL = "/spireuat/fox/ispire/SPIRE_CREATE_OGEL_APP";
     String PATH = "fixture/soap/";
