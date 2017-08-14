@@ -17,7 +17,7 @@ node('jdk8') {
     stage('Gradle test') {
       sh 'chmod 777 gradlew'
       try {
-        sh "./gradlew test"
+        sh "./gradlew test -i"
       }
       finally {
         step([$class: 'JUnitResultArchiver', testResults: 'build/test-results/**/*.xml'])
