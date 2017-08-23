@@ -1,6 +1,7 @@
 package uk.gov.bis.lite.permissions.integration;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToXml;
@@ -10,14 +11,16 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static io.dropwizard.testing.ResourceHelpers.resourceFilePath;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import io.dropwizard.db.DataSourceFactory;
+import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.flywaydb.core.Flyway;
 import org.glassfish.jersey.client.JerseyClientBuilder;
@@ -48,12 +51,23 @@ public class PermissionsServiceIntegrationTest {
   private static final String INVALID_USER_ID = "111000";
   private static final String SUB_ID = "1";
 
+  /**
+   * Configured to bind port dynamically to mitigate bug https://github.com/tomakehurst/wiremock/issues/97
+   * TODO revert to static port once bug is resolved
+   */
   @ClassRule
-  public static final WireMockRule wireMockRule = new WireMockRule(9000);
+  public static final WireMockClassRule wireMockClassRule = new WireMockClassRule(options().dynamicPort());
 
   @Rule
   public final DropwizardAppRule<PermissionsAppConfig> RULE =
-      new DropwizardAppRule<>(PermissionsApp.class, resourceFilePath("service-test.yaml"));
+      new DropwizardAppRule<>(PermissionsApp.class, resourceFilePath("service-test.yaml"),
+          ConfigOverride.config("customerServiceUrl", "http://localhost:" +  wireMockClassRule.port() + "/"),
+          ConfigOverride.config("spireClientUrl", "http://localhost:" +  wireMockClassRule.port() + "/spire/fox/ispire/"));
+
+  @Before
+  public void setupWireMockStubFor() {
+    configureFor(wireMockClassRule.port());
+  }
 
   @Before
   public void setupDatabase() {
@@ -68,7 +82,7 @@ public class PermissionsServiceIntegrationTest {
     initRegisterOgelStubs();
     Response response = JerseyClientBuilder.createClient()
         .target(REGISTER_OGEL_URL)
-        .queryParam("callbackUrl", "http://localhost:9000/callback")
+        .queryParam("callbackUrl", "http://localhost:" + wireMockClassRule.port() + "/callback")
         .request()
         .post(Entity.entity(fixture("fixture/integration/registerOgel/registerOgelNewCustomer.json"), MediaType.APPLICATION_JSON_TYPE));
 
@@ -104,7 +118,7 @@ public class PermissionsServiceIntegrationTest {
         .withRequestBody(equalToJson(fixture("fixture/integration/registerOgel/createNewSiteRequest.json"))));
     verify(postRequestedFor(urlEqualTo("/user-roles/user/testUser/site/SITE12018"))
         .withRequestBody(equalToJson(fixture("fixture/integration/registerOgel/updateUserRoleRequest.json"))));
-    verify(postRequestedFor(urlEqualTo("/spireuat/fox/ispire/SPIRE_CREATE_OGEL_APP"))
+    verify(postRequestedFor(urlEqualTo("/spire/fox/ispire/SPIRE_CREATE_OGEL_APP"))
         .withRequestBody(equalToXml(fixture("fixture/integration/spire/createOgelRegRequest.xml"))));
     verify(postRequestedFor(urlEqualTo("/callback"))
         .withRequestBody(equalToJson(fixture("fixture/integration/registerOgel/callBackRequest.json"))));
@@ -112,7 +126,7 @@ public class PermissionsServiceIntegrationTest {
 
   @Test
   public void getOgelRegistrationsValidUser() {
-    stubFor(post(urlEqualTo("/spireuat/fox/ispire/SPIRE_OGEL_REGISTRATIONS"))
+    stubFor(post(urlEqualTo("/spire/fox/ispire/SPIRE_OGEL_REGISTRATIONS"))
         .withRequestBody(containing(USER_ID))
         .willReturn(aResponse()
             .withStatus(200)
@@ -136,25 +150,25 @@ public class PermissionsServiceIntegrationTest {
     assertThat(ogelRegistrationReponse.getSiteId()).isEqualTo("DUMMY_SAR_SITE");
     assertThat(ogelRegistrationReponse.getRegistrationReference()).isEqualTo("DUMMY_REGISTRATION_REF");
 
-    verify(postRequestedFor(urlEqualTo("/spireuat/fox/ispire/SPIRE_OGEL_REGISTRATIONS"))
+    verify(postRequestedFor(urlEqualTo("/spire/fox/ispire/SPIRE_OGEL_REGISTRATIONS"))
         .withRequestBody(equalToXml(fixture("fixture/integration/spire/getOgelRegistrationsValidUserRequest.xml"))));
   }
 
   @Test
   public void getOgelRegistrationInvalidUser() {
-    stubFor(post(urlEqualTo("/spireuat/fox/ispire/SPIRE_OGEL_REGISTRATIONS"))
+    stubFor(post(urlEqualTo("/spire/fox/ispire/SPIRE_OGEL_REGISTRATIONS"))
         .withRequestBody(containing(INVALID_USER_ID))
         .willReturn(aResponse()
-            .withStatus(500)));
+            .withStatus(400)));
 
     Response response = JerseyClientBuilder.createClient()
         .target(OGEL_REG_URL + INVALID_USER_ID)
         .request()
         .get();
 
-    assertThat(response.getStatus()).isEqualTo(500);
+    assertThat(response.getStatus()).isEqualTo(400);
 
-    verify(postRequestedFor(urlEqualTo("/spireuat/fox/ispire/SPIRE_OGEL_REGISTRATIONS"))
+    verify(postRequestedFor(urlEqualTo("/spire/fox/ispire/SPIRE_OGEL_REGISTRATIONS"))
         .withRequestBody(equalToXml(fixture("fixture/integration/spire/getOgelRegistrationsInvalidUserRequest.xml"))));
   }
 
@@ -187,7 +201,7 @@ public class PermissionsServiceIntegrationTest {
 
 
     //return registration_ref on sucessful spire call to create OGEL
-    stubFor(post(urlEqualTo("/spireuat/fox/ispire/SPIRE_CREATE_OGEL_APP"))
+    stubFor(post(urlEqualTo("/spire/fox/ispire/SPIRE_CREATE_OGEL_APP"))
         .willReturn(aResponse()
             .withStatus(200)
             .withHeader("Content-Type", "text/xml")
