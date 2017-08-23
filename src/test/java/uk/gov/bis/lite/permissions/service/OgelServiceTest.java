@@ -2,13 +2,16 @@ package uk.gov.bis.lite.permissions.service;
 
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -31,18 +34,18 @@ public class OgelServiceTest {
   private static String USER_ID_SITE_ALREADY_REGISTERED = "USER_ID_SITE_ALREADY_REGISTERED";
   private static String USER_ID_INVALID_OGEL_REF = "USER_ID_INVALID_OGEL_REF";
 
-  private static int PORT = 8080;
-  private static String MOCK_SPIRE_URL = "http://localhost:" + PORT + "/spireuat/fox/ispire/";
-
   @ClassRule
-  public static WireMockRule wiremockRule = new WireMockRule(PORT);
+  public static WireMockClassRule wireMockClassRule = new WireMockClassRule(options().dynamicPort());
 
   private static OgelService ogelService;
   private static ProcessSubmissionServiceImpl.Origin OGEL_CREATE = ProcessSubmissionServiceImpl.Origin.OGEL_CREATE;
 
   @BeforeClass
   public static void before() {
-    SpireReferenceClient client = provideSpireCreateOgelAppClient("username", "password", MOCK_SPIRE_URL);
+    configureFor(wireMockClassRule.port());
+
+    String mockSpireUrl = "http://localhost:" + wireMockClassRule.port() + "/spire/fox/ispire/";
+    SpireReferenceClient client = provideSpireCreateOgelAppClient("username", "password", mockSpireUrl);
     ogelService = new OgelServiceImpl(client);
 
     // Initialise Wiremock stubs
@@ -121,13 +124,13 @@ public class OgelServiceTest {
 
   private static void initStubs() {
 
-    String OGEL_URL = "/spireuat/fox/ispire/SPIRE_CREATE_OGEL_APP";
+    String OGEL_URL = "/spire/fox/ispire/SPIRE_CREATE_OGEL_APP";
     String PATH = "fixture/soap/";
     String CONTENT_TYPE = "Content-Type";
     String TEXT_XML = "text/xml";
 
     // Success
-    wiremockRule.stubFor(post(urlEqualTo(OGEL_URL))
+    stubFor(post(urlEqualTo(OGEL_URL))
         .withRequestBody(containing(USER_ID_SUCCESS))
         .willReturn(aResponse()
             .withStatus(200)
@@ -135,7 +138,7 @@ public class OgelServiceTest {
             .withBody(fixture(PATH + "createOgelSuccess.xml"))));
 
     // Error
-    wiremockRule.stubFor(post(urlEqualTo(OGEL_URL))
+    stubFor(post(urlEqualTo(OGEL_URL))
         .withRequestBody(containing(USER_ID_ERROR))
         .willReturn(aResponse()
             .withStatus(200)
@@ -143,7 +146,7 @@ public class OgelServiceTest {
             .withBody(fixture(PATH + "error.xml"))));
 
     // Soap Fault Stub
-    wiremockRule.stubFor(post(urlEqualTo(OGEL_URL))
+    stubFor(post(urlEqualTo(OGEL_URL))
         .withRequestBody(containing(USER_ID_SOAP_FAULT))
         .willReturn(aResponse()
             .withStatus(200)
@@ -151,7 +154,7 @@ public class OgelServiceTest {
             .withBody(fixture(PATH + "soapFault.xml"))));
 
     // User lacks privileges
-    wiremockRule.stubFor(post(urlEqualTo(OGEL_URL))
+    stubFor(post(urlEqualTo(OGEL_URL))
         .withRequestBody(containing(USER_ID_USER_LACKS_PRIVILEGES))
         .willReturn(aResponse()
             .withStatus(200)
@@ -159,7 +162,7 @@ public class OgelServiceTest {
             .withBody(fixture(PATH + "userLacksPrivileges.xml"))));
 
     // Site already registered
-    wiremockRule.stubFor(post(urlEqualTo(OGEL_URL))
+    stubFor(post(urlEqualTo(OGEL_URL))
         .withRequestBody(containing(USER_ID_SITE_ALREADY_REGISTERED))
         .willReturn(aResponse()
             .withStatus(200)
@@ -167,7 +170,7 @@ public class OgelServiceTest {
             .withBody(fixture(PATH + "siteAlreadyRegistered.xml"))));
 
     // Blacklisted
-    wiremockRule.stubFor(post(urlEqualTo(OGEL_URL))
+    stubFor(post(urlEqualTo(OGEL_URL))
         .withRequestBody(containing(USER_ID_BLACKLISTED))
         .willReturn(aResponse()
             .withStatus(200)
@@ -175,7 +178,7 @@ public class OgelServiceTest {
             .withBody(fixture(PATH + "blacklisted.xml"))));
 
     // Invalid ogel ref
-    wiremockRule.stubFor(post(urlEqualTo(OGEL_URL))
+    stubFor(post(urlEqualTo(OGEL_URL))
         .withRequestBody(containing(USER_ID_INVALID_OGEL_REF))
         .willReturn(aResponse()
             .withStatus(200)
