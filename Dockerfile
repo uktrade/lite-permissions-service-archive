@@ -7,6 +7,8 @@ ARG BUILD_VERSION
 ENV PROJECT_NAME permissions-service
 ENV JAR_FILE $PROJECT_NAME-$BUILD_VERSION.jar
 ENV CONFIG_FILE /conf/$PROJECT_NAME-config.yaml
+ENV SOAP_CONNECT_TIMEOUT 20000
+ENV SOAP_READ_TIMEOUT 60000
 
 LABEL uk.gov.bis.lite.version=$BUILD_VERSION
 
@@ -17,4 +19,9 @@ RUN chmod 0644 $JAR_FILE
 
 EXPOSE 8080
 
-CMD java -Djava.security.egd=file:/dev/./urandom -jar $JAR_FILE server $CONFIG_FILE
+CMD java \
+-Djava.security.egd=file:/dev/./urandom \
+-Dsun.rmi.transport.proxy.connectTimeout=$SOAP_CONNECT_TIMEOUT \
+-Dsun.net.client.defaultConnectTimeout=$SOAP_CONNECT_TIMEOUT \
+-Dsun.net.client.defaultReadTimeout=$SOAP_READ_TIMEOUT \
+-jar $JAR_FILE server $CONFIG_FILE
