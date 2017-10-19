@@ -36,9 +36,9 @@ import uk.gov.bis.lite.permissions.service.RegistrationsService;
 import uk.gov.bis.lite.permissions.service.RegistrationsServiceImpl;
 import uk.gov.bis.lite.permissions.service.SubmissionService;
 import uk.gov.bis.lite.permissions.service.SubmissionServiceImpl;
-import uk.gov.bis.lite.permissions.spire.OgelErrorNodeErrorHandler;
-import uk.gov.bis.lite.permissions.spire.SpireOgelRegistrationClient;
-import uk.gov.bis.lite.permissions.spire.SpireReferenceClient;
+import uk.gov.bis.lite.permissions.spire.errorhandlers.OgelErrorNodeErrorHandler;
+import uk.gov.bis.lite.permissions.spire.clients.SpireOgelRegistrationClient;
+import uk.gov.bis.lite.permissions.spire.clients.SpireReferenceClient;
 import uk.gov.bis.lite.permissions.spire.parsers.OgelRegistrationParser;
 
 import javax.ws.rs.client.Client;

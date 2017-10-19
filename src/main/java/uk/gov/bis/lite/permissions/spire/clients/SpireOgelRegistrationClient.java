@@ -1,4 +1,4 @@
-package uk.gov.bis.lite.permissions.spire;
+package uk.gov.bis.lite.permissions.spire.clients;
 
 
 import uk.gov.bis.lite.common.spire.client.SpireClient;

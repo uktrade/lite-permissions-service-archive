@@ -20,8 +20,8 @@ import uk.gov.bis.lite.common.spire.client.SpireRequestConfig;
 import uk.gov.bis.lite.common.spire.client.parser.ReferenceParser;
 import uk.gov.bis.lite.permissions.Util;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
-import uk.gov.bis.lite.permissions.spire.OgelErrorNodeErrorHandler;
-import uk.gov.bis.lite.permissions.spire.SpireReferenceClient;
+import uk.gov.bis.lite.permissions.spire.errorhandlers.OgelErrorNodeErrorHandler;
+import uk.gov.bis.lite.permissions.spire.clients.SpireReferenceClient;
 
 
 public class OgelServiceTest {
