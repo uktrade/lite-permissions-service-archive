@@ -26,6 +26,8 @@ import uk.gov.bis.lite.permissions.service.CallbackService;
 import uk.gov.bis.lite.permissions.service.CallbackServiceImpl;
 import uk.gov.bis.lite.permissions.service.CustomerService;
 import uk.gov.bis.lite.permissions.service.CustomerServiceImpl;
+import uk.gov.bis.lite.permissions.service.LicenceServiceImpl;
+import uk.gov.bis.lite.permissions.service.LicencesService;
 import uk.gov.bis.lite.permissions.service.OgelService;
 import uk.gov.bis.lite.permissions.service.OgelServiceImpl;
 import uk.gov.bis.lite.permissions.service.ProcessSubmissionService;
@@ -36,9 +38,12 @@ import uk.gov.bis.lite.permissions.service.RegistrationsService;
 import uk.gov.bis.lite.permissions.service.RegistrationsServiceImpl;
 import uk.gov.bis.lite.permissions.service.SubmissionService;
 import uk.gov.bis.lite.permissions.service.SubmissionServiceImpl;
-import uk.gov.bis.lite.permissions.spire.errorhandlers.OgelErrorNodeErrorHandler;
+import uk.gov.bis.lite.permissions.spire.clients.SpireLicencesClient;
 import uk.gov.bis.lite.permissions.spire.clients.SpireOgelRegistrationClient;
 import uk.gov.bis.lite.permissions.spire.clients.SpireReferenceClient;
+import uk.gov.bis.lite.permissions.spire.errorhandlers.LicenceErrorHandler;
+import uk.gov.bis.lite.permissions.spire.errorhandlers.OgelErrorNodeErrorHandler;
+import uk.gov.bis.lite.permissions.spire.parsers.LicenceParser;
 import uk.gov.bis.lite.permissions.spire.parsers.OgelRegistrationParser;
 
 import javax.ws.rs.client.Client;
@@ -64,6 +69,16 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
         new OgelRegistrationParser(),
         new SpireClientConfig(config.getSpireClientUserName(), config.getSpireClientPassword(), config.getSpireClientUrl()),
         new SpireRequestConfig("SPIRE_OGEL_REGISTRATIONS", "getOgelRegs", true));
+  }
+
+  @Provides
+  @Singleton
+  SpireLicencesClient provideSpireLicenceClient(Environment env, PermissionsAppConfig config) {
+    return new SpireLicencesClient(
+        new LicenceParser(),
+        new SpireClientConfig(config.getSpireClientUserName(), config.getSpireClientPassword(), config.getSpireClientUrl()),
+        new SpireRequestConfig("SPIRE_LICENCES", "getLicences", true),
+        new LicenceErrorHandler());
   }
 
   @Provides
@@ -98,6 +113,7 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
 
     bind(CustomerService.class).to(CustomerServiceImpl.class);
     bind(OgelService.class).to(OgelServiceImpl.class);
+    bind(LicencesService.class).to(LicenceServiceImpl.class);
   }
 
   @Provides

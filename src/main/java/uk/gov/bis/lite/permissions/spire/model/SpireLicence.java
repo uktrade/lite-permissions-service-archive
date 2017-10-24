@@ -1,5 +1,7 @@
 package uk.gov.bis.lite.permissions.spire.model;
 
+import java.util.List;
+
 public class SpireLicence {
   private String licenceReference;
   private String originalApplicationReference;
@@ -7,10 +9,11 @@ public class SpireLicence {
   private String sarId;
   private String siteId;
   private String licenceType;
+  private String licenceSubType;
   private String licenceIssueDate;
   private String licenceExpiryDate;
   private String licenceStatus; //enum
-  private String licenceCountryList; // List type
+  private List<String> licenceCountryList; // List type
   private String externalDocumentUrl;
 
   public String getLicenceReference() {
@@ -67,6 +70,15 @@ public class SpireLicence {
     return this;
   }
 
+  public String getLicenceSubType() {
+    return licenceSubType;
+  }
+
+  public SpireLicence setLicenceSubType(String licenceSubType) {
+    this.licenceSubType = licenceSubType;
+    return this;
+  }
+
   public String getLicenceIssueDate() {
     return licenceIssueDate;
   }
@@ -94,11 +106,11 @@ public class SpireLicence {
     return this;
   }
 
-  public String getLicenceCountryList() {
+  public List<String> getLicenceCountryList() {
     return licenceCountryList;
   }
 
-  public SpireLicence setLicenceCountryList(String licenceCountryList) {
+  public SpireLicence setLicenceCountryList(List<String> licenceCountryList) {
     this.licenceCountryList = licenceCountryList;
     return this;
   }

@@ -9,8 +9,8 @@ import uk.gov.bis.lite.permissions.spire.model.SpireLicence;
 
 import java.util.List;
 
-public class SpireLicenceClient extends SpireClient<List<SpireLicence>> {
-  public SpireLicenceClient(SpireParser<List<SpireLicence>> parser, SpireClientConfig clientConfig, SpireRequestConfig requestConfig, ErrorHandler errorHandler) {
+public class SpireLicencesClient extends SpireClient<List<SpireLicence>> {
+  public SpireLicencesClient(SpireParser<List<SpireLicence>> parser, SpireClientConfig clientConfig, SpireRequestConfig requestConfig, ErrorHandler errorHandler) {
     super(parser, clientConfig, requestConfig, errorHandler);
   }
 }
