@@ -1,37 +1,69 @@
 package uk.gov.bis.lite.permissions.service;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.apache.commons.lang3.StringUtils;
+import uk.gov.bis.lite.common.spire.client.SpireRequest;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
+import uk.gov.bis.lite.permissions.spire.adapters.SpireLicenceAdapter;
+import uk.gov.bis.lite.permissions.spire.clients.SpireLicencesClient;
+import uk.gov.bis.lite.permissions.spire.exceptions.SpireUserNotFoundException;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+@Singleton
 public class LicenceServiceImpl implements LicencesService {
+
+  private final SpireLicencesClient client;
+
+  @Inject
+  public LicenceServiceImpl(SpireLicencesClient client) {
+    this.client = client;
+  }
+
   @Override
   public Optional<List<LicenceView>> getLicence(String userId, String reference) {
-    return get();
+    SpireRequest spireRequest = client.createRequest();
+    spireRequest.addChild("userId", userId);
+    try {
+      return Optional.of(client.sendRequest(spireRequest)
+          .stream()
+          .filter(sl -> StringUtils.equalsIgnoreCase(sl.getLicenceReference(), reference))
+          .map(SpireLicenceAdapter::adapt)
+          .collect(Collectors.toList()));
+    } catch (SpireUserNotFoundException e) {
+      return Optional.empty();
+    }
   }
 
   @Override
   public Optional<List<LicenceView>> getLicences(String userId) {
-    return get();
+    SpireRequest spireRequest = client.createRequest();
+    spireRequest.addChild("userId", userId);
+    try {
+      return Optional.of(client.sendRequest(spireRequest)
+          .stream()
+          .map(SpireLicenceAdapter::adapt)
+          .collect(Collectors.toList()));
+    } catch (SpireUserNotFoundException e) {
+      return Optional.empty();
+    }
   }
 
   @Override
   public Optional<List<LicenceView>> getLicences(String userId, LicenceType type) {
-    return get();
-  }
-
-  private Optional<List<LicenceView>> get() {
-    LicenceView licence = new LicenceView();
-    licence.setCountryList(Arrays.asList("UK"));
-    licence.setExternalDocumentUrl("http://google.com");
-    licence.setSubType("subtype");
-    licence.setType("type");
-    licence.setSarId("SAR-123");
-    licence.setExporterApplicationReference("EXPORTER-123");
-    licence.setOriginalApplicationReference("ORIGINAL-123");
-    licence.setReference("ref");
-    return Optional.of(Arrays.asList(licence));
+    SpireRequest spireRequest = client.createRequest();
+    spireRequest.addChild("userId", userId);
+    try {
+      return Optional.of(client.sendRequest(spireRequest)
+          .stream()
+          .filter(sl -> StringUtils.equalsIgnoreCase(sl.getLicenceType(), type.name()))
+          .map(SpireLicenceAdapter::adapt)
+          .collect(Collectors.toList()));
+    } catch (SpireUserNotFoundException e) {
+      return Optional.empty();
+    }
   }
 }

@@ -10,27 +10,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class SpireLicenceAdapter {
-  public static List<LicenceView> adapt(List<SpireLicence> spireLicences) {
-    return spireLicences
-        .stream()
-        .map(sl -> {
-          LicenceView licence = new LicenceView();
-          licence.setReference(sl.getLicenceReference());
-          licence.setOriginalApplicationReference(sl.getOriginalApplicationReference());
-          licence.setExporterApplicationReference(sl.getExporterApplicationReference());
-          licence.setSarId(sl.getSarId());
-          licence.setSiteId(sl.getSiteId());
-          licence.setType(sl.getLicenceType());
-          licence.setSubType(sl.getLicenceSubType());
-          licence.setIssueDate(parseSpireDate(sl.getLicenceIssueDate()));
-          licence.setExpiryDate(parseSpireDate(sl.getLicenceExpiryDate()));
-          licence.setStatus(Status.getEnumByValue(sl.getLicenceStatus())
-              .orElseThrow(() -> new SpireLicenceAdapterException("Unknown status: \"" + sl.getLicenceStatus() + "\"")));
-          licence.setExternalDocumentUrl(sl.getExternalDocumentUrl());
-          licence.setCountryList(sl.getLicenceCountryList());
-          return licence;
-        })
-        .collect(Collectors.toList());
+
+  public static LicenceView adapt(SpireLicence spireLicence) {
+    LicenceView licence = new LicenceView();
+    licence.setReference(spireLicence.getLicenceReference());
+    licence.setOriginalApplicationReference(spireLicence.getOriginalApplicationReference());
+    licence.setExporterApplicationReference(spireLicence.getExporterApplicationReference());
+    licence.setSarId(spireLicence.getSarId());
+    licence.setSiteId(spireLicence.getSiteId());
+    licence.setType(spireLicence.getLicenceType());
+    licence.setSubType(spireLicence.getLicenceSubType());
+    licence.setIssueDate(parseSpireDate(spireLicence.getLicenceIssueDate()));
+    licence.setExpiryDate(parseSpireDate(spireLicence.getLicenceExpiryDate()));
+    licence.setStatus(Status.getEnumByValue(spireLicence.getLicenceStatus())
+        .orElseThrow(() -> new SpireLicenceAdapterException("Unknown status: \"" + spireLicence.getLicenceStatus() + "\"")));
+    licence.setExternalDocumentUrl(spireLicence.getExternalDocumentUrl());
+    licence.setCountryList(spireLicence.getLicenceCountryList());
+    return licence;
   }
 
   static LocalDate parseSpireDate(String spireDate) {
