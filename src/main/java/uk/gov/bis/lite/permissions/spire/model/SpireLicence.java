@@ -3,25 +3,25 @@ package uk.gov.bis.lite.permissions.spire.model;
 import java.util.List;
 
 public class SpireLicence {
-  private String licenceReference;
+  private String reference;
   private String originalApplicationReference;
   private String exporterApplicationReference;
   private String sarId;
   private String siteId;
-  private String licenceType;
-  private String licenceSubType;
-  private String licenceIssueDate;
-  private String licenceExpiryDate;
-  private String licenceStatus; //enum
-  private List<String> licenceCountryList; // List type
+  private String type;
+  private String subType;
+  private String issueDate;
+  private String expiryDate;
+  private String status;
+  private List<String> countryList;
   private String externalDocumentUrl;
 
-  public String getLicenceReference() {
-    return licenceReference;
+  public String getReference() {
+    return reference;
   }
 
-  public SpireLicence setLicenceReference(String licenceReference) {
-    this.licenceReference = licenceReference;
+  public SpireLicence setReference(String reference) {
+    this.reference = reference;
     return this;
   }
 
@@ -61,57 +61,57 @@ public class SpireLicence {
     return this;
   }
 
-  public String getLicenceType() {
-    return licenceType;
+  public String getType() {
+    return type;
   }
 
-  public SpireLicence setLicenceType(String licenceType) {
-    this.licenceType = licenceType;
+  public SpireLicence setType(String type) {
+    this.type = type;
     return this;
   }
 
-  public String getLicenceSubType() {
-    return licenceSubType;
+  public String getSubType() {
+    return subType;
   }
 
-  public SpireLicence setLicenceSubType(String licenceSubType) {
-    this.licenceSubType = licenceSubType;
+  public SpireLicence setSubType(String subType) {
+    this.subType = subType;
     return this;
   }
 
-  public String getLicenceIssueDate() {
-    return licenceIssueDate;
+  public String getIssueDate() {
+    return issueDate;
   }
 
-  public SpireLicence setLicenceIssueDate(String licenceIssueDate) {
-    this.licenceIssueDate = licenceIssueDate;
+  public SpireLicence setIssueDate(String issueDate) {
+    this.issueDate = issueDate;
     return this;
   }
 
-  public String getLicenceExpiryDate() {
-    return licenceExpiryDate;
+  public String getExpiryDate() {
+    return expiryDate;
   }
 
-  public SpireLicence setLicenceExpiryDate(String licenceExpiryDate) {
-    this.licenceExpiryDate = licenceExpiryDate;
+  public SpireLicence setExpiryDate(String expiryDate) {
+    this.expiryDate = expiryDate;
     return this;
   }
 
-  public String getLicenceStatus() {
-    return licenceStatus;
+  public String getStatus() {
+    return status;
   }
 
-  public SpireLicence setLicenceStatus(String licenceStatus) {
-    this.licenceStatus = licenceStatus;
+  public SpireLicence setStatus(String status) {
+    this.status = status;
     return this;
   }
 
-  public List<String> getLicenceCountryList() {
-    return licenceCountryList;
+  public List<String> getCountryList() {
+    return countryList;
   }
 
-  public SpireLicence setLicenceCountryList(List<String> licenceCountryList) {
-    this.licenceCountryList = licenceCountryList;
+  public SpireLicence setCountryList(List<String> countryList) {
+    this.countryList = countryList;
     return this;
   }
 

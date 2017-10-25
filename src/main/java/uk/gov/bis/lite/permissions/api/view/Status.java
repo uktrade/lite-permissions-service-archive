@@ -26,7 +26,7 @@ public enum Status {
 
   public static Optional<Status> getEnumByValue(String value) {
     return Arrays.stream(Status.values())
-        .filter(e -> StringUtils.equals(value, e.getValue()))
+        .filter(e -> StringUtils.equalsIgnoreCase(value, e.getValue()))
         .findAny();
   }
 }

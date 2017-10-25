@@ -35,16 +35,16 @@ public class LicenceParser implements SpireParser<List<SpireLicence>> {
           Node clonedNode = node.cloneNode(true);
           if (StringUtils.equalsIgnoreCase(clonedNode.getNodeName(), "LICENCE")) {
             SpireLicence licence = new SpireLicence();
-            getNodeValue(xPath, clonedNode, "LICENCE_REFERENCE").ifPresent(licence::setLicenceReference);
+            getNodeValue(xPath, clonedNode, "REFERENCE").ifPresent(licence::setReference);
             getNodeValue(xPath, clonedNode, "ORIGINAL_APPLICATION_REFERENCE").ifPresent(licence::setOriginalApplicationReference);
             getNodeValue(xPath, clonedNode, "EXPORTER_APPLICATION_REFERENCE").ifPresent(licence::setExporterApplicationReference);
             getNodeValue(xPath, clonedNode, "SAR_ID").ifPresent(licence::setSarId);
             getNodeValue(xPath, clonedNode, "SITE_ID").ifPresent(licence::setSiteId);
-            getNodeValue(xPath, clonedNode, "LICENCE_TYPE").ifPresent(licence::setLicenceType);
-            getNodeValue(xPath, clonedNode, "LICENCE_SUB_TYPE").ifPresent(licence::setLicenceSubType);
-            getNodeValue(xPath, clonedNode, "LICENCE_ISSUE_DATE").ifPresent(licence::setLicenceIssueDate);
-            getNodeValue(xPath, clonedNode, "LICENCE_EXPIRY_DATE").ifPresent(licence::setLicenceExpiryDate);
-            getNodeValue(xPath, clonedNode, "LICENCE_STATUS").ifPresent(licence::setLicenceStatus);
+            getNodeValue(xPath, clonedNode, "TYPE").ifPresent(licence::setType);
+            getNodeValue(xPath, clonedNode, "SUB_TYPE").ifPresent(licence::setSubType);
+            getNodeValue(xPath, clonedNode, "ISSUE_DATE").ifPresent(licence::setIssueDate);
+            getNodeValue(xPath, clonedNode, "EXPIRY_DATE").ifPresent(licence::setExpiryDate);
+            getNodeValue(xPath, clonedNode, "STATUS").ifPresent(licence::setStatus);
             getNodeValue(xPath, clonedNode, "EXTERNAL_DOCUMENT_URL").ifPresent(licence::setExternalDocumentUrl);
             getChildNodes(xPath, clonedNode, "COUNTRY_LIST").ifPresent(countryNodeList -> {
               List<String> countryList = new ArrayList<>();
@@ -54,7 +54,7 @@ public class LicenceParser implements SpireParser<List<SpireLicence>> {
                   countryList.add(countryNode.getNodeValue());
                 }
               }
-              licence.setLicenceCountryList(Collections.unmodifiableList(countryList));
+              licence.setCountryList(Collections.unmodifiableList(countryList));
             });
             return licence;
           } else {

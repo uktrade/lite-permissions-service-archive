@@ -30,7 +30,7 @@ public class LicenceServiceImpl implements LicencesService {
     try {
       return Optional.of(client.sendRequest(spireRequest)
           .stream()
-          .filter(sl -> StringUtils.equalsIgnoreCase(sl.getLicenceReference(), reference))
+          .filter(sl -> StringUtils.equalsIgnoreCase(sl.getReference(), reference))
           .map(SpireLicenceAdapter::adapt)
           .collect(Collectors.toList()));
     } catch (SpireUserNotFoundException e) {
@@ -59,7 +59,7 @@ public class LicenceServiceImpl implements LicencesService {
     try {
       return Optional.of(client.sendRequest(spireRequest)
           .stream()
-          .filter(sl -> StringUtils.equalsIgnoreCase(sl.getLicenceType(), type.name()))
+          .filter(sl -> StringUtils.equalsIgnoreCase(sl.getType(), type.name()))
           .map(SpireLicenceAdapter::adapt)
           .collect(Collectors.toList()));
     } catch (SpireUserNotFoundException e) {
