@@ -34,7 +34,7 @@ public class SpireLicenceAdapter {
   }
 
   /**
-   * Parses dates matching the SPIRE format, i.e 2000-JAN-01
+   * Parses dates matching the SPIRE format, i.e 31/12/2000
    * @param spireDate
    * @return
    */
@@ -44,7 +44,7 @@ public class SpireLicenceAdapter {
     }
     DateTimeFormatter dateTimeFormatter = new DateTimeFormatterBuilder()
         .parseCaseInsensitive()
-        .appendPattern("uuuu-MMM-dd") // TODO Validate this date format with SPIRE
+        .appendPattern("dd/MM/uuuu")
         .toFormatter(Locale.ENGLISH);
     try {
       return LocalDate.parse(spireDate, dateTimeFormatter);
