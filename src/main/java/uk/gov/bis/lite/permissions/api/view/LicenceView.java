@@ -21,7 +21,7 @@ public class LicenceView {
   private LocalDate expiryDate;
 
   private Status status;
-  private List<String> countryList; // List type
+  private List<String> countryList;
   private String externalDocumentUrl;
 
   public LicenceView() {

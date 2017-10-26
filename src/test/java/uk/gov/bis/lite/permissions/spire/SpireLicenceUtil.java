@@ -6,6 +6,8 @@ import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.keys.HmacKey;
 import org.jose4j.lang.JoseException;
+import org.junit.Ignore;
+import org.junit.Test;
 
 public class SpireLicenceUtil {
   public static String generateToken(String jwtSharedSecret, String subject) {
@@ -33,5 +35,13 @@ public class SpireLicenceUtil {
     }
 
     return jwt;
+  }
+
+  @Test
+  @Ignore
+  public void tokenHelperTest() throws Exception {
+    String jwtSharedSecret = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
+    String userId = "24492";
+    System.out.println("Authorization: Bearer " + generateToken(jwtSharedSecret, userId));
   }
 }
