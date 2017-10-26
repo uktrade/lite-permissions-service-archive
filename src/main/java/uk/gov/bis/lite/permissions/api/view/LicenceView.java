@@ -1,5 +1,7 @@
 package uk.gov.bis.lite.permissions.api.view;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -11,11 +13,19 @@ public class LicenceView {
   private String siteId;
   private String type;
   private String subType;
+
+  @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
   private LocalDate issueDate;
+
+  @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
   private LocalDate expiryDate;
+
   private Status status;
   private List<String> countryList; // List type
   private String externalDocumentUrl;
+
+  public LicenceView() {
+  }
 
   public String getReference() {
     return reference;

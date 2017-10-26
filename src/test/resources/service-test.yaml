@@ -1,7 +1,7 @@
 processScheduledJobCron: 59 59 23 31 12 ? 2099  # 5am 31st February
 
-spireClientUserName: bisuat.api@test.com
-spireClientPassword: sp1reUAT
+spireClientUserName: username
+spireClientPassword: password
 spireClientUrl: http://localhost:9000/spire/fox/ispire/
 #spireClientUrl: https://www.spiretest.trade.gov.uk/spireuat/fox/ispire/
 
@@ -12,6 +12,15 @@ customerServiceUrl: http://localhost:9000/
 
 maxMinutesRetryAfterFail: -1
 maxCallbackFailCount: 1
+
+server:
+  type: default
+  applicationConnectors:
+    - type: http
+      port: 0 # random application port
+  adminConnectors:
+    - type: http
+      port: 0 # random admin port
 
 logging:
   level: INFO

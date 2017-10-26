@@ -7,7 +7,8 @@ import java.util.Optional;
 
 public interface LicencesService {
   enum LicenceType {
-    SIEL
+    SIEL,
+    OIEL
   }
   Optional<List<LicenceView>> getLicence(String userId, String reference);
   Optional<List<LicenceView>> getLicences(String userId);

@@ -12,7 +12,7 @@ public class ParseOgelRegistrationsTest extends SpireParseTest {
 
   @Test
   public void testOgelRegistrationParser() {
-    List<SpireOgelRegistration> regs = new OgelRegistrationParser().parseResponse(createSpireResponse("spire/ogelRegistrations.xml"));
+    List<SpireOgelRegistration> regs = new OgelRegistrationParser().parseResponse(createSpireResponse("fixture/soap/SPIRE_OGEL_REGISTRATIONS/ogelRegistrations.xml"));
     assertThat(regs).hasSize(3);
     assertThat(regs).extracting("sarRef").contains("SAR1", "SAR2", "SAR2");
     assertThat(regs).filteredOn(comp -> comp.getStatus().equals("EXTANT")).hasSize(1);

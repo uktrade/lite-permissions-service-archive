@@ -10,12 +10,11 @@ import uk.gov.bis.lite.common.spire.client.exception.SpireClientException;
 import uk.gov.bis.lite.common.spire.client.parser.SpireParser;
 import uk.gov.bis.lite.permissions.spire.model.SpireLicence;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -46,16 +45,7 @@ public class LicenceParser implements SpireParser<List<SpireLicence>> {
             getNodeValue(xPath, clonedNode, "EXPIRY_DATE").ifPresent(licence::setExpiryDate);
             getNodeValue(xPath, clonedNode, "STATUS").ifPresent(licence::setStatus);
             getNodeValue(xPath, clonedNode, "EXTERNAL_DOCUMENT_URL").ifPresent(licence::setExternalDocumentUrl);
-            getChildNodes(xPath, clonedNode, "COUNTRY_LIST").ifPresent(countryNodeList -> {
-              List<String> countryList = new ArrayList<>();
-              for (int i = 0; i < countryNodeList.getLength(); i++) {
-                Node countryNode = countryNodeList.item(i);
-                if (StringUtils.equalsIgnoreCase(countryNode.getNodeName(), "COUNTRY")) {
-                  countryList.add(countryNode.getNodeValue());
-                }
-              }
-              licence.setCountryList(Collections.unmodifiableList(countryList));
-            });
+            getChildNodesValues(xPath, clonedNode, "COUNTRY_LIST", "COUNTRY").ifPresent(licence::setCountryList);
             return licence;
           } else {
             LOGGER.warn("Unexpected element found while parsing the SOAP response body: \"{}\"", clonedNode.getNodeName());
@@ -74,11 +64,19 @@ public class LicenceParser implements SpireParser<List<SpireLicence>> {
     }
   }
 
-  private static Optional<NodeList> getChildNodes(XPath xPath, Node node, String name) {
+  private static Optional<List<String>> getChildNodesValues(XPath xPath, Node baseNode, String listNodeName, String childNodeName) {
     try {
-      return Optional.ofNullable((Node) xPath.evaluate(name, node, XPathConstants.NODE)).map(Node::getChildNodes);
+      return Optional.ofNullable((Node) xPath.evaluate(listNodeName, baseNode, XPathConstants.NODE)).map(node -> {
+        NodeList nodeList = node.getChildNodes();
+        return IntStream.range(0, nodeList.getLength())
+            .mapToObj(nodeList::item)
+            .filter(cn -> cn.getNodeType() == Node.ELEMENT_NODE)
+            .filter(cn -> StringUtils.equals(cn.getNodeName(), childNodeName))
+            .map(Node::getTextContent)
+            .collect(Collectors.toList());
+      });
     } catch (XPathExpressionException e) {
-      throw new SpireClientException("Error occurred while parsing the SOAP response body", e);
+      throw new SpireClientException("An error occurred while extracting the SOAP Response Body", e);
     }
   }
 }

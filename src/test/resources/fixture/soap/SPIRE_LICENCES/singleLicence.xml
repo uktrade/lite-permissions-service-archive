@@ -1,0 +1,26 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.fivium.co.uk/fox/webservices/ispire/SPIRE_LICENCES">
+  <soap:Header/>
+  <soap:Body>
+    <ns:getLicencesResponse>
+      <LICENCE_LIST>
+        <LICENCE>
+          <!-- LicenceViewA, SpireLicenceA, See LicenceTestUtil -->
+          <REFERENCE>REF-123</REFERENCE>
+          <ORIGINAL_APPLICATION_REFERENCE>OREF-123</ORIGINAL_APPLICATION_REFERENCE>
+          <EXPORTER_APPLICATION_REFERENCE>EREF-123</EXPORTER_APPLICATION_REFERENCE>
+          <SAR_ID>SAR-123</SAR_ID>
+          <SITE_ID>SITE-123</SITE_ID>
+          <TYPE>SIEL</TYPE>
+          <SUB_TYPE>SUB</SUB_TYPE>
+          <ISSUE_DATE>31/12/2000</ISSUE_DATE>
+          <EXPIRY_DATE>31/12/2020</EXPIRY_DATE>
+          <STATUS>ACTIVE</STATUS>
+          <COUNTRY_LIST>
+            <COUNTRY>UK</COUNTRY>
+          </COUNTRY_LIST>
+          <EXTERNAL_DOCUMENT_URL>http://www.example.org</EXTERNAL_DOCUMENT_URL>
+        </LICENCE>
+      </LICENCE_LIST>
+    </ns:getLicencesResponse>
+  </soap:Body>
+</soap:Envelope>
