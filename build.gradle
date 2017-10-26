@@ -31,7 +31,7 @@ if (project.hasProperty('projVersion')) {
 
 mainClassName = "uk.gov.bis.lite.permissions.PermissionsApp"
 
-ext.dropwizardVersion = '1.0.5'
+ext.dropwizardVersion = '1.2.0'
 
 repositories {
   mavenCentral()
