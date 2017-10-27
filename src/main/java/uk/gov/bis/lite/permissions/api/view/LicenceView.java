@@ -6,6 +6,14 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class LicenceView {
+  public enum Status {
+    ACTIVE,
+    SURRENDERED,
+    REVOKED,
+    EXPIRED,
+    EXHAUSTED
+  }
+
   private String licenceRef;
   private String originalAppId;
   private String originalExporterRef;

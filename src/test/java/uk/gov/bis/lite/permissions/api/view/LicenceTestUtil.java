@@ -42,7 +42,7 @@ public class LicenceTestUtil {
         .setSubType("SUB")
         .setIssueDate(LocalDate.of(2000, 12, 31))
         .setExpiryDate(LocalDate.of(2020, 12, 31))
-        .setStatus(Status.ACTIVE)
+        .setStatus(LicenceView.Status.ACTIVE)
         .setCountryList(ImmutableList.of("UK"))
         .setExternalDocumentUrl("http://www.example.org");
   }
@@ -58,7 +58,7 @@ public class LicenceTestUtil {
         .setSubType("SUB")
         .setIssueDate(LocalDate.of(2000, 12, 31))
         .setExpiryDate(LocalDate.of(2020, 12, 31))
-        .setStatus(Status.EXHAUSTED)
+        .setStatus(LicenceView.Status.EXHAUSTED)
         .setCountryList(ImmutableList.of("UK"))
         .setExternalDocumentUrl("http://www.example.org");
   }
@@ -74,7 +74,7 @@ public class LicenceTestUtil {
         .setSubType("SUB")
         .setIssueDate(LocalDate.of(2000, 12, 31))
         .setExpiryDate(LocalDate.of(2020, 12, 31))
-        .setStatus(Status.EXPIRED)
+        .setStatus(LicenceView.Status.EXPIRED)
         .setCountryList(Collections.emptyList())
         .setExternalDocumentUrl("http://www.example.org");
   }
@@ -89,7 +89,7 @@ public class LicenceTestUtil {
     assertThat(licenceView.getSubType()).isEqualTo("SUB");
     assertThat(licenceView.getIssueDate()).isEqualTo("2000-12-31");
     assertThat(licenceView.getExpiryDate()).isEqualTo("2020-12-31");
-    assertThat(licenceView.getStatus()).isEqualTo(Status.ACTIVE);
+    assertThat(licenceView.getStatus()).isEqualTo(LicenceView.Status.ACTIVE);
     assertThat(licenceView.getCountryList()).containsOnly("UK");
     assertThat(licenceView.getExternalDocumentUrl()).isEqualTo("http://www.example.org");
   }
@@ -104,7 +104,7 @@ public class LicenceTestUtil {
     assertThat(licenceView.getSubType()).isEqualTo("SUB");
     assertThat(licenceView.getIssueDate()).isEqualTo("2000-12-31");
     assertThat(licenceView.getExpiryDate()).isEqualTo("2020-12-31");
-    assertThat(licenceView.getStatus()).isEqualTo(Status.EXHAUSTED);
+    assertThat(licenceView.getStatus()).isEqualTo(LicenceView.Status.EXHAUSTED);
     assertThat(licenceView.getCountryList()).containsOnly("UK");
     assertThat(licenceView.getExternalDocumentUrl()).isEqualTo("http://www.example.org");
   }
@@ -120,7 +120,7 @@ public class LicenceTestUtil {
     assertThat(licenceView.getSubType()).isEqualTo("SUB");
     assertThat(licenceView.getIssueDate()).isEqualTo("2000-12-31");
     assertThat(licenceView.getExpiryDate()).isEqualTo("2020-12-31");
-    assertThat(licenceView.getStatus()).isEqualTo(Status.EXPIRED);
+    assertThat(licenceView.getStatus()).isEqualTo(LicenceView.Status.EXPIRED);
     assertThat(licenceView.getCountryList()).isEmpty();
     assertThat(licenceView.getExternalDocumentUrl()).isEqualTo("http://www.example.org");
   }

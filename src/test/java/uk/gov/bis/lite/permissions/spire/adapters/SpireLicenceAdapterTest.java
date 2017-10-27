@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
-import uk.gov.bis.lite.permissions.api.view.Status;
 import uk.gov.bis.lite.permissions.spire.model.SpireLicence;
 
 import java.util.Collections;
@@ -35,7 +34,7 @@ public class SpireLicenceAdapterTest {
     assertThat(licence.getSiteId()).isEqualTo("SITE-123");
     assertThat(licence.getType()).isEqualTo("Type");
     assertThat(licence.getSubType()).isEqualTo("Sub type");
-    assertThat(licence.getStatus()).isEqualTo(Status.ACTIVE);
+    assertThat(licence.getStatus()).isEqualTo(LicenceView.Status.ACTIVE);
     assertThat(licence.getLicenceRef()).isEqualTo("Reference");
     assertThat(licence.getOriginalAppId()).isEqualTo("OAREF");
     assertThat(licence.getOriginalExporterRef()).isEqualTo("EAREF");

@@ -38,7 +38,6 @@ public class SpireLicenceUtil {
   }
 
   @Test
-  @Ignore
   public void tokenHelperTest() throws Exception {
     String jwtSharedSecret = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
     String userId = "24492";

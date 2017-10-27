@@ -2,7 +2,6 @@ package uk.gov.bis.lite.permissions.spire.adapters;
 
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
-import uk.gov.bis.lite.permissions.api.view.Status;
 import uk.gov.bis.lite.permissions.spire.model.SpireLicence;
 
 import java.time.LocalDate;
@@ -24,10 +23,7 @@ public class SpireLicenceAdapter {
     licence.setSubType(spireLicence.getSubType());
     licence.setIssueDate(parseSpireDate(spireLicence.getIssueDate()));
     licence.setExpiryDate(parseSpireDate(spireLicence.getExpiryDate()));
-    if (!StringUtils.isEmpty(spireLicence.getStatus())) {
-      licence.setStatus(Status.getEnumByValue(spireLicence.getStatus())
-          .orElseThrow(() -> new SpireLicenceAdapterException("Unknown status: \"" + spireLicence.getStatus() + "\"")));
-    }
+    licence.setStatus(parseStatus(spireLicence.getStatus()));
     licence.setExternalDocumentUrl(spireLicence.getExternalDocumentUrl());
     licence.setCountryList(spireLicence.getCountryList());
     return licence;
@@ -50,6 +46,18 @@ public class SpireLicenceAdapter {
       return LocalDate.parse(spireDate, dateTimeFormatter);
     } catch (DateTimeParseException e) {
       throw new SpireLicenceAdapterException(String.format("Unexpected date format: \"%s\"", spireDate));
+    }
+  }
+
+  static LicenceView.Status parseStatus(String status){
+    if (StringUtils.isEmpty(status)) {
+      return null;
+    } else {
+      try {
+        return LicenceView.Status.valueOf(status);
+      } catch (IllegalArgumentException e) {
+        throw new SpireLicenceAdapterException("Unknown status: \"" + status + "\"");
+      }
     }
   }
 }
