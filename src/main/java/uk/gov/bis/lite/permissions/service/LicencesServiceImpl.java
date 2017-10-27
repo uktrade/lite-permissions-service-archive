@@ -33,7 +33,7 @@ public class LicencesServiceImpl implements LicencesService {
           .stream()
           .filter(sl -> StringUtils.equalsIgnoreCase(sl.getReference(), reference))
           .map(SpireLicenceAdapter::adapt)
-          .sorted(Comparator.comparing(LicenceView::getReference))
+          .sorted(Comparator.comparing(LicenceView::getLicenceRef))
           .collect(Collectors.toList()));
     } catch (SpireUserNotFoundException e) {
       return Optional.empty();
@@ -48,7 +48,7 @@ public class LicencesServiceImpl implements LicencesService {
       return Optional.of(client.sendRequest(spireRequest)
           .stream()
           .map(SpireLicenceAdapter::adapt)
-          .sorted(Comparator.comparing(LicenceView::getReference))
+          .sorted(Comparator.comparing(LicenceView::getLicenceRef))
           .collect(Collectors.toList()));
     } catch (SpireUserNotFoundException e) {
       return Optional.empty();
@@ -64,7 +64,7 @@ public class LicencesServiceImpl implements LicencesService {
           .stream()
           .filter(sl -> StringUtils.equalsIgnoreCase(sl.getType(), type.name()))
           .map(SpireLicenceAdapter::adapt)
-          .sorted(Comparator.comparing(LicenceView::getReference))
+          .sorted(Comparator.comparing(LicenceView::getLicenceRef))
           .collect(Collectors.toList()));
     } catch (SpireUserNotFoundException e) {
       return Optional.empty();

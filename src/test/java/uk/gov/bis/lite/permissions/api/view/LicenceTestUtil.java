@@ -33,10 +33,10 @@ public class LicenceTestUtil {
 
   public static LicenceView generateLicenceViewA() {
     return new LicenceView()
-        .setReference("REF-123")
-        .setOriginalApplicationReference("OREF-123")
-        .setExporterApplicationReference("EREF-123")
-        .setSarId("SAR-123")
+        .setLicenceRef("REF-123")
+        .setOriginalAppId("OREF-123")
+        .setOriginalExporterRef("EREF-123")
+        .setCustomerId("SAR-123")
         .setSiteId("SITE-123")
         .setType("SIEL")
         .setSubType("SUB")
@@ -49,10 +49,10 @@ public class LicenceTestUtil {
 
   public static LicenceView generateLicenceViewB() {
     return new LicenceView()
-        .setReference("REF-456")
-        .setOriginalApplicationReference("OREF-456")
-        .setExporterApplicationReference("EREF-456")
-        .setSarId("SAR-456")
+        .setLicenceRef("REF-456")
+        .setOriginalAppId("OREF-456")
+        .setOriginalExporterRef("EREF-456")
+        .setCustomerId("SAR-456")
         .setSiteId("SITE-456")
         .setType("SIEL")
         .setSubType("SUB")
@@ -65,10 +65,10 @@ public class LicenceTestUtil {
 
   public static LicenceView generateLicenceViewC() {
     return new LicenceView()
-        .setReference("REF-789")
-        .setOriginalApplicationReference("OREF-789")
-        .setExporterApplicationReference("EREF-789")
-        .setSarId("SAR-789")
+        .setLicenceRef("REF-789")
+        .setOriginalAppId("OREF-789")
+        .setOriginalExporterRef("EREF-789")
+        .setCustomerId("SAR-789")
         .setSiteId("SITE-789")
         .setType("OIEL")
         .setSubType("SUB")
@@ -80,10 +80,10 @@ public class LicenceTestUtil {
   }
 
   public static void assertLicenceViewA(LicenceView licenceView) {
-    assertThat(licenceView.getReference()).isEqualTo("REF-123");
-    assertThat(licenceView.getOriginalApplicationReference()).isEqualTo("OREF-123");
-    assertThat(licenceView.getExporterApplicationReference()).isEqualTo("EREF-123");
-    assertThat(licenceView.getSarId()).isEqualTo("SAR-123");
+    assertThat(licenceView.getLicenceRef()).isEqualTo("REF-123");
+    assertThat(licenceView.getOriginalAppId()).isEqualTo("OREF-123");
+    assertThat(licenceView.getOriginalExporterRef()).isEqualTo("EREF-123");
+    assertThat(licenceView.getCustomerId()).isEqualTo("SAR-123");
     assertThat(licenceView.getSiteId()).isEqualTo("SITE-123");
     assertThat(licenceView.getType()).isEqualTo("SIEL");
     assertThat(licenceView.getSubType()).isEqualTo("SUB");
@@ -95,10 +95,10 @@ public class LicenceTestUtil {
   }
 
   public static void assertLicenceViewB(LicenceView licenceView) {
-    assertThat(licenceView.getReference()).isEqualTo("REF-456");
-    assertThat(licenceView.getOriginalApplicationReference()).isEqualTo("OREF-456");
-    assertThat(licenceView.getExporterApplicationReference()).isEqualTo("EREF-456");
-    assertThat(licenceView.getSarId()).isEqualTo("SAR-456");
+    assertThat(licenceView.getLicenceRef()).isEqualTo("REF-456");
+    assertThat(licenceView.getOriginalAppId()).isEqualTo("OREF-456");
+    assertThat(licenceView.getOriginalExporterRef()).isEqualTo("EREF-456");
+    assertThat(licenceView.getCustomerId()).isEqualTo("SAR-456");
     assertThat(licenceView.getSiteId()).isEqualTo("SITE-456");
     assertThat(licenceView.getType()).isEqualTo("SIEL");
     assertThat(licenceView.getSubType()).isEqualTo("SUB");
@@ -111,10 +111,10 @@ public class LicenceTestUtil {
 
 
   public static void assertLicenceViewC(LicenceView licenceView) {
-    assertThat(licenceView.getReference()).isEqualTo("REF-789");
-    assertThat(licenceView.getOriginalApplicationReference()).isEqualTo("OREF-789");
-    assertThat(licenceView.getExporterApplicationReference()).isEqualTo("EREF-789");
-    assertThat(licenceView.getSarId()).isEqualTo("SAR-789");
+    assertThat(licenceView.getLicenceRef()).isEqualTo("REF-789");
+    assertThat(licenceView.getOriginalAppId()).isEqualTo("OREF-789");
+    assertThat(licenceView.getOriginalExporterRef()).isEqualTo("EREF-789");
+    assertThat(licenceView.getCustomerId()).isEqualTo("SAR-789");
     assertThat(licenceView.getSiteId()).isEqualTo("SITE-789");
     assertThat(licenceView.getType()).isEqualTo("OIEL");
     assertThat(licenceView.getSubType()).isEqualTo("SUB");

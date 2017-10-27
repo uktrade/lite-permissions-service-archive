@@ -15,10 +15,10 @@ public class SpireLicenceAdapter {
 
   public static LicenceView adapt(SpireLicence spireLicence) {
     LicenceView licence = new LicenceView();
-    licence.setReference(spireLicence.getReference());
-    licence.setOriginalApplicationReference(spireLicence.getOriginalApplicationReference());
-    licence.setExporterApplicationReference(spireLicence.getExporterApplicationReference());
-    licence.setSarId(spireLicence.getSarId());
+    licence.setLicenceRef(spireLicence.getReference());
+    licence.setOriginalAppId(spireLicence.getOriginalApplicationReference());
+    licence.setOriginalExporterRef(spireLicence.getExporterApplicationReference());
+    licence.setCustomerId(spireLicence.getSarId());
     licence.setSiteId(spireLicence.getSiteId());
     licence.setType(spireLicence.getType());
     licence.setSubType(spireLicence.getSubType());

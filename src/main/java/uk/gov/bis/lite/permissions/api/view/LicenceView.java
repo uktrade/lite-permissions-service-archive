@@ -6,10 +6,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class LicenceView {
-  private String reference;
-  private String originalApplicationReference;
-  private String exporterApplicationReference;
-  private String sarId;
+  private String licenceRef;
+  private String originalAppId;
+  private String originalExporterRef;
+  private String customerId;
   private String siteId;
   private String type;
   private String subType;
@@ -27,39 +27,39 @@ public class LicenceView {
   public LicenceView() {
   }
 
-  public String getReference() {
-    return reference;
+  public String getLicenceRef() {
+    return licenceRef;
   }
 
-  public LicenceView setReference(String reference) {
-    this.reference = reference;
+  public LicenceView setLicenceRef(String licenceRef) {
+    this.licenceRef = licenceRef;
     return this;
   }
 
-  public String getOriginalApplicationReference() {
-    return originalApplicationReference;
+  public String getOriginalAppId() {
+    return originalAppId;
   }
 
-  public LicenceView setOriginalApplicationReference(String originalApplicationReference) {
-    this.originalApplicationReference = originalApplicationReference;
+  public LicenceView setOriginalAppId(String originalAppId) {
+    this.originalAppId = originalAppId;
     return this;
   }
 
-  public String getExporterApplicationReference() {
-    return exporterApplicationReference;
+  public String getOriginalExporterRef() {
+    return originalExporterRef;
   }
 
-  public LicenceView setExporterApplicationReference(String exporterApplicationReference) {
-    this.exporterApplicationReference = exporterApplicationReference;
+  public LicenceView setOriginalExporterRef(String originalExporterRef) {
+    this.originalExporterRef = originalExporterRef;
     return this;
   }
 
-  public String getSarId() {
-    return sarId;
+  public String getCustomerId() {
+    return customerId;
   }
 
-  public LicenceView setSarId(String sarId) {
-    this.sarId = sarId;
+  public LicenceView setCustomerId(String customerId) {
+    this.customerId = customerId;
     return this;
   }
 

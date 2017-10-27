@@ -31,14 +31,14 @@ public class SpireLicenceAdapterTest {
 
     LicenceView licence = SpireLicenceAdapter.adapt(spireLicence);
 
-    assertThat(licence.getSarId()).isEqualTo("SAR-123");
+    assertThat(licence.getCustomerId()).isEqualTo("SAR-123");
     assertThat(licence.getSiteId()).isEqualTo("SITE-123");
     assertThat(licence.getType()).isEqualTo("Type");
     assertThat(licence.getSubType()).isEqualTo("Sub type");
     assertThat(licence.getStatus()).isEqualTo(Status.ACTIVE);
-    assertThat(licence.getReference()).isEqualTo("Reference");
-    assertThat(licence.getOriginalApplicationReference()).isEqualTo("OAREF");
-    assertThat(licence.getExporterApplicationReference()).isEqualTo("EAREF");
+    assertThat(licence.getLicenceRef()).isEqualTo("Reference");
+    assertThat(licence.getOriginalAppId()).isEqualTo("OAREF");
+    assertThat(licence.getOriginalExporterRef()).isEqualTo("EAREF");
     assertThat(licence.getIssueDate()).isEqualTo("2000-12-31");
     assertThat(licence.getExpiryDate()).isEqualTo("2020-12-31");
     assertThat(licence.getCountryList()).containsOnly("UK");
@@ -63,14 +63,14 @@ public class SpireLicenceAdapterTest {
 
     LicenceView licence = SpireLicenceAdapter.adapt(spireLicence);
 
-    assertThat(licence.getSarId()).isEmpty();
+    assertThat(licence.getCustomerId()).isEmpty();
     assertThat(licence.getSiteId()).isEmpty();
     assertThat(licence.getType()).isEmpty();
     assertThat(licence.getSubType()).isEmpty();
     assertThat(licence.getStatus()).isNull();
-    assertThat(licence.getReference()).isEmpty();
-    assertThat(licence.getOriginalApplicationReference()).isEmpty();
-    assertThat(licence.getExporterApplicationReference()).isEmpty();
+    assertThat(licence.getLicenceRef()).isEmpty();
+    assertThat(licence.getOriginalAppId()).isEmpty();
+    assertThat(licence.getOriginalExporterRef()).isEmpty();
     assertThat(licence.getIssueDate()).isNull();
     assertThat(licence.getExpiryDate()).isNull();
     assertThat(licence.getCountryList()).isEmpty();
@@ -95,14 +95,14 @@ public class SpireLicenceAdapterTest {
 
     LicenceView licence = SpireLicenceAdapter.adapt(spireLicence);
 
-    assertThat(licence.getSarId()).isNull();
+    assertThat(licence.getCustomerId()).isNull();
     assertThat(licence.getSiteId()).isNull();
     assertThat(licence.getType()).isNull();
     assertThat(licence.getSubType()).isNull();
     assertThat(licence.getStatus()).isNull();
-    assertThat(licence.getReference()).isNull();
-    assertThat(licence.getOriginalApplicationReference()).isNull();
-    assertThat(licence.getExporterApplicationReference()).isNull();
+    assertThat(licence.getLicenceRef()).isNull();
+    assertThat(licence.getOriginalAppId()).isNull();
+    assertThat(licence.getOriginalExporterRef()).isNull();
     assertThat(licence.getIssueDate()).isNull();
     assertThat(licence.getExpiryDate()).isNull();
     assertThat(licence.getCountryList()).isNull();
