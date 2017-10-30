@@ -18,7 +18,7 @@ public class SpireLicenceAdapterTest {
         .setSarId("SAR-123")
         .setSiteId("SITE-123")
         .setType("SIEL")
-        .setSubType("Sub type")
+        .setSubType("SUB")
         .setStatus("ACTIVE")
         .setReference("Reference")
         .setOriginalApplicationReference("OAREF")
@@ -33,7 +33,7 @@ public class SpireLicenceAdapterTest {
     assertThat(licence.getCustomerId()).isEqualTo("SAR-123");
     assertThat(licence.getSiteId()).isEqualTo("SITE-123");
     assertThat(licence.getType()).isEqualTo(LicenceView.Type.SIEL);
-    assertThat(licence.getSubType()).isEqualTo("Sub type");
+    assertThat(licence.getSubType()).isNull();
     assertThat(licence.getStatus()).isEqualTo(LicenceView.Status.ACTIVE);
     assertThat(licence.getLicenceRef()).isEqualTo("Reference");
     assertThat(licence.getOriginalAppId()).isEqualTo("OAREF");
@@ -65,7 +65,7 @@ public class SpireLicenceAdapterTest {
     assertThat(licence.getCustomerId()).isEmpty();
     assertThat(licence.getSiteId()).isEmpty();
     assertThat(licence.getType()).isNull();
-    assertThat(licence.getSubType()).isEmpty();
+    assertThat(licence.getSubType()).isNull();
     assertThat(licence.getStatus()).isNull();
     assertThat(licence.getLicenceRef()).isEmpty();
     assertThat(licence.getOriginalAppId()).isEmpty();

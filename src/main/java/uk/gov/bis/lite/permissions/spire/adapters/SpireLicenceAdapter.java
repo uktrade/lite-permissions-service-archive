@@ -20,7 +20,7 @@ public class SpireLicenceAdapter {
     licence.setCustomerId(spireLicence.getSarId());
     licence.setSiteId(spireLicence.getSiteId());
     licence.setType(parseSpireEnum(LicenceView.Type.class, spireLicence.getType()));
-    licence.setSubType(spireLicence.getSubType());
+    licence.setSubType(null); // TODO Convert to parseSpireEnum when values for LicenceView.SubType are known
     licence.setIssueDate(parseSpireDate(spireLicence.getIssueDate()));
     licence.setExpiryDate(parseSpireDate(spireLicence.getExpiryDate()));
     licence.setStatus(parseSpireEnum(LicenceView.Status.class, spireLicence.getStatus()));

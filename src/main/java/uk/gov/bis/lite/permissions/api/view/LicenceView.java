@@ -19,13 +19,17 @@ public class LicenceView {
     SIEL
   }
 
+  public enum SubType {
+
+  }
+
   private String licenceRef;
   private String originalAppId;
   private String originalExporterRef;
   private String customerId;
   private String siteId;
   private Type type;
-  private String subType;
+  private SubType subType;
 
   @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
   private LocalDate issueDate;
@@ -94,11 +98,11 @@ public class LicenceView {
     return this;
   }
 
-  public String getSubType() {
+  public SubType getSubType() {
     return subType;
   }
 
-  public LicenceView setSubType(String subType) {
+  public LicenceView setSubType(SubType subType) {
     this.subType = subType;
     return this;
   }

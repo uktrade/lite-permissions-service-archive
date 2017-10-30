@@ -39,7 +39,7 @@ public class LicenceTestUtil {
         .setCustomerId("SAR-123")
         .setSiteId("SITE-123")
         .setType(LicenceView.Type.SIEL)
-        .setSubType("SUB")
+        .setSubType(null)
         .setIssueDate(LocalDate.of(2000, 12, 31))
         .setExpiryDate(LocalDate.of(2020, 12, 31))
         .setStatus(LicenceView.Status.ACTIVE)
@@ -55,7 +55,7 @@ public class LicenceTestUtil {
         .setCustomerId("SAR-456")
         .setSiteId("SITE-456")
         .setType(LicenceView.Type.SIEL)
-        .setSubType("SUB")
+        .setSubType(null)
         .setIssueDate(LocalDate.of(2000, 12, 31))
         .setExpiryDate(LocalDate.of(2020, 12, 31))
         .setStatus(LicenceView.Status.EXHAUSTED)
@@ -71,7 +71,7 @@ public class LicenceTestUtil {
         .setCustomerId("SAR-789")
         .setSiteId("SITE-789")
         .setType(LicenceView.Type.OIEL)
-        .setSubType("SUB")
+        .setSubType(null)
         .setIssueDate(LocalDate.of(2000, 12, 31))
         .setExpiryDate(LocalDate.of(2020, 12, 31))
         .setStatus(LicenceView.Status.EXPIRED)
@@ -86,7 +86,7 @@ public class LicenceTestUtil {
     assertThat(licenceView.getCustomerId()).isEqualTo("SAR-123");
     assertThat(licenceView.getSiteId()).isEqualTo("SITE-123");
     assertThat(licenceView.getType()).isEqualTo(LicenceView.Type.SIEL);
-    assertThat(licenceView.getSubType()).isEqualTo("SUB");
+    assertThat(licenceView.getSubType()).isNull();
     assertThat(licenceView.getIssueDate()).isEqualTo("2000-12-31");
     assertThat(licenceView.getExpiryDate()).isEqualTo("2020-12-31");
     assertThat(licenceView.getStatus()).isEqualTo(LicenceView.Status.ACTIVE);
@@ -101,7 +101,7 @@ public class LicenceTestUtil {
     assertThat(licenceView.getCustomerId()).isEqualTo("SAR-456");
     assertThat(licenceView.getSiteId()).isEqualTo("SITE-456");
     assertThat(licenceView.getType()).isEqualTo(LicenceView.Type.SIEL);
-    assertThat(licenceView.getSubType()).isEqualTo("SUB");
+    assertThat(licenceView.getSubType()).isNull();
     assertThat(licenceView.getIssueDate()).isEqualTo("2000-12-31");
     assertThat(licenceView.getExpiryDate()).isEqualTo("2020-12-31");
     assertThat(licenceView.getStatus()).isEqualTo(LicenceView.Status.EXHAUSTED);
@@ -117,7 +117,7 @@ public class LicenceTestUtil {
     assertThat(licenceView.getCustomerId()).isEqualTo("SAR-789");
     assertThat(licenceView.getSiteId()).isEqualTo("SITE-789");
     assertThat(licenceView.getType()).isEqualTo(LicenceView.Type.OIEL);
-    assertThat(licenceView.getSubType()).isEqualTo("SUB");
+    assertThat(licenceView.getSubType()).isNull();
     assertThat(licenceView.getIssueDate()).isEqualTo("2000-12-31");
     assertThat(licenceView.getExpiryDate()).isEqualTo("2020-12-31");
     assertThat(licenceView.getStatus()).isEqualTo(LicenceView.Status.EXPIRED);
