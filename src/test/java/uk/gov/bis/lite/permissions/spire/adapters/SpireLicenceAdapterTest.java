@@ -17,7 +17,7 @@ public class SpireLicenceAdapterTest {
     SpireLicence spireLicence = new SpireLicence()
         .setSarId("SAR-123")
         .setSiteId("SITE-123")
-        .setType("Type")
+        .setType("SIEL")
         .setSubType("Sub type")
         .setStatus("ACTIVE")
         .setReference("Reference")
@@ -32,7 +32,7 @@ public class SpireLicenceAdapterTest {
 
     assertThat(licence.getCustomerId()).isEqualTo("SAR-123");
     assertThat(licence.getSiteId()).isEqualTo("SITE-123");
-    assertThat(licence.getType()).isEqualTo("Type");
+    assertThat(licence.getType()).isEqualTo(LicenceView.Type.SIEL);
     assertThat(licence.getSubType()).isEqualTo("Sub type");
     assertThat(licence.getStatus()).isEqualTo(LicenceView.Status.ACTIVE);
     assertThat(licence.getLicenceRef()).isEqualTo("Reference");
@@ -64,7 +64,7 @@ public class SpireLicenceAdapterTest {
 
     assertThat(licence.getCustomerId()).isEmpty();
     assertThat(licence.getSiteId()).isEmpty();
-    assertThat(licence.getType()).isEmpty();
+    assertThat(licence.getType()).isNull();
     assertThat(licence.getSubType()).isEmpty();
     assertThat(licence.getStatus()).isNull();
     assertThat(licence.getLicenceRef()).isEmpty();
@@ -112,11 +112,22 @@ public class SpireLicenceAdapterTest {
   public void statusTest() throws Exception {
     assertThatThrownBy(() -> SpireLicenceAdapter.adapt(new SpireLicence().setStatus("foo")))
         .isExactlyInstanceOf(SpireLicenceAdapterException.class)
-        .hasMessageContaining("Unknown status");
+        .hasMessageContaining("Unknown value");
 
     assertThat(SpireLicenceAdapter.adapt(new SpireLicence().setStatus("")).getStatus()).isNull();
 
     assertThat(SpireLicenceAdapter.adapt(new SpireLicence().setStatus("")).getStatus()).isNull();
+  }
+
+  @Test
+  public void typeTest() throws Exception {
+    assertThatThrownBy(() -> SpireLicenceAdapter.adapt(new SpireLicence().setType("foo")))
+        .isExactlyInstanceOf(SpireLicenceAdapterException.class)
+        .hasMessageContaining("Unknown value");
+
+    assertThat(SpireLicenceAdapter.adapt(new SpireLicence().setType("")).getType()).isNull();
+
+    assertThat(SpireLicenceAdapter.adapt(new SpireLicence().setType("")).getType()).isNull();
   }
 
   @Test

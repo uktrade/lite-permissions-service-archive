@@ -8,10 +8,15 @@ import java.util.List;
 public class LicenceView {
   public enum Status {
     ACTIVE,
-    SURRENDERED,
-    REVOKED,
+    EXHAUSTED,
     EXPIRED,
-    EXHAUSTED
+    REVOKED,
+    SURRENDERED
+  }
+
+  public enum Type {
+    OIEL,
+    SIEL
   }
 
   private String licenceRef;
@@ -19,7 +24,7 @@ public class LicenceView {
   private String originalExporterRef;
   private String customerId;
   private String siteId;
-  private String type;
+  private Type type;
   private String subType;
 
   @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
@@ -80,11 +85,11 @@ public class LicenceView {
     return this;
   }
 
-  public String getType() {
+  public Type getType() {
     return type;
   }
 
-  public LicenceView setType(String type) {
+  public LicenceView setType(Type type) {
     this.type = type;
     return this;
   }

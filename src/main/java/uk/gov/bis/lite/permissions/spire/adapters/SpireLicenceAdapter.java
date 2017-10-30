@@ -19,11 +19,11 @@ public class SpireLicenceAdapter {
     licence.setOriginalExporterRef(spireLicence.getExporterApplicationReference());
     licence.setCustomerId(spireLicence.getSarId());
     licence.setSiteId(spireLicence.getSiteId());
-    licence.setType(spireLicence.getType());
+    licence.setType(parseSpireEnum(LicenceView.Type.class, spireLicence.getType()));
     licence.setSubType(spireLicence.getSubType());
     licence.setIssueDate(parseSpireDate(spireLicence.getIssueDate()));
     licence.setExpiryDate(parseSpireDate(spireLicence.getExpiryDate()));
-    licence.setStatus(parseStatus(spireLicence.getStatus()));
+    licence.setStatus(parseSpireEnum(LicenceView.Status.class, spireLicence.getStatus()));
     licence.setExternalDocumentUrl(spireLicence.getExternalDocumentUrl());
     licence.setCountryList(spireLicence.getCountryList());
     return licence;
@@ -49,14 +49,14 @@ public class SpireLicenceAdapter {
     }
   }
 
-  static LicenceView.Status parseStatus(String status){
-    if (StringUtils.isEmpty(status)) {
+  static <E extends Enum<E>> E parseSpireEnum(Class<E> enumClass, String value) {
+    if (StringUtils.isEmpty(value)) {
       return null;
     } else {
       try {
-        return LicenceView.Status.valueOf(status);
+        return Enum.valueOf(enumClass, value);
       } catch (IllegalArgumentException e) {
-        throw new SpireLicenceAdapterException("Unknown status: \"" + status + "\"");
+        throw new SpireLicenceAdapterException(String.format("Unknown value for %s: \"%s\"", enumClass.getCanonicalName(), value));
       }
     }
   }
