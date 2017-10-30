@@ -15,12 +15,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Singleton
-public class LicencesServiceImpl implements LicencesService {
+public class LicenceServiceImpl implements LicenceService {
 
   private final SpireLicencesClient client;
 
   @Inject
-  public LicencesServiceImpl(SpireLicencesClient client) {
+  public LicenceServiceImpl(SpireLicencesClient client) {
     this.client = client;
   }
 

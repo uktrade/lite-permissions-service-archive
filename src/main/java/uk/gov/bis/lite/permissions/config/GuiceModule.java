@@ -26,8 +26,8 @@ import uk.gov.bis.lite.permissions.service.CallbackService;
 import uk.gov.bis.lite.permissions.service.CallbackServiceImpl;
 import uk.gov.bis.lite.permissions.service.CustomerService;
 import uk.gov.bis.lite.permissions.service.CustomerServiceImpl;
-import uk.gov.bis.lite.permissions.service.LicencesService;
-import uk.gov.bis.lite.permissions.service.LicencesServiceImpl;
+import uk.gov.bis.lite.permissions.service.LicenceService;
+import uk.gov.bis.lite.permissions.service.LicenceServiceImpl;
 import uk.gov.bis.lite.permissions.service.OgelService;
 import uk.gov.bis.lite.permissions.service.OgelServiceImpl;
 import uk.gov.bis.lite.permissions.service.ProcessSubmissionService;
@@ -113,7 +113,7 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
 
     bind(CustomerService.class).to(CustomerServiceImpl.class);
     bind(OgelService.class).to(OgelServiceImpl.class);
-    bind(LicencesService.class).to(LicencesServiceImpl.class);
+    bind(LicenceService.class).to(LicenceServiceImpl.class);
   }
 
   @Provides

@@ -22,7 +22,7 @@ import org.junit.Test;
 import uk.gov.bis.lite.common.jwt.LiteJwtAuthFilterHelper;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
-import uk.gov.bis.lite.permissions.service.LicencesService;
+import uk.gov.bis.lite.permissions.service.LicenceService;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,19 +37,19 @@ public class LicencesResourceTest {
   private static final String URL = "/licences";
   private static String JWT_SHARED_SECRET = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
 
-  private final LicencesService licencesService = mock(LicencesService.class);
+  private final LicenceService licenceService = mock(LicenceService.class);
 
   @Rule
   public final ResourceTestRule rule = ResourceTestRule.builder()
       .setTestContainerFactory(new GrizzlyWebTestContainerFactory())
       .addProvider(new AuthDynamicFeature(LiteJwtAuthFilterHelper.buildAuthFilter(JWT_SHARED_SECRET)))
       .addProvider(new AuthValueFactoryProvider.Binder<>(LiteJwtUser.class))
-      .addResource(new LicencesResource(licencesService))
+      .addResource(new LicencesResource(licenceService))
       .build();
 
   @Test
   public void noParamsSingleLicenceTest() throws Exception {
-    when(licencesService.getLicences("123456"))
+    when(licenceService.getLicences("123456"))
         .thenReturn(Optional.of(ImmutableList.of(generateLicenceViewA())));
 
     Response response = rule.getJerseyTest()
@@ -70,7 +70,7 @@ public class LicencesResourceTest {
 
   @Test
   public void noParamsMultipleLicencesTest() throws Exception {
-    when(licencesService.getLicences("123456"))
+    when(licenceService.getLicences("123456"))
         .thenReturn(Optional.of(ImmutableList.of(generateLicenceViewA(), generateLicenceViewB())));
 
     Response response = rule.getJerseyTest()
@@ -91,7 +91,7 @@ public class LicencesResourceTest {
 
   @Test
   public void noParamsNoLicencesTest() throws Exception {
-    when(licencesService.getLicences("123456"))
+    when(licenceService.getLicences("123456"))
         .thenReturn(Optional.of(Collections.emptyList()));
 
     Response response = rule.getJerseyTest()
@@ -120,7 +120,7 @@ public class LicencesResourceTest {
 
   @Test
   public void refParamSingleLicenceTest() throws Exception {
-    when(licencesService.getLicence("123456", "REF-123"))
+    when(licenceService.getLicence("123456", "REF-123"))
         .thenReturn(Optional.of(ImmutableList.of(generateLicenceViewA())));
 
     Response response = rule.getJerseyTest()
@@ -141,7 +141,7 @@ public class LicencesResourceTest {
 
   @Test
   public void refParamNoLicenceTest() throws Exception {
-    when(licencesService.getLicence("123456", "REF-123"))
+    when(licenceService.getLicence("123456", "REF-123"))
         .thenReturn(Optional.of(Collections.emptyList()));
 
     Response response = rule.getJerseyTest()
@@ -172,7 +172,7 @@ public class LicencesResourceTest {
 
   @Test
   public void typeParamSingleLicenceTest() throws Exception {
-    when(licencesService.getLicences("123456", LicencesService.LicenceType.SIEL))
+    when(licenceService.getLicences("123456", LicenceService.LicenceType.SIEL))
         .thenReturn(Optional.of(ImmutableList.of(generateLicenceViewA())));
 
     Response response = rule.getJerseyTest()
@@ -221,7 +221,7 @@ public class LicencesResourceTest {
 
   @Test
   public void typeAndRefParamPriorityTest() throws Exception {
-   when(licencesService.getLicence("123456", "REF-123"))
+   when(licenceService.getLicence("123456", "REF-123"))
         .thenReturn(Optional.of(Collections.emptyList()));
 
     Response response = rule.getJerseyTest()
@@ -238,6 +238,6 @@ public class LicencesResourceTest {
     assertThat(results).isNotNull();
     assertThat(results).hasSize(0);
 
-    verify(licencesService).getLicence(eq("123456"), eq("REF-123"));
+    verify(licenceService).getLicence(eq("123456"), eq("REF-123"));
   }
 }

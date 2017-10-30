@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
-import uk.gov.bis.lite.permissions.service.LicencesService;
+import uk.gov.bis.lite.permissions.service.LicenceService;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,11 +26,11 @@ public class LicencesResource {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LicencesResource.class);
 
-  private final LicencesService licencesService;
+  private final LicenceService licenceService;
 
   @Inject
-  public LicencesResource(LicencesService licencesService) {
-    this.licencesService = licencesService;
+  public LicencesResource(LicenceService licenceService) {
+    this.licenceService = licenceService;
   }
 
   @GET
@@ -43,15 +43,15 @@ public class LicencesResource {
     validateUserIdToJwt(userId, user);
     Optional<List<LicenceView>> licences;
     if (ref != null) {
-      licences = licencesService.getLicence(userId, ref);
+      licences = licenceService.getLicence(userId, ref);
     } else if (type != null) {
-      if (StringUtils.equalsIgnoreCase(type, LicencesService.LicenceType.SIEL.name())) {
-        licences = licencesService.getLicences(userId, LicencesService.LicenceType.SIEL);
+      if (StringUtils.equalsIgnoreCase(type, LicenceService.LicenceType.SIEL.name())) {
+        licences = licenceService.getLicences(userId, LicenceService.LicenceType.SIEL);
       } else {
         throw new WebApplicationException(String.format("Invalid licence type \"%s\"", type), Response.Status.BAD_REQUEST);
       }
     } else {
-      licences = licencesService.getLicences(userId);
+      licences = licenceService.getLicences(userId);
     }
 
     if (licences.isPresent()) {

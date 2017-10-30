@@ -20,11 +20,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class LicencesServiceImplTest {
+public class LicenceServiceImplTest {
 
   private SpireLicencesClient client = mock(SpireLicencesClient.class);
 
-  private LicencesServiceImpl service = new LicencesServiceImpl(client);
+  private LicenceServiceImpl service = new LicenceServiceImpl(client);
 
   @Test
   public void getLicencesSingleTest() throws Exception {
@@ -115,7 +115,7 @@ public class LicencesServiceImplTest {
     when(client.sendRequest(any()))
         .thenReturn(Arrays.asList(generateSpireLicenceA()));
 
-    Optional<List<LicenceView>> licencesOpt = service.getLicences("123456", LicencesService.LicenceType.SIEL);
+    Optional<List<LicenceView>> licencesOpt = service.getLicences("123456", LicenceService.LicenceType.SIEL);
     assertThat(licencesOpt).isPresent();
     List<LicenceView> licences = licencesOpt.get();
     assertThat(licences).hasSize(1);
@@ -128,7 +128,7 @@ public class LicencesServiceImplTest {
     when(client.sendRequest(any()))
         .thenReturn(Arrays.asList(generateSpireLicenceA()));
 
-    Optional<List<LicenceView>> licencesOpt = service.getLicences("123456", LicencesService.LicenceType.OIEL);
+    Optional<List<LicenceView>> licencesOpt = service.getLicences("123456", LicenceService.LicenceType.OIEL);
     assertThat(licencesOpt).isPresent();
     List<LicenceView> licences = licencesOpt.get();
     assertThat(licences).isEmpty();
@@ -139,7 +139,7 @@ public class LicencesServiceImplTest {
     when(client.createRequest()).thenReturn(mock(SpireRequest.class));
     when(client.sendRequest(any())).thenThrow(new SpireUserNotFoundException("User not found"));
 
-    Optional<List<LicenceView>> licencesOpt = service.getLicences("123456", LicencesService.LicenceType.SIEL);
+    Optional<List<LicenceView>> licencesOpt = service.getLicences("123456", LicenceService.LicenceType.SIEL);
     assertThat(licencesOpt).isEmpty();
   }
 }

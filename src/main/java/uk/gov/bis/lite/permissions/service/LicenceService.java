@@ -5,7 +5,7 @@ import uk.gov.bis.lite.permissions.api.view.LicenceView;
 import java.util.List;
 import java.util.Optional;
 
-public interface LicencesService {
+public interface LicenceService {
   enum LicenceType {
     SIEL,
     OIEL
