@@ -25,7 +25,7 @@ public class SpireLicenceAdapterTest {
         .setExporterApplicationReference("EAREF")
         .setIssueDate("31/12/2000")
         .setExpiryDate("31/12/2020")
-        .setCountryList(ImmutableList.of("UK"))
+        .setCountryList(ImmutableList.of("CTRY0"))
         .setExternalDocumentUrl("http://www.example.org");
 
     LicenceView licence = SpireLicenceAdapter.adapt(spireLicence);
@@ -40,7 +40,7 @@ public class SpireLicenceAdapterTest {
     assertThat(licence.getOriginalExporterRef()).isEqualTo("EAREF");
     assertThat(licence.getIssueDate()).isEqualTo("2000-12-31");
     assertThat(licence.getExpiryDate()).isEqualTo("2020-12-31");
-    assertThat(licence.getCountryList()).containsOnly("UK");
+    assertThat(licence.getCountryList()).containsOnly("CTRY0");
     assertThat(licence.getExternalDocumentUrl()).isEqualTo("http://www.example.org");
   }
 

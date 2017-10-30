@@ -16,7 +16,7 @@
           <EXPIRY_DATE>31/12/2020</EXPIRY_DATE>
           <STATUS>ACTIVE</STATUS>
           <COUNTRY_LIST>
-            <COUNTRY>UK</COUNTRY>
+            <COUNTRY>CTRY0</COUNTRY>
           </COUNTRY_LIST>
           <EXTERNAL_DOCUMENT_URL>http://www.example.org</EXTERNAL_DOCUMENT_URL>
         </LICENCE>
@@ -33,7 +33,7 @@
           <EXPIRY_DATE>31/12/2020</EXPIRY_DATE>
           <STATUS>EXHAUSTED</STATUS>
           <COUNTRY_LIST>
-            <COUNTRY>UK</COUNTRY>
+            <COUNTRY>CTRY0</COUNTRY>
           </COUNTRY_LIST>
           <EXTERNAL_DOCUMENT_URL>http://www.example.org</EXTERNAL_DOCUMENT_URL>
         </LICENCE>

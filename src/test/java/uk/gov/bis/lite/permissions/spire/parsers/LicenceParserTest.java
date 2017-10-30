@@ -51,7 +51,7 @@ public class LicenceParserTest {
     assertThat(sl.getIssueDate()).isEqualTo("31/12/2000");
     assertThat(sl.getExpiryDate()).isEqualTo("31/12/2020");
     assertThat(sl.getStatus()).isEqualTo("ACTIVE");
-    assertThat(sl.getCountryList()).containsOnly("UK");
+    assertThat(sl.getCountryList()).containsOnly("CTRY0");
     assertThat(sl.getExternalDocumentUrl()).isEqualTo("http://www.example.org");
   }
 
