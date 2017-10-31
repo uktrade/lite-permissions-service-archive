@@ -1,16 +1,17 @@
 package uk.gov.bis.lite.permissions.service;
 
-import uk.gov.bis.lite.permissions.api.view.LicenceView;
-
-import java.util.List;
-import java.util.Optional;
+import uk.gov.bis.lite.permissions.service.model.LicenceResult;
+import uk.gov.bis.lite.permissions.service.model.LicencesResult;
 
 public interface LicenceService {
-  enum LicenceType {
+  enum LicenceTypeParam {
     SIEL,
     OIEL
   }
-  Optional<List<LicenceView>> getLicence(String userId, String reference);
-  Optional<List<LicenceView>> getLicences(String userId);
-  Optional<List<LicenceView>> getLicences(String userId, LicenceType type);
+
+  LicenceResult getLicence(String userId, String reference);
+
+  LicencesResult getLicences(String userId);
+
+  LicencesResult getLicences(String userId, LicenceTypeParam type);
 }

@@ -12,13 +12,16 @@ import static uk.gov.bis.lite.permissions.api.view.LicenceTestUtil.assertLicence
 import static uk.gov.bis.lite.permissions.api.view.LicenceTestUtil.assertLicenceViewC;
 import static uk.gov.bis.lite.permissions.spire.SpireLicenceUtil.generateToken;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.Test;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
@@ -158,21 +161,38 @@ public class LicenceEndpointsIntegrationTest extends BaseIntegrationTest {
 
   @Test
   public void filterLicencesByRefExistsTest() throws Exception {
-    stubForBody(fixture("fixture/soap/SPIRE_LICENCES/multipleLicences.xml"));
+    stubForBody(fixture("fixture/soap/SPIRE_LICENCES/singleLicence.xml"));
 
-    Response response = get(LICENCES_URL + "123456", "ref", "REF-456");
+    Response response = get(LICENCES_URL + "123456", "ref", "REF-123");
 
     assertThat(response.getStatus()).isEqualTo(200);
     assertThat(response.getHeaderString("Content-Type")).isEqualTo("application/json");
 
     List<LicenceView> licences = Arrays.asList(MAPPER.readValue(response.readEntity(String.class), LicenceView[].class));
     assertThat(licences).hasSize(1);
-    assertLicenceViewB(licences.get(0));
+    assertLicenceViewA(licences.get(0));
+  }
+
+  @Test
+  public void filterLicencesByRefExistsTooManyLicencesTest() throws Exception {
+    stubForBody(fixture("fixture/soap/SPIRE_LICENCES/multipleLicences.xml"));
+
+    Response response = get(LICENCES_URL + "123456", "ref", "REF-123");
+
+    assertThat(response.getStatus()).isEqualTo(400);
+    assertThat(response.getHeaderString("Content-Type")).isEqualTo("application/json");
+
+    TypeReference<HashMap<String, String>> typeRef = new TypeReference<HashMap<String, String>>() {};
+    Map<String, String> map = MAPPER.readValue(response.readEntity(String.class), typeRef);
+
+    System.out.println(map.get("code"));
+
+    System.out.println(map.get("message"));
   }
 
   @Test
   public void filterLicencesByRefDoesNotExistTest() throws Exception {
-    stubForBody(fixture("fixture/soap/SPIRE_LICENCES/multipleLicences.xml"));
+    stubForBody(fixture("fixture/soap/SPIRE_LICENCES/noLicences.xml"));
 
     Response response = get(LICENCES_URL + "123456", "ref", "REF-999");
 
@@ -185,7 +205,7 @@ public class LicenceEndpointsIntegrationTest extends BaseIntegrationTest {
 
   @Test
   public void filterLicencesByTypeExistsTest() throws Exception {
-    stubForBody(fixture("fixture/soap/SPIRE_LICENCES/multipleLicences.xml"));
+    stubForBody(fixture("fixture/soap/SPIRE_LICENCES/singleLicence.xml"));
 
     Response response = get(LICENCES_URL + "123456", "type", "SIEL");
 
@@ -193,9 +213,8 @@ public class LicenceEndpointsIntegrationTest extends BaseIntegrationTest {
     assertThat(response.getHeaderString("Content-Type")).isEqualTo("application/json");
 
     List<LicenceView> licences = Arrays.asList(MAPPER.readValue(response.readEntity(String.class), LicenceView[].class));
-    assertThat(licences).hasSize(2);
+    assertThat(licences).hasSize(1);
     assertLicenceViewA(licences.get(0));
-    assertLicenceViewB(licences.get(1));
   }
 
   @Test

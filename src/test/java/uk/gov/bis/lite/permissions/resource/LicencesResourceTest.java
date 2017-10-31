@@ -23,12 +23,13 @@ import uk.gov.bis.lite.common.jwt.LiteJwtAuthFilterHelper;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
 import uk.gov.bis.lite.permissions.service.LicenceService;
+import uk.gov.bis.lite.permissions.service.model.LicenceResult;
+import uk.gov.bis.lite.permissions.service.model.LicencesResult;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
@@ -50,7 +51,7 @@ public class LicencesResourceTest {
   @Test
   public void noParamsSingleLicenceTest() throws Exception {
     when(licenceService.getLicences("123456"))
-        .thenReturn(Optional.of(ImmutableList.of(generateLicenceViewA())));
+        .thenReturn(LicencesResult.ok(ImmutableList.of(generateLicenceViewA())));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -71,7 +72,7 @@ public class LicencesResourceTest {
   @Test
   public void noParamsMultipleLicencesTest() throws Exception {
     when(licenceService.getLicences("123456"))
-        .thenReturn(Optional.of(ImmutableList.of(generateLicenceViewA(), generateLicenceViewB())));
+        .thenReturn(LicencesResult.ok((ImmutableList.of(generateLicenceViewA(), generateLicenceViewB()))));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -92,7 +93,7 @@ public class LicencesResourceTest {
   @Test
   public void noParamsNoLicencesTest() throws Exception {
     when(licenceService.getLicences("123456"))
-        .thenReturn(Optional.of(Collections.emptyList()));
+        .thenReturn(LicencesResult.ok((Collections.emptyList())));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -121,7 +122,7 @@ public class LicencesResourceTest {
   @Test
   public void refParamSingleLicenceTest() throws Exception {
     when(licenceService.getLicence("123456", "REF-123"))
-        .thenReturn(Optional.of(ImmutableList.of(generateLicenceViewA())));
+        .thenReturn(LicenceResult.ok(generateLicenceViewA()));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -142,7 +143,7 @@ public class LicencesResourceTest {
   @Test
   public void refParamNoLicenceTest() throws Exception {
     when(licenceService.getLicence("123456", "REF-123"))
-        .thenReturn(Optional.of(Collections.emptyList()));
+        .thenReturn(LicenceResult.empty());
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -159,6 +160,21 @@ public class LicencesResourceTest {
   }
 
   @Test
+  public void refParamNoUserIdFoundTest() throws Exception {
+    when(licenceService.getLicence("123456", "REF-123"))
+        .thenReturn(LicenceResult.userIdNotFound());
+
+    Response response = rule.getJerseyTest()
+        .target(URL + "/123456")
+        .queryParam("ref", "REF-123")
+        .request()
+        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "123456"))
+        .get();
+
+    assertThat(response.getStatus()).isEqualTo(404);
+  }
+
+  @Test
   public void refParamNotAuthedTest() throws Exception {
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -172,8 +188,8 @@ public class LicencesResourceTest {
 
   @Test
   public void typeParamSingleLicenceTest() throws Exception {
-    when(licenceService.getLicences("123456", LicenceService.LicenceType.SIEL))
-        .thenReturn(Optional.of(ImmutableList.of(generateLicenceViewA())));
+    when(licenceService.getLicences("123456", LicenceService.LicenceTypeParam.SIEL))
+        .thenReturn(LicencesResult.ok(ImmutableList.of(generateLicenceViewA())));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -188,6 +204,21 @@ public class LicencesResourceTest {
     assertThat(results).isNotNull();
     assertThat(results).hasSize(1);
     assertLicenceViewA(results.get(0));
+  }
+
+  @Test
+  public void typeParamNoUserFoundTest() throws Exception {
+    when(licenceService.getLicences("123456", LicenceService.LicenceTypeParam.SIEL))
+        .thenReturn(LicencesResult.userIdNotFound());
+
+    Response response = rule.getJerseyTest()
+        .target(URL + "/123456")
+        .queryParam("type", "SIEL")
+        .request()
+        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "123456"))
+        .get();
+
+    assertThat(response.getStatus()).isEqualTo(404);
   }
 
   @Test
@@ -222,7 +253,7 @@ public class LicencesResourceTest {
   @Test
   public void typeAndRefParamPriorityTest() throws Exception {
    when(licenceService.getLicence("123456", "REF-123"))
-        .thenReturn(Optional.of(Collections.emptyList()));
+        .thenReturn(LicenceResult.empty());
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
