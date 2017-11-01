@@ -26,14 +26,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/licences")
-public class LicencesResource {
+public class LicenceResource {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(LicencesResource.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(LicenceResource.class);
 
   private final LicenceService licenceService;
 
   @Inject
-  public LicencesResource(LicenceService licenceService) {
+  public LicenceResource(LicenceService licenceService) {
     this.licenceService = licenceService;
   }
 

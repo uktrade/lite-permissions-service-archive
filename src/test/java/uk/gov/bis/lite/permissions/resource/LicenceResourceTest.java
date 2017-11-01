@@ -34,7 +34,7 @@ import java.util.Map;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
-public class LicencesResourceTest {
+public class LicenceResourceTest {
   private static final String URL = "/licences";
   private static String JWT_SHARED_SECRET = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
 
@@ -45,7 +45,7 @@ public class LicencesResourceTest {
       .setTestContainerFactory(new GrizzlyWebTestContainerFactory())
       .addProvider(new AuthDynamicFeature(LiteJwtAuthFilterHelper.buildAuthFilter(JWT_SHARED_SECRET)))
       .addProvider(new AuthValueFactoryProvider.Binder<>(LiteJwtUser.class))
-      .addResource(new LicencesResource(licenceService))
+      .addResource(new LicenceResource(licenceService))
       .build();
 
   @Test

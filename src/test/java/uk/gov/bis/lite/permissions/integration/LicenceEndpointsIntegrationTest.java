@@ -28,7 +28,7 @@ import javax.ws.rs.core.Response;
 /**
  * Integration test for the following resources:
  * <pre>
- * GET     /licences/{userId} (uk.gov.bis.lite.permissions.resource.LicencesResource)
+ * GET     /licences/{userId} (uk.gov.bis.lite.permissions.resource.LicenceResource)
  * </pre>
  */
 public class LicenceEndpointsIntegrationTest extends BaseIntegrationTest {
