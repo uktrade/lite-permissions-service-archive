@@ -6,7 +6,7 @@ import uk.gov.bis.lite.common.spire.client.SpireRequest;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
 import uk.gov.bis.lite.permissions.exception.LicenceServiceException;
 import uk.gov.bis.lite.permissions.service.model.SingleLicenceResult;
-import uk.gov.bis.lite.permissions.service.model.LicencesResult;
+import uk.gov.bis.lite.permissions.service.model.MultipleLicenceResult;
 import uk.gov.bis.lite.permissions.spire.adapters.SpireLicenceAdapter;
 import uk.gov.bis.lite.permissions.spire.clients.SpireLicencesClient;
 import uk.gov.bis.lite.permissions.spire.exceptions.SpireUserNotFoundException;
@@ -48,33 +48,33 @@ public class LicenceServiceImpl implements LicenceService {
   }
 
   @Override
-  public LicencesResult getLicences(String userId) {
+  public MultipleLicenceResult getLicences(String userId) {
     SpireRequest spireRequest = client.createRequest();
     spireRequest.addChild("userId", userId);
     try {
-      return LicencesResult.ok(client.sendRequest(spireRequest)
+      return MultipleLicenceResult.ok(client.sendRequest(spireRequest)
           .stream()
           .map(SpireLicenceAdapter::adapt)
           .sorted(Comparator.comparing(LicenceView::getLicenceRef))
           .collect(Collectors.toList()));
     } catch (SpireUserNotFoundException e) {
-      return LicencesResult.userIdNotFound();
+      return MultipleLicenceResult.userIdNotFound();
     }
   }
 
   @Override
-  public LicencesResult getLicences(String userId, LicenceTypeParam type) {
+  public MultipleLicenceResult getLicences(String userId, LicenceTypeParam type) {
     SpireRequest spireRequest = client.createRequest();
     spireRequest.addChild("userId", userId);
     spireRequest.addChild("type", type.name());
     try {
-      return LicencesResult.ok(client.sendRequest(spireRequest)
+      return MultipleLicenceResult.ok(client.sendRequest(spireRequest)
           .stream()
           .map(SpireLicenceAdapter::adapt)
           .sorted(Comparator.comparing(LicenceView::getLicenceRef))
           .collect(Collectors.toList()));
     } catch (SpireUserNotFoundException e) {
-      return LicencesResult.userIdNotFound();
+      return MultipleLicenceResult.userIdNotFound();
     }
   }
 }

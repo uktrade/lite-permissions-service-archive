@@ -24,7 +24,7 @@ import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
 import uk.gov.bis.lite.permissions.service.LicenceService;
 import uk.gov.bis.lite.permissions.service.model.SingleLicenceResult;
-import uk.gov.bis.lite.permissions.service.model.LicencesResult;
+import uk.gov.bis.lite.permissions.service.model.MultipleLicenceResult;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -51,7 +51,7 @@ public class LicenceResourceTest {
   @Test
   public void noParamsSingleLicenceTest() throws Exception {
     when(licenceService.getLicences("123456"))
-        .thenReturn(LicencesResult.ok(ImmutableList.of(generateLicenceViewA())));
+        .thenReturn(MultipleLicenceResult.ok(ImmutableList.of(generateLicenceViewA())));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -72,7 +72,7 @@ public class LicenceResourceTest {
   @Test
   public void noParamsMultipleLicencesTest() throws Exception {
     when(licenceService.getLicences("123456"))
-        .thenReturn(LicencesResult.ok((ImmutableList.of(generateLicenceViewA(), generateLicenceViewB()))));
+        .thenReturn(MultipleLicenceResult.ok((ImmutableList.of(generateLicenceViewA(), generateLicenceViewB()))));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -93,7 +93,7 @@ public class LicenceResourceTest {
   @Test
   public void noParamsNoLicencesTest() throws Exception {
     when(licenceService.getLicences("123456"))
-        .thenReturn(LicencesResult.ok((Collections.emptyList())));
+        .thenReturn(MultipleLicenceResult.ok((Collections.emptyList())));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -189,7 +189,7 @@ public class LicenceResourceTest {
   @Test
   public void typeParamSingleLicenceTest() throws Exception {
     when(licenceService.getLicences("123456", LicenceService.LicenceTypeParam.SIEL))
-        .thenReturn(LicencesResult.ok(ImmutableList.of(generateLicenceViewA())));
+        .thenReturn(MultipleLicenceResult.ok(ImmutableList.of(generateLicenceViewA())));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -209,7 +209,7 @@ public class LicenceResourceTest {
   @Test
   public void typeParamNoUserFoundTest() throws Exception {
     when(licenceService.getLicences("123456", LicenceService.LicenceTypeParam.SIEL))
-        .thenReturn(LicencesResult.userIdNotFound());
+        .thenReturn(MultipleLicenceResult.userIdNotFound());
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")

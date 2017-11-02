@@ -1,7 +1,7 @@
 package uk.gov.bis.lite.permissions.service;
 
 import uk.gov.bis.lite.permissions.service.model.SingleLicenceResult;
-import uk.gov.bis.lite.permissions.service.model.LicencesResult;
+import uk.gov.bis.lite.permissions.service.model.MultipleLicenceResult;
 
 public interface LicenceService {
   enum LicenceTypeParam {
@@ -11,7 +11,7 @@ public interface LicenceService {
 
   SingleLicenceResult getLicence(String userId, String reference);
 
-  LicencesResult getLicences(String userId);
+  MultipleLicenceResult getLicences(String userId);
 
-  LicencesResult getLicences(String userId, LicenceTypeParam type);
+  MultipleLicenceResult getLicences(String userId, LicenceTypeParam type);
 }

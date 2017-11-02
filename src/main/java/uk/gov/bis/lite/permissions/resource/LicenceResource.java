@@ -11,7 +11,7 @@ import uk.gov.bis.lite.permissions.api.view.LicenceView;
 import uk.gov.bis.lite.permissions.service.LicenceService;
 import uk.gov.bis.lite.permissions.service.model.SingleLicenceResult;
 import uk.gov.bis.lite.permissions.service.model.LicenceServiceResult;
-import uk.gov.bis.lite.permissions.service.model.LicencesResult;
+import uk.gov.bis.lite.permissions.service.model.MultipleLicenceResult;
 
 import java.util.Collections;
 import java.util.List;
@@ -65,14 +65,14 @@ public class LicenceResource {
   }
 
   List<LicenceView> getAllLicences(String userId) {
-    LicencesResult licencesResult = licenceService.getLicences(userId);
+    MultipleLicenceResult licencesResult = licenceService.getLicences(userId);
     validateResult(licencesResult);
     return licencesResult.getResult();
   }
 
   List<LicenceView> getLicencesByType(String userId, String type) {
     if (StringUtils.equalsIgnoreCase(type, LicenceService.LicenceTypeParam.SIEL.name())) {
-      LicencesResult licencesResult = licenceService.getLicences(userId, LicenceService.LicenceTypeParam.SIEL);
+      MultipleLicenceResult licencesResult = licenceService.getLicences(userId, LicenceService.LicenceTypeParam.SIEL);
       validateResult(licencesResult);
       return licencesResult.getResult();
     } else {
