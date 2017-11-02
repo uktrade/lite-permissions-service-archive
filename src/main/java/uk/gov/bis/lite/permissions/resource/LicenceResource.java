@@ -57,11 +57,9 @@ public class LicenceResource {
   List<LicenceView> getLicenceByRef(String userId, String ref) {
     SingleLicenceResult licenceResult = licenceService.getLicence(userId, ref);
     validateResult(licenceResult);
-    if (licenceResult.getResult() == null) {
-      return Collections.emptyList();
-    } else {
-      return ImmutableList.of(licenceResult.getResult());
-    }
+    return licenceResult.getResult()
+        .map(ImmutableList::of)
+        .orElse(ImmutableList.of());
   }
 
   List<LicenceView> getAllLicences(String userId) {

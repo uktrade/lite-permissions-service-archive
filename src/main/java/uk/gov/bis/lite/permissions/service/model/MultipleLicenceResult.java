@@ -17,16 +17,4 @@ public class MultipleLicenceResult extends LicenceServiceResult<List<LicenceView
     return new MultipleLicenceResult(Status.USER_ID_NOT_FOUND, null);
   }
 
-  /**
-   * Depending on the result of {@link MultipleLicenceResult#getStatus()} will return:
-   * <ul>
-   *   <li>{@link MultipleLicenceResult.Status#OK} - List&lt;LicenceView&gt;</li>
-   *   <li>{@link MultipleLicenceResult.Status#USER_ID_NOT_FOUND} - null</li>
-   * </ul>
-   * @return the result of a call to the {@link uk.gov.bis.lite.permissions.service.LicenceService}
-   */
-  @Override
-  public List<LicenceView> getResult() {
-    return super.getResult();
-  }
 }

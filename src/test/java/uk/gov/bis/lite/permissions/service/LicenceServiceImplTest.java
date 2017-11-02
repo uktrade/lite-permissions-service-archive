@@ -86,7 +86,7 @@ public class LicenceServiceImplTest {
 
     SingleLicenceResult licenceResult = service.getLicence("123456", "REF-123");
     assertThat(licenceResult.isOk()).isTrue();
-    assertLicenceViewA(licenceResult.getResult());
+    assertLicenceViewA(licenceResult.getResult().get());
   }
 
   @Test
@@ -97,7 +97,7 @@ public class LicenceServiceImplTest {
 
     SingleLicenceResult licenceResult = service.getLicence("123456", "REF-9999999");
     assertThat(licenceResult.isOk()).isTrue();
-    assertThat(licenceResult.getResult()).isNull();
+    assertThat(licenceResult.getResult().isPresent()).isFalse();
   }
 
   @Test
