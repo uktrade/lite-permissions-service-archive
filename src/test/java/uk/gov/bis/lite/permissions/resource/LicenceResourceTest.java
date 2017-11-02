@@ -152,11 +152,10 @@ public class LicenceResourceTest {
         .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "123456"))
         .get();
 
-    assertThat(response.getStatus()).isEqualTo(200);
-
-    List<LicenceView> results = Arrays.asList(response.readEntity(LicenceView[].class));
-    assertThat(results).isNotNull();
-    assertThat(results).hasSize(0);
+    Map<String, String> map = response.readEntity(new GenericType<Map<String, String>>(){});
+    assertThat(map.entrySet().size()).isEqualTo(2);
+    assertThat(map.get("code")).isEqualTo("404");
+    assertThat(map.get("message")).contains("No licence with ref \"REF-123\" found for userId \"123456\"");
   }
 
   @Test
@@ -263,12 +262,11 @@ public class LicenceResourceTest {
         .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "123456"))
         .get();
 
-    assertThat(response.getStatus()).isEqualTo(200);
+    assertThat(response.getStatus()).isEqualTo(404);
 
-    List<LicenceView> results = Arrays.asList(response.readEntity(LicenceView[].class));
-    assertThat(results).isNotNull();
-    assertThat(results).hasSize(0);
-
-    verify(licenceService).getLicence(eq("123456"), eq("REF-123"));
+    Map<String, String> map = response.readEntity(new GenericType<Map<String, String>>(){});
+    assertThat(map.entrySet().size()).isEqualTo(2);
+    assertThat(map.get("code")).isEqualTo("404");
+    assertThat(map.get("message")).contains("No licence with ref \"REF-123\" found for userId \"123456\"");
   }
 }

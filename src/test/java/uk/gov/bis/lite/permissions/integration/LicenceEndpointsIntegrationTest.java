@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
 /**
@@ -196,11 +197,13 @@ public class LicenceEndpointsIntegrationTest extends BaseIntegrationTest {
 
     Response response = get(LICENCES_URL + "123456", "ref", "REF-999");
 
-    assertThat(response.getStatus()).isEqualTo(200);
+    assertThat(response.getStatus()).isEqualTo(404);
     assertThat(response.getHeaderString("Content-Type")).isEqualTo("application/json");
 
-    List<LicenceView> licences = Arrays.asList(MAPPER.readValue(response.readEntity(String.class), LicenceView[].class));
-    assertThat(licences).isEmpty();
+    Map<String, String> map = response.readEntity(new GenericType<Map<String, String>>(){});
+    assertThat(map.entrySet().size()).isEqualTo(2);
+    assertThat(map.get("code")).isEqualTo("404");
+    assertThat(map.get("message")).contains("No licence with ref \"REF-999\" found for userId \"123456\"");
   }
 
   @Test

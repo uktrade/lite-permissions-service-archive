@@ -9,11 +9,10 @@ import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
 import uk.gov.bis.lite.permissions.service.LicenceService;
-import uk.gov.bis.lite.permissions.service.model.SingleLicenceResult;
 import uk.gov.bis.lite.permissions.service.model.LicenceServiceResult;
 import uk.gov.bis.lite.permissions.service.model.MultipleLicenceResult;
+import uk.gov.bis.lite.permissions.service.model.SingleLicenceResult;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -59,7 +58,8 @@ public class LicenceResource {
     validateResult(licenceResult);
     return licenceResult.getResult()
         .map(ImmutableList::of)
-        .orElse(ImmutableList.of());
+        .orElseThrow(() -> new WebApplicationException(String.format("No licence with ref \"%s\" found " +
+          "for userId \"%s\"", ref, userId), Response.Status.NOT_FOUND));
   }
 
   List<LicenceView> getAllLicences(String userId) {
