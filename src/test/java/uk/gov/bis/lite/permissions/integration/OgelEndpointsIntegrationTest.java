@@ -14,6 +14,7 @@ import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static uk.gov.bis.lite.permissions.spire.SpireLicenceUtil.generateToken;
 
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.JerseyInvocation;
@@ -23,6 +24,7 @@ import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
 import uk.gov.bis.lite.permissions.api.view.OgelSubmissionView;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
@@ -48,6 +50,7 @@ public class OgelEndpointsIntegrationTest extends BaseIntegrationTest {
   private final String USER_ID = "112233";
   private final String INVALID_USER_ID = "111000";
   private final String SUB_ID = "1";
+  private static String JWT_SHARED_SECRET = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
 
   @Test
   public void registerOgelSuccessImmediate() throws Exception {
@@ -108,6 +111,7 @@ public class OgelEndpointsIntegrationTest extends BaseIntegrationTest {
     Response response = JerseyClientBuilder.createClient()
         .target(localUrl(OGEL_REG_URL + USER_ID))
         .request()
+        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, USER_ID))
         .get();
 
     List<OgelRegistrationView> actualResponse = response.readEntity(new GenericType<List<OgelRegistrationView>>(){});
@@ -136,12 +140,40 @@ public class OgelEndpointsIntegrationTest extends BaseIntegrationTest {
     Response response = JerseyClientBuilder.createClient()
         .target(localUrl(OGEL_REG_URL + INVALID_USER_ID))
         .request()
+        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, INVALID_USER_ID))
         .get();
 
     assertThat(response.getStatus()).isEqualTo(400);
 
     verify(postRequestedFor(urlEqualTo("/spire/fox/ispire/SPIRE_OGEL_REGISTRATIONS"))
         .withRequestBody(equalToXml(fixture("fixture/integration/spire/getOgelRegistrationsInvalidUserRequest.xml"))));
+  }
+
+  @Test
+  public void getOgelRegistrationNoAuthHeader() {
+    Response response = JerseyClientBuilder.createClient()
+        .target(localUrl(OGEL_REG_URL + USER_ID))
+        .request()
+        .get();
+
+    assertThat(response.getStatus()).isEqualTo(401);
+  }
+
+  @Test
+  public void getOgelRegistrationJwtUserIdMismatch() {
+    Response response = JerseyClientBuilder.createClient()
+        .target(localUrl(OGEL_REG_URL + USER_ID))
+        .request()
+        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, INVALID_USER_ID))
+        .get();
+
+    assertThat(response.getStatus()).isEqualTo(401);
+
+    Map<String, String> map = response.readEntity(new GenericType<Map<String, String>>(){});
+    assertThat(map.entrySet().size()).isEqualTo(2);
+    assertThat(map.get("code")).isEqualTo("401");
+    assertThat(map.get("message")).contains("userId \"" + USER_ID + "\" does not match value supplied in token (" + INVALID_USER_ID + ")");
+
   }
 
   private void initRegisterOgelStubs() {
