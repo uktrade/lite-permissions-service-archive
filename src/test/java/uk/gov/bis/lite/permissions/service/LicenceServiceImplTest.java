@@ -12,7 +12,7 @@ import static uk.gov.bis.lite.permissions.api.view.LicenceTestUtil.generateSpire
 import org.junit.Test;
 import uk.gov.bis.lite.common.spire.client.SpireRequest;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
-import uk.gov.bis.lite.permissions.service.model.LicenceResult;
+import uk.gov.bis.lite.permissions.service.model.SingleLicenceResult;
 import uk.gov.bis.lite.permissions.service.model.LicencesResult;
 import uk.gov.bis.lite.permissions.spire.clients.SpireLicencesClient;
 import uk.gov.bis.lite.permissions.spire.exceptions.SpireUserNotFoundException;
@@ -84,7 +84,7 @@ public class LicenceServiceImplTest {
     when(client.sendRequest(any()))
         .thenReturn(Arrays.asList(generateSpireLicenceA()));
 
-    LicenceResult licenceResult = service.getLicence("123456", "REF-123");
+    SingleLicenceResult licenceResult = service.getLicence("123456", "REF-123");
     assertThat(licenceResult.isOk()).isTrue();
     assertLicenceViewA(licenceResult.getResult());
   }
@@ -95,7 +95,7 @@ public class LicenceServiceImplTest {
     when(client.sendRequest(any()))
         .thenReturn(Collections.emptyList());
 
-    LicenceResult licenceResult = service.getLicence("123456", "REF-9999999");
+    SingleLicenceResult licenceResult = service.getLicence("123456", "REF-9999999");
     assertThat(licenceResult.isOk()).isTrue();
     assertThat(licenceResult.getResult()).isNull();
   }
@@ -105,9 +105,9 @@ public class LicenceServiceImplTest {
     when(client.createRequest()).thenReturn(mock(SpireRequest.class));
     when(client.sendRequest(any())).thenThrow(new SpireUserNotFoundException("User not found"));
 
-    LicenceResult licenceResult = service.getLicence("123456", "REF-123");
+    SingleLicenceResult licenceResult = service.getLicence("123456", "REF-123");
     assertThat(licenceResult.isOk()).isFalse();
-    assertThat(licenceResult.getStatus()).isEqualTo(LicenceResult.Status.USER_ID_NOT_FOUND);
+    assertThat(licenceResult.getStatus()).isEqualTo(SingleLicenceResult.Status.USER_ID_NOT_FOUND);
     assertThat(licenceResult.getResult()).isNull();
   }
 

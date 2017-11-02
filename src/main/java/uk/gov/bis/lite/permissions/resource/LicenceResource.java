@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
 import uk.gov.bis.lite.permissions.service.LicenceService;
-import uk.gov.bis.lite.permissions.service.model.LicenceResult;
+import uk.gov.bis.lite.permissions.service.model.SingleLicenceResult;
 import uk.gov.bis.lite.permissions.service.model.LicenceServiceResult;
 import uk.gov.bis.lite.permissions.service.model.LicencesResult;
 
@@ -55,7 +55,7 @@ public class LicenceResource {
   }
 
   List<LicenceView> getLicenceByRef(String userId, String ref) {
-    LicenceResult licenceResult = licenceService.getLicence(userId, ref);
+    SingleLicenceResult licenceResult = licenceService.getLicence(userId, ref);
     validateResult(licenceResult);
     if (licenceResult.getResult() == null) {
       return Collections.emptyList();

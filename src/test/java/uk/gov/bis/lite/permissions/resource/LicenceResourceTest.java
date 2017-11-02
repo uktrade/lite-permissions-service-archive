@@ -23,7 +23,7 @@ import uk.gov.bis.lite.common.jwt.LiteJwtAuthFilterHelper;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
 import uk.gov.bis.lite.permissions.service.LicenceService;
-import uk.gov.bis.lite.permissions.service.model.LicenceResult;
+import uk.gov.bis.lite.permissions.service.model.SingleLicenceResult;
 import uk.gov.bis.lite.permissions.service.model.LicencesResult;
 
 import java.util.Arrays;
@@ -122,7 +122,7 @@ public class LicenceResourceTest {
   @Test
   public void refParamSingleLicenceTest() throws Exception {
     when(licenceService.getLicence("123456", "REF-123"))
-        .thenReturn(LicenceResult.ok(generateLicenceViewA()));
+        .thenReturn(SingleLicenceResult.ok(generateLicenceViewA()));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -143,7 +143,7 @@ public class LicenceResourceTest {
   @Test
   public void refParamNoLicenceTest() throws Exception {
     when(licenceService.getLicence("123456", "REF-123"))
-        .thenReturn(LicenceResult.empty());
+        .thenReturn(SingleLicenceResult.empty());
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -162,7 +162,7 @@ public class LicenceResourceTest {
   @Test
   public void refParamNoUserIdFoundTest() throws Exception {
     when(licenceService.getLicence("123456", "REF-123"))
-        .thenReturn(LicenceResult.userIdNotFound());
+        .thenReturn(SingleLicenceResult.userIdNotFound());
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -253,7 +253,7 @@ public class LicenceResourceTest {
   @Test
   public void typeAndRefParamPriorityTest() throws Exception {
    when(licenceService.getLicence("123456", "REF-123"))
-        .thenReturn(LicenceResult.empty());
+        .thenReturn(SingleLicenceResult.empty());
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")

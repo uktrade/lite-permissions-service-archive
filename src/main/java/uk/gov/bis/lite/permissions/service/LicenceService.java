@@ -1,6 +1,6 @@
 package uk.gov.bis.lite.permissions.service;
 
-import uk.gov.bis.lite.permissions.service.model.LicenceResult;
+import uk.gov.bis.lite.permissions.service.model.SingleLicenceResult;
 import uk.gov.bis.lite.permissions.service.model.LicencesResult;
 
 public interface LicenceService {
@@ -9,7 +9,7 @@ public interface LicenceService {
     OIEL
   }
 
-  LicenceResult getLicence(String userId, String reference);
+  SingleLicenceResult getLicence(String userId, String reference);
 
   LicencesResult getLicences(String userId);
 

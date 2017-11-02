@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import uk.gov.bis.lite.common.spire.client.SpireRequest;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
 import uk.gov.bis.lite.permissions.exception.LicenceServiceException;
-import uk.gov.bis.lite.permissions.service.model.LicenceResult;
+import uk.gov.bis.lite.permissions.service.model.SingleLicenceResult;
 import uk.gov.bis.lite.permissions.service.model.LicencesResult;
 import uk.gov.bis.lite.permissions.spire.adapters.SpireLicenceAdapter;
 import uk.gov.bis.lite.permissions.spire.clients.SpireLicencesClient;
@@ -26,7 +26,7 @@ public class LicenceServiceImpl implements LicenceService {
   }
 
   @Override
-  public LicenceResult getLicence(String userId, String reference) {
+  public SingleLicenceResult getLicence(String userId, String reference) {
     SpireRequest spireRequest = client.createRequest();
     spireRequest.addChild("userId", userId);
     spireRequest.addChild("reference", reference);
@@ -36,14 +36,14 @@ public class LicenceServiceImpl implements LicenceService {
           .map(SpireLicenceAdapter::adapt)
           .collect(Collectors.toList());
       if (licences.isEmpty()) {
-        return LicenceResult.empty();
+        return SingleLicenceResult.empty();
       } else if (licences.size() == 1) {
-        return LicenceResult.ok(licences.get(0));
+        return SingleLicenceResult.ok(licences.get(0));
       } else {
         throw new LicenceServiceException(String.format("Too many results from spire client, expected 1 but got %d", licences.size()));
       }
     } catch (SpireUserNotFoundException e) {
-      return LicenceResult.userIdNotFound();
+      return SingleLicenceResult.userIdNotFound();
     }
   }
 
