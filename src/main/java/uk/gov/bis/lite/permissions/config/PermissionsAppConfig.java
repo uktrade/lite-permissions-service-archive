@@ -45,6 +45,9 @@ public class PermissionsAppConfig extends Configuration {
   @NotEmpty
   private String adminPassword;
 
+  @NotEmpty
+  private String jwtSharedSecret;
+
   public DataSourceFactory getDataSourceFactory() {
     return database;
   }
@@ -87,5 +90,9 @@ public class PermissionsAppConfig extends Configuration {
 
   public String getMaxCallbackFailCount() {
     return maxCallbackFailCount;
+  }
+
+  public String getJwtSharedSecret() {
+    return jwtSharedSecret;
   }
 }

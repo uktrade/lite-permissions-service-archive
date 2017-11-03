@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.common.spire.client.SpireRequest;
 import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
-import uk.gov.bis.lite.permissions.spire.SpireOgelRegistrationClient;
+import uk.gov.bis.lite.permissions.spire.clients.SpireOgelRegistrationClient;
 import uk.gov.bis.lite.permissions.spire.model.SpireOgelRegistration;
 
 import java.util.List;

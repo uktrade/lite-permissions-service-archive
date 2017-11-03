@@ -9,7 +9,7 @@ import uk.gov.bis.lite.common.spire.client.SpireRequest;
 import uk.gov.bis.lite.permissions.exception.SpireFailReasonException;
 import uk.gov.bis.lite.permissions.model.FailEvent;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
-import uk.gov.bis.lite.permissions.spire.SpireReferenceClient;
+import uk.gov.bis.lite.permissions.spire.clients.SpireReferenceClient;
 
 import java.util.Optional;
 

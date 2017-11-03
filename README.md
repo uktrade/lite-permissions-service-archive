@@ -78,3 +78,16 @@ Configuration options are available to determine when to stop processing attempt
 
 Any submission can be terminated at any stage through a dedicated API endpoint: `DELETE /ogel-submissions/{id}`
 
+## Notes on the view API
+When attempting to serialize or deserialize `LicenceView` with jackson-databind, you will need to enable the serialization 
+format for `LocalDate`.
+```java
+ObjectMapper mapper = new ObjectMapper();
+mapper.registerModule(new JavaTimeModule());
+mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+String json = mapper.writeValueAsString(LocalDate.of(2000,12,31)); // "2000-12-31"
+LocalDate localDate = mapper.readValue(json, LocalDate.class);
+assertThat(localDate).isEqualTo("2000-12-31"); // true
+```
+

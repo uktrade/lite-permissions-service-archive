@@ -20,8 +20,8 @@ import uk.gov.bis.lite.common.spire.client.SpireRequestConfig;
 import uk.gov.bis.lite.common.spire.client.parser.ReferenceParser;
 import uk.gov.bis.lite.permissions.Util;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
-import uk.gov.bis.lite.permissions.spire.OgelErrorNodeErrorHandler;
-import uk.gov.bis.lite.permissions.spire.SpireReferenceClient;
+import uk.gov.bis.lite.permissions.spire.clients.SpireReferenceClient;
+import uk.gov.bis.lite.permissions.spire.errorhandlers.OgelErrorNodeErrorHandler;
 
 
 public class OgelServiceTest {
@@ -125,7 +125,7 @@ public class OgelServiceTest {
   private static void initStubs() {
 
     String OGEL_URL = "/spire/fox/ispire/SPIRE_CREATE_OGEL_APP";
-    String PATH = "fixture/soap/";
+    String PATH = "fixture/soap/SPIRE_CREATE_OGEL_APP/";
     String CONTENT_TYPE = "Content-Type";
     String TEXT_XML = "text/xml";
 

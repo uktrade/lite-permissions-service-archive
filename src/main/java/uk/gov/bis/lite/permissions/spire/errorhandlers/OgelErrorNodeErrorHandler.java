@@ -1,4 +1,4 @@
-package uk.gov.bis.lite.permissions.spire;
+package uk.gov.bis.lite.permissions.spire.errorhandlers;
 
 import uk.gov.bis.lite.common.spire.client.errorhandler.ErrorNodeErrorHandler;
 import uk.gov.bis.lite.permissions.exception.SpireFailReasonException;
