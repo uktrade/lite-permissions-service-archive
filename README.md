@@ -33,7 +33,7 @@ Gets all licences for the supplied `userId`. Requires JWT with `userId` matching
 
 # JWT Authentication
 
-Some endpoints of this require authentication with a JWT token, information on the token can be found here [lite-dropwizard-common/jwt](https://github.com/uktrade/lite-dropwizard-common/tree/master/jwt). 
+Some of this services endpoints require authentication with a JWT token, information on the token can be found here [lite-dropwizard-common/jwt](https://github.com/uktrade/lite-dropwizard-common/tree/master/jwt). 
 It's recommended to use `SpireLicenceUtil#tokenHelperTest()`, this generates a token which is valid for this service. 
 
 # OGEL submission processing
