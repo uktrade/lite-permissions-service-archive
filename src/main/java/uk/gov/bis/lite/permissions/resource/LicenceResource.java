@@ -1,5 +1,7 @@
 package uk.gov.bis.lite.permissions.resource;
 
+import static uk.gov.bis.lite.permissions.resource.ResourceUtil.validateUserIdToJwt;
+
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import io.dropwizard.auth.Auth;
@@ -75,13 +77,6 @@ public class LicenceResource {
       return licencesResult.getResult();
     } else {
       throw new WebApplicationException(String.format("Invalid licence type \"%s\"", type), Response.Status.BAD_REQUEST);
-    }
-  }
-
-  static void validateUserIdToJwt(String userId, LiteJwtUser user) {
-    if (!StringUtils.equals(userId, user.getUserId())) {
-      throw new WebApplicationException("userId \"" + userId + "\" does not match value supplied in token (" +
-          user.getUserId() + ")", Response.Status.UNAUTHORIZED);
     }
   }
 

@@ -17,7 +17,7 @@ detailing the result of its processing.
 
 * `/ogel-registrations` (`OgelRegistrationResource`)
 
-Gets all existing OGEL registration details for a given user.
+Gets all existing OGEL registration details for a given user. Requires JWT with `userId` matching the `subject`.
  
 * `/ogel-submissions` (`OgelSubmissionResource`)
  
@@ -26,6 +26,15 @@ Administrative endpoints for viewing/cancelling OGEL submissions which are compl
 * `/register-ogel` (`RegisterOgelResource`)
 
 Allows a user to register an OGEL and triggers the processing described below.
+
+* `/licences` (`LicenceResource`)
+
+Gets all licences for the supplied `userId`. Requires JWT with `userId` matching the `subject`. 
+
+# JWT Authentication
+
+Some endpoints of this require authentication with a JWT token, information on the token can be found here [lite-dropwizard-common/jwt](https://github.com/uktrade/lite-dropwizard-common/tree/master/jwt). 
+It's recommended to use `SpireLicenceUtil#tokenHelperTest()`, this generates a token which is valid for this service. 
 
 # OGEL submission processing
 
