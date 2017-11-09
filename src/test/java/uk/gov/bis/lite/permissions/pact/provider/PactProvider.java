@@ -42,7 +42,7 @@ public class PactProvider {
     mock.setNoResults(true);
   }
 
-  @State("Provided user does not exist")
+  @State("provided user does not exist")
   public void userDoesNotExistState() {
     RegistrationsServiceMock mock = InjectorLookup.getInjector(RULE.getApplication()).get().getInstance(RegistrationsServiceMock.class);
     mock.resetState();
