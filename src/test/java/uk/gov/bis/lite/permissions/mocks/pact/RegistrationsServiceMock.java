@@ -1,31 +1,43 @@
 package uk.gov.bis.lite.permissions.mocks.pact;
 
+import static java.util.Collections.emptyList;
+
 import com.google.inject.Singleton;
 import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
 import uk.gov.bis.lite.permissions.service.RegistrationsService;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Singleton
 public class RegistrationsServiceMock implements RegistrationsService {
 
-  private boolean hasRegistrations = true;
+  private boolean noResults = false;
+  private boolean userNotFound = false;
 
-  public List<OgelRegistrationView> getRegistrations(String userId, String registrationReference) {
-    if (hasRegistrations) {
-      return buildRegistrations();
+  public void resetState() {
+    setNoResults(false);
+    setUserNotFound(false);
+  }
+
+  public Optional<List<OgelRegistrationView>> getRegistrations(String userId, String registrationReference) {
+    if (userNotFound) {
+      return Optional.empty();
+    } else if (noResults) {
+      return Optional.of(emptyList());
     } else {
-      return Collections.emptyList();
+      return Optional.of(buildRegistrations());
     }
   }
 
-  public List<OgelRegistrationView> getRegistrations(String userId) {
-    if (hasRegistrations) {
-      return buildRegistrations();
+  public Optional<List<OgelRegistrationView>> getRegistrations(String userId) {
+    if (userNotFound) {
+      return Optional.empty();
+    } else if (noResults) {
+      return Optional.of(emptyList());
     } else {
-      return Collections.emptyList();
+      return Optional.of(buildRegistrations());
     }
   }
 
@@ -40,7 +52,11 @@ public class RegistrationsServiceMock implements RegistrationsService {
     return Arrays.asList(ogelRegistrationView);
   }
 
-  public void setHasRegistrations(boolean hasRegistrations) {
-    this.hasRegistrations = hasRegistrations;
+  public void setNoResults(boolean noResults) {
+    this.noResults = noResults;
+  }
+
+  public void setUserNotFound(boolean userNotFound) {
+    this.userNotFound = userNotFound;
   }
 }

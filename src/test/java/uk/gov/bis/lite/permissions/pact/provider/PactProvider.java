@@ -31,11 +31,21 @@ public class PactProvider {
 
   @State("OGEL registrations exist for provided user")
   public void someRegistrationsState() {
-    InjectorLookup.getInjector(RULE.getApplication()).get().getInstance(RegistrationsServiceMock.class).setHasRegistrations(true);
+    RegistrationsServiceMock mock = InjectorLookup.getInjector(RULE.getApplication()).get().getInstance(RegistrationsServiceMock.class);
+    mock.resetState();
   }
 
   @State("no OGEL registrations exist for provided user")
   public void noRegistrationsState() {
-    InjectorLookup.getInjector(RULE.getApplication()).get().getInstance(RegistrationsServiceMock.class).setHasRegistrations(false);
+    RegistrationsServiceMock mock = InjectorLookup.getInjector(RULE.getApplication()).get().getInstance(RegistrationsServiceMock.class);
+    mock.resetState();
+    mock.setNoResults(true);
+  }
+
+  @State("Provided user does not exist")
+  public void userDoesNotExistState() {
+    RegistrationsServiceMock mock = InjectorLookup.getInjector(RULE.getApplication()).get().getInstance(RegistrationsServiceMock.class);
+    mock.resetState();
+    mock.setUserNotFound(true);
   }
 }

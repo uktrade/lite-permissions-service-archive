@@ -12,6 +12,7 @@ import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
 import uk.gov.bis.lite.permissions.service.RegistrationsService;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
@@ -42,7 +43,7 @@ public class OgelRegistrationResource {
                                                           @Auth LiteJwtUser user) {
     validateUserIdToJwt(userId, user);
 
-    List<OgelRegistrationView> results;
+    Optional<List<OgelRegistrationView>> results;
 
     if (StringUtils.isBlank(registrationReference)) {
       results = registrationsService.getRegistrations(userId);
@@ -50,11 +51,11 @@ public class OgelRegistrationResource {
       results = registrationsService.getRegistrations(userId, registrationReference);
     }
 
-    if (results.size() == 0) {
-      throw new WebApplicationException("No OgelRegistrations found", Response.Status.NOT_FOUND);
+    if (results.isPresent()) {
+      return results.get();
+    } else {
+      throw new WebApplicationException(String.format("userId %s not found.", userId), Response.Status.NOT_FOUND);
     }
-
-    return results;
   }
 
 }

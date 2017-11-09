@@ -8,6 +8,7 @@ import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.bis.lite.common.jwt.LiteJwtAuthFilterHelper;
@@ -31,6 +32,11 @@ public class ResourceOgelRegistrationTest {
   private static String MOCK_REGISTRATION_TAG = "SPIRE";
   private static String JWT_SHARED_SECRET = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
   private static RegistrationsServiceMock mockRegistrationsService = new RegistrationsServiceMock(MOCK_REGISTRATION_TAG, MOCK_REGISTRATIONS_NUMBER);
+
+  @Before
+  public void setUp() throws Exception {
+    mockRegistrationsService.resetState();
+  }
 
   @ClassRule
   public static final ResourceTestRule resources = ResourceTestRule.builder()
@@ -88,6 +94,7 @@ public class ResourceOgelRegistrationTest {
 
   @Test
   public void viewOgelRegistrationsWithParam2() {
+    mockRegistrationsService.setUserNotFound(true); // Update mockRegistrationsService first
     Response response = resources.getJerseyTest()
         .target("/ogel-registrations/user/1")
         .queryParam("registrationReference", "NOT_THERE")
@@ -105,7 +112,8 @@ public class ResourceOgelRegistrationTest {
         .request()
         .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "1"))
         .get();
-    assertThat(status(response)).isEqualTo(NOT_FOUND);
+    assertThat(status(response)).isEqualTo(OK);
+    assertThat(getOgelRegistrationsResponse(response).isEmpty()).isTrue();
   }
 
   /**

@@ -7,9 +7,11 @@ import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.common.spire.client.SpireRequest;
 import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
 import uk.gov.bis.lite.permissions.spire.clients.SpireOgelRegistrationClient;
+import uk.gov.bis.lite.permissions.spire.exceptions.SpireUserNotFoundException;
 import uk.gov.bis.lite.permissions.spire.model.SpireOgelRegistration;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class RegistrationsServiceImpl implements RegistrationsService {
@@ -24,27 +26,40 @@ public class RegistrationsServiceImpl implements RegistrationsService {
   }
 
   /**
-   * Call SpireClient using userId
+   * Call SpireClient using userId.
+   * {@link Optional#empty()} implies userId does not exist.
    */
-  public List<OgelRegistrationView> getRegistrations(String userId) {
-    return getSpireOgelRegistrations(userId).stream().map(this::getOgelRegistrationView).collect(Collectors.toList());
+  public Optional<List<OgelRegistrationView>> getRegistrations(String userId) {
+    return getSpireOgelRegistrations(userId).map(registrations -> registrations
+        .stream()
+        .map(this::getOgelRegistrationView)
+        .collect(Collectors.toList()));
   }
 
   /**
    * Call SpireClient using userId
-   * and then filter results based on registrationReference
+   * and then filter results based on registrationReference.
+   * {@link Optional#empty()} implies userId does not exist.
    */
-  public List<OgelRegistrationView> getRegistrations(String userId, String registrationReference) {
-    return getSpireOgelRegistrations(userId).stream()
-        .filter(sor -> sor.getRegistrationRef().toUpperCase().equals(registrationReference.toUpperCase()))
+  public Optional<List<OgelRegistrationView>> getRegistrations(String userId, String registrationReference) {
+    return getSpireOgelRegistrations(userId).map(registrations -> registrations
+        .stream()
+        .filter(sor -> sor.getRegistrationRef().equalsIgnoreCase(registrationReference))
         .map(this::getOgelRegistrationView)
-        .collect(Collectors.toList());
+        .collect(Collectors.toList()));
   }
 
-  private List<SpireOgelRegistration> getSpireOgelRegistrations(String userId) {
+  /**
+   * Returns {@link Optional#empty()} when {@link SpireUserNotFoundException} is thrown, otherwise {@link Optional#of(Object)}.
+   */
+  private Optional<List<SpireOgelRegistration>> getSpireOgelRegistrations(String userId) {
     SpireRequest request = registrationClient.createRequest();
     request.addChild("userId", userId);
-    return registrationClient.sendRequest(request);
+    try {
+      return Optional.of(registrationClient.sendRequest(request));
+    } catch (SpireUserNotFoundException e) {
+      return Optional.empty();
+    }
   }
 
   private OgelRegistrationView getOgelRegistrationView(SpireOgelRegistration spireOgelRegistration) {
