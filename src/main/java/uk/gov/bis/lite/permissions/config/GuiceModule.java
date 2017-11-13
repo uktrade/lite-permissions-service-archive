@@ -34,8 +34,8 @@ import uk.gov.bis.lite.permissions.service.ProcessSubmissionService;
 import uk.gov.bis.lite.permissions.service.ProcessSubmissionServiceImpl;
 import uk.gov.bis.lite.permissions.service.RegisterService;
 import uk.gov.bis.lite.permissions.service.RegisterServiceImpl;
-import uk.gov.bis.lite.permissions.service.RegistrationsService;
-import uk.gov.bis.lite.permissions.service.RegistrationsServiceImpl;
+import uk.gov.bis.lite.permissions.service.RegistrationService;
+import uk.gov.bis.lite.permissions.service.RegistrationServiceImpl;
 import uk.gov.bis.lite.permissions.service.SubmissionService;
 import uk.gov.bis.lite.permissions.service.SubmissionServiceImpl;
 import uk.gov.bis.lite.permissions.spire.clients.SpireLicencesClient;
@@ -108,7 +108,7 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
     bind(OgelSubmissionDao.class).to(OgelSubmissionDaoImpl.class);
 
     bind(RegisterService.class).to(RegisterServiceImpl.class);
-    bind(RegistrationsService.class).to(RegistrationsServiceImpl.class);
+    bind(RegistrationService.class).to(RegistrationServiceImpl.class);
     bind(SubmissionService.class).to(SubmissionServiceImpl.class);
     bind(CallbackService.class).to(CallbackServiceImpl.class);
     bind(ProcessSubmissionService.class).to(ProcessSubmissionServiceImpl.class);

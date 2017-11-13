@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
-import uk.gov.bis.lite.permissions.service.RegistrationsService;
+import uk.gov.bis.lite.permissions.service.RegistrationService;
 import uk.gov.bis.lite.permissions.service.model.registration.MultipleRegistrationResult;
 import uk.gov.bis.lite.permissions.service.model.registration.SingleRegistrationResult;
 
@@ -31,11 +31,11 @@ import javax.ws.rs.core.Response;
 public class OgelRegistrationResource {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(OgelRegistrationResource.class);
-  private RegistrationsService registrationsService;
+  private RegistrationService registrationService;
 
   @Inject
-  public OgelRegistrationResource(RegistrationsService registrationsService) {
-    this.registrationsService = registrationsService;
+  public OgelRegistrationResource(RegistrationService registrationService) {
+    this.registrationService = registrationService;
   }
 
   @GET
@@ -53,13 +53,13 @@ public class OgelRegistrationResource {
   }
 
   private List<OgelRegistrationView> getAllRegistrations(String userId) {
-    MultipleRegistrationResult registrations = registrationsService.getRegistrations(userId);
+    MultipleRegistrationResult registrations = registrationService.getRegistrations(userId);
     validateServiceResult(registrations);
     return registrations.getResult();
   }
 
   private List<OgelRegistrationView> getRegistrationByRef(String userId, String registrationReference) {
-    SingleRegistrationResult registration = registrationsService.getRegistration(userId, registrationReference);
+    SingleRegistrationResult registration = registrationService.getRegistration(userId, registrationReference);
     validateServiceResult(registration);
     return registration.getResult()
         .map(ImmutableList::of)

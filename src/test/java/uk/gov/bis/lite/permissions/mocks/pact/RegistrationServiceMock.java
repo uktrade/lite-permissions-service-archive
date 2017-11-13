@@ -4,7 +4,7 @@ import static java.util.Collections.emptyList;
 
 import com.google.inject.Singleton;
 import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
-import uk.gov.bis.lite.permissions.service.RegistrationsService;
+import uk.gov.bis.lite.permissions.service.RegistrationService;
 import uk.gov.bis.lite.permissions.service.model.registration.MultipleRegistrationResult;
 import uk.gov.bis.lite.permissions.service.model.registration.SingleRegistrationResult;
 
@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Singleton
-public class RegistrationsServiceMock implements RegistrationsService {
+public class RegistrationServiceMock implements RegistrationService {
 
   private boolean noResults = false;
   private boolean userNotFound = false;

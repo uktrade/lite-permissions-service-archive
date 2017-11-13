@@ -16,14 +16,14 @@ import uk.gov.bis.lite.permissions.spire.model.SpireOgelRegistration;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class RegistrationsServiceImpl implements RegistrationsService {
+public class RegistrationServiceImpl implements RegistrationService {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationsServiceImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationServiceImpl.class);
 
   private SpireOgelRegistrationClient registrationClient;
 
   @Inject
-  public RegistrationsServiceImpl(SpireOgelRegistrationClient registrationClient) {
+  public RegistrationServiceImpl(SpireOgelRegistrationClient registrationClient) {
     this.registrationClient = registrationClient;
   }
 

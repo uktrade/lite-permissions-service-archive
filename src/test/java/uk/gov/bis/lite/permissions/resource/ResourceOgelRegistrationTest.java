@@ -14,7 +14,7 @@ import org.junit.Test;
 import uk.gov.bis.lite.common.jwt.LiteJwtAuthFilterHelper;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
-import uk.gov.bis.lite.permissions.mocks.RegistrationsServiceMock;
+import uk.gov.bis.lite.permissions.mocks.RegistrationServiceMock;
 
 import java.util.List;
 import java.util.Map;
@@ -31,7 +31,7 @@ public class ResourceOgelRegistrationTest {
   private static int MOCK_REGISTRATIONS_NUMBER = 3;
   private static String MOCK_REGISTRATION_TAG = "SPIRE";
   private static String JWT_SHARED_SECRET = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
-  private static RegistrationsServiceMock mockRegistrationsService = new RegistrationsServiceMock(MOCK_REGISTRATION_TAG, MOCK_REGISTRATIONS_NUMBER);
+  private static RegistrationServiceMock mockRegistrationsService = new RegistrationServiceMock(MOCK_REGISTRATION_TAG, MOCK_REGISTRATIONS_NUMBER);
 
   @Before
   public void setUp() throws Exception {
