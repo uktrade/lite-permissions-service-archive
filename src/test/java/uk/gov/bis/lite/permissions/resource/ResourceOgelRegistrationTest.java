@@ -47,10 +47,11 @@ public class ResourceOgelRegistrationTest {
 
   @Test
   public void viewOgelRegistrations() {
+    String token = generateToken(JWT_SHARED_SECRET, "1");
     Response response = resources.getJerseyTest()
         .target("/ogel-registrations/user/1")
         .request()
-        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "1"))
+        .header("Authorization", "Bearer " + token)
         .get();
     assertThat(status(response)).isEqualTo(OK);
     assertThat(getOgelRegistrationsResponse(response).size()).isEqualTo(MOCK_REGISTRATIONS_NUMBER);
@@ -67,10 +68,11 @@ public class ResourceOgelRegistrationTest {
 
   @Test
   public void viewOgelRegistrationsJwtUserIdMismatch() {
+    String token = generateToken(JWT_SHARED_SECRET, "999");
     Response response = resources.getJerseyTest()
         .target("/ogel-registrations/user/1")
         .request()
-        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "999"))
+        .header("Authorization", "Bearer " + token)
         .get();
     assertThat(status(response)).isEqualTo(UNAUTHORIZED);
     Map<String, String> map = response.readEntity(new GenericType<Map<String, String>>(){});
@@ -95,11 +97,25 @@ public class ResourceOgelRegistrationTest {
   @Test
   public void viewOgelRegistrationsWithParam2() {
     mockRegistrationsService.setUserNotFound(true); // Update mockRegistrationsService first
+    String token = generateToken(JWT_SHARED_SECRET, "1");
     Response response = resources.getJerseyTest()
         .target("/ogel-registrations/user/1")
         .queryParam("registrationReference", "NOT_THERE")
         .request()
-        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "1"))
+        .header("Authorization", "Bearer " + token)
+        .get();
+    assertThat(status(response)).isEqualTo(NOT_FOUND);
+  }
+
+  @Test
+  public void viewOgelRegistrationsWithParam3() {
+    mockRegistrationsService.setNoResults(true);
+    String token = generateToken(JWT_SHARED_SECRET, "1");
+    Response response = resources.getJerseyTest()
+        .target("/ogel-registrations/user/1")
+        .queryParam("registrationReference", MOCK_REGISTRATION_TAG + "1")
+        .request()
+        .header("Authorization", "Bearer " + token)
         .get();
     assertThat(status(response)).isEqualTo(NOT_FOUND);
   }
@@ -107,10 +123,11 @@ public class ResourceOgelRegistrationTest {
   @Test
   public void viewOgelRegistrationsNoResults() {
     mockRegistrationsService.setNoResults(true); // Update mockRegistrationsService first
+    String token = generateToken(JWT_SHARED_SECRET, "1");
     Response response = resources.getJerseyTest()
         .target("/ogel-registrations/user/1")
         .request()
-        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "1"))
+        .header("Authorization", "Bearer " + token)
         .get();
     assertThat(status(response)).isEqualTo(OK);
     assertThat(getOgelRegistrationsResponse(response).isEmpty()).isTrue();

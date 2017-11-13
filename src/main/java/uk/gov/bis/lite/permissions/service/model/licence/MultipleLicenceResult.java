@@ -1,4 +1,4 @@
-package uk.gov.bis.lite.permissions.service.model;
+package uk.gov.bis.lite.permissions.service.model.licence;
 
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
 

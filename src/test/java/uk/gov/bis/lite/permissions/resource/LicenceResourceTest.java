@@ -1,9 +1,7 @@
 package uk.gov.bis.lite.permissions.resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.bis.lite.permissions.api.view.LicenceTestUtil.assertLicenceViewA;
 import static uk.gov.bis.lite.permissions.api.view.LicenceTestUtil.assertLicenceViewB;
@@ -23,8 +21,8 @@ import uk.gov.bis.lite.common.jwt.LiteJwtAuthFilterHelper;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
 import uk.gov.bis.lite.permissions.service.LicenceService;
-import uk.gov.bis.lite.permissions.service.model.SingleLicenceResult;
-import uk.gov.bis.lite.permissions.service.model.MultipleLicenceResult;
+import uk.gov.bis.lite.permissions.service.model.licence.MultipleLicenceResult;
+import uk.gov.bis.lite.permissions.service.model.licence.SingleLicenceResult;
 
 import java.util.Arrays;
 import java.util.Collections;

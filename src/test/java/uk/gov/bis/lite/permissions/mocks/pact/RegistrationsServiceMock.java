@@ -5,10 +5,11 @@ import static java.util.Collections.emptyList;
 import com.google.inject.Singleton;
 import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
 import uk.gov.bis.lite.permissions.service.RegistrationsService;
+import uk.gov.bis.lite.permissions.service.model.registration.MultipleRegistrationResult;
+import uk.gov.bis.lite.permissions.service.model.registration.SingleRegistrationResult;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @Singleton
 public class RegistrationsServiceMock implements RegistrationsService {
@@ -21,23 +22,23 @@ public class RegistrationsServiceMock implements RegistrationsService {
     setUserNotFound(false);
   }
 
-  public Optional<List<OgelRegistrationView>> getRegistrations(String userId, String registrationReference) {
+  public SingleRegistrationResult getRegistration(String userId, String registrationReference) {
     if (userNotFound) {
-      return Optional.empty();
+      return SingleRegistrationResult.userIdNotFound();
     } else if (noResults) {
-      return Optional.of(emptyList());
+      return SingleRegistrationResult.empty();
     } else {
-      return Optional.of(buildRegistrations());
+      return SingleRegistrationResult.ok(buildRegistrations().get(0));
     }
   }
 
-  public Optional<List<OgelRegistrationView>> getRegistrations(String userId) {
+  public MultipleRegistrationResult getRegistrations(String userId) {
     if (userNotFound) {
-      return Optional.empty();
+      return MultipleRegistrationResult.userIdNotFound();
     } else if (noResults) {
-      return Optional.of(emptyList());
+      return MultipleRegistrationResult.ok(emptyList());
     } else {
-      return Optional.of(buildRegistrations());
+      return MultipleRegistrationResult.ok(buildRegistrations());
     }
   }
 

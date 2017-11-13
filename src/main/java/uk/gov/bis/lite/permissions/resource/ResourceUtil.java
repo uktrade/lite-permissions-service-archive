@@ -1,12 +1,19 @@
 package uk.gov.bis.lite.permissions.resource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
+import uk.gov.bis.lite.permissions.service.model.ServiceResult;
+import uk.gov.bis.lite.permissions.service.model.licence.LicenceServiceResult;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 public class ResourceUtil {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ResourceUtil.class);
+
   private ResourceUtil() {
   }
 
@@ -20,6 +27,20 @@ public class ResourceUtil {
    if (!StringUtils.equals(userId, user.getUserId())) {
       throw new WebApplicationException("userId \"" + userId + "\" does not match value supplied in token (" +
           user.getUserId() + ")", Response.Status.UNAUTHORIZED);
+    }
+  }
+
+  /**
+   * Validates the given service result, throws a {@link WebApplicationException} when {@link ServiceResult#isOk()} is false
+   * @param serviceResult
+   */
+  static void validateServiceResult(ServiceResult<?> serviceResult) {
+    if (!serviceResult.isOk()) {
+      if (serviceResult.getStatus() == ServiceResult.Status.USER_ID_NOT_FOUND) {
+        throw new WebApplicationException("User not found.", Response.Status.NOT_FOUND);
+      } else {
+        throw new WebApplicationException("Unexpected value for ServiceResult.Status", Response.Status.INTERNAL_SERVER_ERROR);
+      }
     }
   }
 }

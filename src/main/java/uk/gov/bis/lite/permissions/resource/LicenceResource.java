@@ -1,5 +1,6 @@
 package uk.gov.bis.lite.permissions.resource;
 
+import static uk.gov.bis.lite.permissions.resource.ResourceUtil.validateServiceResult;
 import static uk.gov.bis.lite.permissions.resource.ResourceUtil.validateUserIdToJwt;
 
 import com.google.common.collect.ImmutableList;
@@ -11,9 +12,8 @@ import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
 import uk.gov.bis.lite.permissions.service.LicenceService;
-import uk.gov.bis.lite.permissions.service.model.LicenceServiceResult;
-import uk.gov.bis.lite.permissions.service.model.MultipleLicenceResult;
-import uk.gov.bis.lite.permissions.service.model.SingleLicenceResult;
+import uk.gov.bis.lite.permissions.service.model.licence.MultipleLicenceResult;
+import uk.gov.bis.lite.permissions.service.model.licence.SingleLicenceResult;
 
 import java.util.List;
 
@@ -57,7 +57,7 @@ public class LicenceResource {
 
   List<LicenceView> getLicenceByRef(String userId, String ref) {
     SingleLicenceResult licenceResult = licenceService.getLicence(userId, ref);
-    validateResult(licenceResult);
+    validateServiceResult(licenceResult);
     return licenceResult.getResult()
         .map(ImmutableList::of)
         .orElseThrow(() -> new WebApplicationException(String.format("No licence with ref \"%s\" found " +
@@ -66,27 +66,17 @@ public class LicenceResource {
 
   List<LicenceView> getAllLicences(String userId) {
     MultipleLicenceResult licencesResult = licenceService.getLicences(userId);
-    validateResult(licencesResult);
+    validateServiceResult(licencesResult);
     return licencesResult.getResult();
   }
 
   List<LicenceView> getLicencesByType(String userId, String type) {
     if (StringUtils.equalsIgnoreCase(type, LicenceService.LicenceTypeParam.SIEL.name())) {
       MultipleLicenceResult licencesResult = licenceService.getLicences(userId, LicenceService.LicenceTypeParam.SIEL);
-      validateResult(licencesResult);
+      validateServiceResult(licencesResult);
       return licencesResult.getResult();
     } else {
       throw new WebApplicationException(String.format("Invalid licence type \"%s\"", type), Response.Status.BAD_REQUEST);
-    }
-  }
-
-  static void validateResult(LicenceServiceResult<?> serviceResult) {
-    if (!serviceResult.isOk()) {
-      if (serviceResult.getStatus() == LicenceServiceResult.Status.USER_ID_NOT_FOUND) {
-        throw new WebApplicationException("User not found.", Response.Status.NOT_FOUND);
-      } else {
-        LOGGER.warn("Unexpected value for LicenceServiceResult.Status");
-      }
     }
   }
 }

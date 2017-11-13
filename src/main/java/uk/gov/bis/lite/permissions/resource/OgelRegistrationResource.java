@@ -1,7 +1,9 @@
 package uk.gov.bis.lite.permissions.resource;
 
+import static uk.gov.bis.lite.permissions.resource.ResourceUtil.validateServiceResult;
 import static uk.gov.bis.lite.permissions.resource.ResourceUtil.validateUserIdToJwt;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import io.dropwizard.auth.Auth;
 import org.apache.commons.lang3.StringUtils;
@@ -10,9 +12,10 @@ import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
 import uk.gov.bis.lite.permissions.service.RegistrationsService;
+import uk.gov.bis.lite.permissions.service.model.registration.MultipleRegistrationResult;
+import uk.gov.bis.lite.permissions.service.model.registration.SingleRegistrationResult;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
@@ -42,20 +45,25 @@ public class OgelRegistrationResource {
                                                           @QueryParam("registrationReference") String registrationReference,
                                                           @Auth LiteJwtUser user) {
     validateUserIdToJwt(userId, user);
-
-    Optional<List<OgelRegistrationView>> results;
-
-    if (StringUtils.isBlank(registrationReference)) {
-      results = registrationsService.getRegistrations(userId);
+    if (StringUtils.isNotBlank(registrationReference)) {
+      return getRegistrationByRef(userId, registrationReference);
     } else {
-      results = registrationsService.getRegistrations(userId, registrationReference);
-    }
-
-    if (results.isPresent()) {
-      return results.get();
-    } else {
-      throw new WebApplicationException(String.format("userId %s not found.", userId), Response.Status.NOT_FOUND);
+      return getAllRegistrations(userId);
     }
   }
 
+  private List<OgelRegistrationView> getAllRegistrations(String userId) {
+    MultipleRegistrationResult registrations = registrationsService.getRegistrations(userId);
+    validateServiceResult(registrations);
+    return registrations.getResult();
+  }
+
+  private List<OgelRegistrationView> getRegistrationByRef(String userId, String registrationReference) {
+    SingleRegistrationResult registration = registrationsService.getRegistration(userId, registrationReference);
+    validateServiceResult(registration);
+    return registration.getResult()
+        .map(ImmutableList::of)
+        .orElseThrow(() -> new WebApplicationException(String.format("No licence with ref \"%s\" found " +
+            "for userId \"%s\"", registrationReference, userId), Response.Status.NOT_FOUND));
+  }
 }

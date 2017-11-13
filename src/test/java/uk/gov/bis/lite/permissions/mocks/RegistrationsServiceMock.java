@@ -5,11 +5,11 @@ import static java.util.Collections.emptyList;
 import com.google.inject.Singleton;
 import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
 import uk.gov.bis.lite.permissions.service.RegistrationsService;
+import uk.gov.bis.lite.permissions.service.model.registration.MultipleRegistrationResult;
+import uk.gov.bis.lite.permissions.service.model.registration.SingleRegistrationResult;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Singleton
 public class RegistrationsServiceMock implements RegistrationsService {
@@ -46,24 +46,29 @@ public class RegistrationsServiceMock implements RegistrationsService {
     }
   }
 
-  public Optional<List<OgelRegistrationView>> getRegistrations(String userId, String registrationReference) {
+  public SingleRegistrationResult getRegistration(String userId, String registrationReference) {
     if (userNotFound) {
-      return Optional.empty();
+      return SingleRegistrationResult.userIdNotFound();
     }
     if (noResults) {
-      return Optional.of(emptyList());
+      return SingleRegistrationResult.empty();
     }
-    return Optional.of(mockRegistrations.stream().filter(or -> or.getRegistrationReference().equals(registrationReference)).collect(Collectors.toList()));
+    OgelRegistrationView registration = mockRegistrations
+        .stream()
+        .filter(or -> or.getRegistrationReference().equals(registrationReference))
+        .findFirst()
+        .get();
+    return SingleRegistrationResult.ok(registration);
   }
 
-  public Optional<List<OgelRegistrationView>> getRegistrations(String userId) {
+  public MultipleRegistrationResult getRegistrations(String userId) {
     if (userNotFound) {
-      return Optional.empty();
+      return MultipleRegistrationResult.userIdNotFound();
     }
     if (noResults) {
-      return Optional.of(emptyList());
+      return MultipleRegistrationResult.ok(emptyList());
     }
-    return Optional.of(mockRegistrations);
+    return MultipleRegistrationResult.ok(mockRegistrations);
   }
 
   public void setNoResults(boolean noResults) {

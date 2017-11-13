@@ -12,8 +12,8 @@ import static uk.gov.bis.lite.permissions.api.view.LicenceTestUtil.generateSpire
 import org.junit.Test;
 import uk.gov.bis.lite.common.spire.client.SpireRequest;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
-import uk.gov.bis.lite.permissions.service.model.SingleLicenceResult;
-import uk.gov.bis.lite.permissions.service.model.MultipleLicenceResult;
+import uk.gov.bis.lite.permissions.service.model.licence.MultipleLicenceResult;
+import uk.gov.bis.lite.permissions.service.model.licence.SingleLicenceResult;
 import uk.gov.bis.lite.permissions.spire.clients.SpireLicencesClient;
 import uk.gov.bis.lite.permissions.spire.exceptions.SpireUserNotFoundException;
 

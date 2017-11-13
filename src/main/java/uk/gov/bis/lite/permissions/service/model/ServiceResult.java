@@ -1,10 +1,6 @@
 package uk.gov.bis.lite.permissions.service.model;
 
-/**
- * Wrapper for {@link uk.gov.bis.lite.permissions.service.LicenceService} service calls
- * @param <T> Type to wrap
- */
-public abstract class LicenceServiceResult<T> {
+public abstract class ServiceResult<T> {
   public enum Status {
     OK,
     USER_ID_NOT_FOUND
@@ -14,7 +10,7 @@ public abstract class LicenceServiceResult<T> {
 
   private final T result;
 
-  LicenceServiceResult (Status status, T result) {
+  public ServiceResult (Status status, T result) {
     this.status = status;
     this.result = result;
   }
