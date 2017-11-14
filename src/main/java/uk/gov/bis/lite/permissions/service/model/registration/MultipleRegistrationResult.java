@@ -1,20 +1,29 @@
 package uk.gov.bis.lite.permissions.service.model.registration;
 
 import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
+import uk.gov.bis.lite.permissions.service.model.Status;
 
+import java.util.Collections;
 import java.util.List;
 
-public class MultipleRegistrationResult extends RegistrationServiceResult<List<OgelRegistrationView>> {
-  MultipleRegistrationResult(Status status, List<OgelRegistrationView> result) {
-    super(status, result);
+public class MultipleRegistrationResult {
+  private final Status status;
+  private final  List<OgelRegistrationView> registrationViews;
+
+  public MultipleRegistrationResult(Status status, List<OgelRegistrationView> registrationViews) {
+    this.status = status;
+    if (registrationViews == null) {
+      this.registrationViews = Collections.emptyList();
+    } else {
+      this.registrationViews = registrationViews;
+    }
   }
 
-  public static MultipleRegistrationResult ok(List<OgelRegistrationView> result) {
-    return new MultipleRegistrationResult(Status.OK, result);
+  public Status getStatus() {
+    return status;
   }
 
-  public static MultipleRegistrationResult userIdNotFound() {
-    return new MultipleRegistrationResult(Status.USER_ID_NOT_FOUND, null);
+  public List<OgelRegistrationView> getRegistrationViews() {
+    return registrationViews;
   }
-
 }

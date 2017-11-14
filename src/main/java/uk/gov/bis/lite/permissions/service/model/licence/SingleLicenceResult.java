@@ -1,24 +1,24 @@
 package uk.gov.bis.lite.permissions.service.model.licence;
 
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
+import uk.gov.bis.lite.permissions.service.model.Status;
 
 import java.util.Optional;
 
-public class SingleLicenceResult extends LicenceServiceResult<Optional<LicenceView>> {
-  SingleLicenceResult(Status status, Optional<LicenceView> result) {
-    super(status, result);
+public class SingleLicenceResult {
+  private final Status status;
+  private final Optional<LicenceView> licenceView;
+
+  public SingleLicenceResult(Status status, LicenceView licenceView) {
+    this.status = status;
+    this.licenceView = Optional.ofNullable(licenceView);
   }
 
-  public static SingleLicenceResult ok(LicenceView result) {
-    return new SingleLicenceResult(Status.OK, Optional.ofNullable(result));
+  public Status getStatus() {
+    return status;
   }
 
-  public static SingleLicenceResult empty() {
-    return ok(null);
+  public Optional<LicenceView> getLicenceView() {
+    return licenceView;
   }
-
-  public static SingleLicenceResult userIdNotFound() {
-    return new SingleLicenceResult(Status.USER_ID_NOT_FOUND, null);
-  }
-
 }

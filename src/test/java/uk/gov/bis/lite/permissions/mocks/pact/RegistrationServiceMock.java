@@ -5,6 +5,7 @@ import static java.util.Collections.emptyList;
 import com.google.inject.Singleton;
 import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
 import uk.gov.bis.lite.permissions.service.RegistrationService;
+import uk.gov.bis.lite.permissions.service.model.Status;
 import uk.gov.bis.lite.permissions.service.model.registration.MultipleRegistrationResult;
 import uk.gov.bis.lite.permissions.service.model.registration.SingleRegistrationResult;
 
@@ -24,21 +25,21 @@ public class RegistrationServiceMock implements RegistrationService {
 
   public SingleRegistrationResult getRegistration(String userId, String registrationReference) {
     if (userNotFound) {
-      return SingleRegistrationResult.userIdNotFound();
+      return new SingleRegistrationResult(Status.USER_ID_NOT_FOUND, null);
     } else if (noResults) {
-      return SingleRegistrationResult.empty();
+      return new SingleRegistrationResult(Status.OK, null);
     } else {
-      return SingleRegistrationResult.ok(buildRegistrations().get(0));
+      return new SingleRegistrationResult(Status.OK, buildRegistrations().get(0));
     }
   }
 
   public MultipleRegistrationResult getRegistrations(String userId) {
     if (userNotFound) {
-      return MultipleRegistrationResult.userIdNotFound();
+      return new MultipleRegistrationResult(Status.USER_ID_NOT_FOUND, null);
     } else if (noResults) {
-      return MultipleRegistrationResult.ok(emptyList());
+      return new MultipleRegistrationResult(Status.OK, null);
     } else {
-      return MultipleRegistrationResult.ok(buildRegistrations());
+      return new MultipleRegistrationResult(Status.OK, buildRegistrations());
     }
   }
 

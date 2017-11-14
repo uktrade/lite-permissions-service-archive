@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.common.spire.client.SpireRequest;
 import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
 import uk.gov.bis.lite.permissions.exception.OgelRegistrationServiceException;
+import uk.gov.bis.lite.permissions.service.model.Status;
 import uk.gov.bis.lite.permissions.service.model.registration.MultipleRegistrationResult;
 import uk.gov.bis.lite.permissions.service.model.registration.SingleRegistrationResult;
 import uk.gov.bis.lite.permissions.spire.clients.SpireOgelRegistrationClient;
@@ -38,9 +39,9 @@ public class RegistrationServiceImpl implements RegistrationService {
           .stream()
           .map(this::getOgelRegistrationView)
           .collect(Collectors.toList());
-      return MultipleRegistrationResult.ok(registrations);
+      return new MultipleRegistrationResult(Status.OK, registrations);
     } catch (SpireUserNotFoundException e) {
-      return MultipleRegistrationResult.userIdNotFound();
+      return new MultipleRegistrationResult(Status.USER_ID_NOT_FOUND, null);
     }
   }
 
@@ -57,14 +58,14 @@ public class RegistrationServiceImpl implements RegistrationService {
           .map(this::getOgelRegistrationView)
           .collect(Collectors.toList());
       if (registrations.isEmpty()) {
-        return SingleRegistrationResult.empty();
+        return new SingleRegistrationResult(Status.OK, null);
       } else if (registrations.size() == 1) {
-        return SingleRegistrationResult.ok(registrations.get(0));
+        return new SingleRegistrationResult(Status.OK, registrations.get(0));
       } else {
         throw new OgelRegistrationServiceException(String.format("Too many results from spire client, expected 1 but got %d", registrations.size()));
       }
     } catch (SpireUserNotFoundException e) {
-      return SingleRegistrationResult.userIdNotFound();
+      return new SingleRegistrationResult(Status.USER_ID_NOT_FOUND, null);
     }
   }
 

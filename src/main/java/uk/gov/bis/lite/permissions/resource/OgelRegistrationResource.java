@@ -1,6 +1,6 @@
 package uk.gov.bis.lite.permissions.resource;
 
-import static uk.gov.bis.lite.permissions.resource.ResourceUtil.validateServiceResult;
+import static uk.gov.bis.lite.permissions.resource.ResourceUtil.validateServiceStatus;
 import static uk.gov.bis.lite.permissions.resource.ResourceUtil.validateUserIdToJwt;
 
 import com.google.common.collect.ImmutableList;
@@ -54,14 +54,15 @@ public class OgelRegistrationResource {
 
   private List<OgelRegistrationView> getAllRegistrations(String userId) {
     MultipleRegistrationResult registrations = registrationService.getRegistrations(userId);
-    validateServiceResult(registrations);
-    return registrations.getResult();
+    validateServiceStatus(registrations.getStatus());
+    return registrations.getRegistrationViews();
   }
 
   private List<OgelRegistrationView> getRegistrationByRef(String userId, String registrationReference) {
     SingleRegistrationResult registration = registrationService.getRegistration(userId, registrationReference);
-    validateServiceResult(registration);
-    return registration.getResult()
+    validateServiceStatus(registration.getStatus());
+
+    return registration.getRegistrationView()
         .map(ImmutableList::of)
         .orElseThrow(() -> new WebApplicationException(String.format("No licence with ref \"%s\" found " +
             "for userId \"%s\"", registrationReference, userId), Response.Status.NOT_FOUND));

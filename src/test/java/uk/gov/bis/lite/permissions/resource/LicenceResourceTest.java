@@ -21,6 +21,7 @@ import uk.gov.bis.lite.common.jwt.LiteJwtAuthFilterHelper;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
 import uk.gov.bis.lite.permissions.service.LicenceService;
+import uk.gov.bis.lite.permissions.service.model.Status;
 import uk.gov.bis.lite.permissions.service.model.licence.MultipleLicenceResult;
 import uk.gov.bis.lite.permissions.service.model.licence.SingleLicenceResult;
 
@@ -49,7 +50,7 @@ public class LicenceResourceTest {
   @Test
   public void noParamsSingleLicenceTest() throws Exception {
     when(licenceService.getLicences("123456"))
-        .thenReturn(MultipleLicenceResult.ok(ImmutableList.of(generateLicenceViewA())));
+        .thenReturn(new MultipleLicenceResult(Status.OK, ImmutableList.of(generateLicenceViewA())));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -70,7 +71,7 @@ public class LicenceResourceTest {
   @Test
   public void noParamsMultipleLicencesTest() throws Exception {
     when(licenceService.getLicences("123456"))
-        .thenReturn(MultipleLicenceResult.ok((ImmutableList.of(generateLicenceViewA(), generateLicenceViewB()))));
+        .thenReturn(new MultipleLicenceResult(Status.OK, ImmutableList.of(generateLicenceViewA(), generateLicenceViewB())));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -91,7 +92,7 @@ public class LicenceResourceTest {
   @Test
   public void noParamsNoLicencesTest() throws Exception {
     when(licenceService.getLicences("123456"))
-        .thenReturn(MultipleLicenceResult.ok((Collections.emptyList())));
+        .thenReturn(new MultipleLicenceResult(Status.OK, Collections.emptyList()));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -120,7 +121,7 @@ public class LicenceResourceTest {
   @Test
   public void refParamSingleLicenceTest() throws Exception {
     when(licenceService.getLicence("123456", "REF-123"))
-        .thenReturn(SingleLicenceResult.ok(generateLicenceViewA()));
+        .thenReturn(new SingleLicenceResult(Status.OK, generateLicenceViewA()));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -141,7 +142,7 @@ public class LicenceResourceTest {
   @Test
   public void refParamNoLicenceTest() throws Exception {
     when(licenceService.getLicence("123456", "REF-123"))
-        .thenReturn(SingleLicenceResult.empty());
+        .thenReturn(new SingleLicenceResult(Status.OK, null));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -159,7 +160,7 @@ public class LicenceResourceTest {
   @Test
   public void refParamNoUserIdFoundTest() throws Exception {
     when(licenceService.getLicence("123456", "REF-123"))
-        .thenReturn(SingleLicenceResult.userIdNotFound());
+        .thenReturn(new SingleLicenceResult(Status.USER_ID_NOT_FOUND, null));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -186,7 +187,7 @@ public class LicenceResourceTest {
   @Test
   public void typeParamSingleLicenceTest() throws Exception {
     when(licenceService.getLicences("123456", LicenceService.LicenceTypeParam.SIEL))
-        .thenReturn(MultipleLicenceResult.ok(ImmutableList.of(generateLicenceViewA())));
+        .thenReturn(new MultipleLicenceResult(Status.OK, ImmutableList.of(generateLicenceViewA())));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -206,7 +207,7 @@ public class LicenceResourceTest {
   @Test
   public void typeParamNoUserFoundTest() throws Exception {
     when(licenceService.getLicences("123456", LicenceService.LicenceTypeParam.SIEL))
-        .thenReturn(MultipleLicenceResult.userIdNotFound());
+        .thenReturn(new MultipleLicenceResult(Status.USER_ID_NOT_FOUND, null));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -250,7 +251,7 @@ public class LicenceResourceTest {
   @Test
   public void typeAndRefParamPriorityTest() throws Exception {
    when(licenceService.getLicence("123456", "REF-123"))
-        .thenReturn(SingleLicenceResult.empty());
+        .thenReturn(new SingleLicenceResult(Status.OK, null));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")

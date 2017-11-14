@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import uk.gov.bis.lite.common.spire.client.SpireRequest;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
 import uk.gov.bis.lite.permissions.exception.LicenceServiceException;
+import uk.gov.bis.lite.permissions.service.model.Status;
 import uk.gov.bis.lite.permissions.service.model.licence.MultipleLicenceResult;
 import uk.gov.bis.lite.permissions.service.model.licence.SingleLicenceResult;
 import uk.gov.bis.lite.permissions.spire.adapters.SpireLicenceAdapter;
@@ -36,14 +37,14 @@ public class LicenceServiceImpl implements LicenceService {
           .map(SpireLicenceAdapter::adapt)
           .collect(Collectors.toList());
       if (licences.isEmpty()) {
-        return SingleLicenceResult.empty();
+        return new SingleLicenceResult(Status.OK, null);
       } else if (licences.size() == 1) {
-        return SingleLicenceResult.ok(licences.get(0));
+        return new SingleLicenceResult(Status.OK, licences.get(0));
       } else {
         throw new LicenceServiceException(String.format("Too many results from spire client, expected 1 but got %d", licences.size()));
       }
     } catch (SpireUserNotFoundException e) {
-      return SingleLicenceResult.userIdNotFound();
+      return new SingleLicenceResult(Status.USER_ID_NOT_FOUND, null);
     }
   }
 
@@ -52,13 +53,14 @@ public class LicenceServiceImpl implements LicenceService {
     SpireRequest spireRequest = client.createRequest();
     spireRequest.addChild("userId", userId);
     try {
-      return MultipleLicenceResult.ok(client.sendRequest(spireRequest)
+      List<LicenceView> licenceViews = client.sendRequest(spireRequest)
           .stream()
           .map(SpireLicenceAdapter::adapt)
           .sorted(Comparator.comparing(LicenceView::getLicenceRef))
-          .collect(Collectors.toList()));
+          .collect(Collectors.toList());
+      return new MultipleLicenceResult(Status.OK, licenceViews);
     } catch (SpireUserNotFoundException e) {
-      return MultipleLicenceResult.userIdNotFound();
+      return new MultipleLicenceResult(Status.USER_ID_NOT_FOUND, null);
     }
   }
 
@@ -68,13 +70,14 @@ public class LicenceServiceImpl implements LicenceService {
     spireRequest.addChild("userId", userId);
     spireRequest.addChild("type", type.name());
     try {
-      return MultipleLicenceResult.ok(client.sendRequest(spireRequest)
+      List<LicenceView> licenceViews = client.sendRequest(spireRequest)
           .stream()
           .map(SpireLicenceAdapter::adapt)
           .sorted(Comparator.comparing(LicenceView::getLicenceRef))
-          .collect(Collectors.toList()));
+          .collect(Collectors.toList());
+      return new MultipleLicenceResult(Status.OK, licenceViews);
     } catch (SpireUserNotFoundException e) {
-      return MultipleLicenceResult.userIdNotFound();
+      return new MultipleLicenceResult(Status.USER_ID_NOT_FOUND, null);
     }
   }
 }

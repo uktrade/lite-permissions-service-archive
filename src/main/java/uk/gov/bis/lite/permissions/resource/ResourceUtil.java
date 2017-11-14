@@ -4,8 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
-import uk.gov.bis.lite.permissions.service.model.ServiceResult;
-import uk.gov.bis.lite.permissions.service.model.licence.LicenceServiceResult;
+import uk.gov.bis.lite.permissions.service.model.Status;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -31,16 +30,17 @@ public class ResourceUtil {
   }
 
   /**
-   * Validates the given service result, throws a {@link WebApplicationException} when {@link ServiceResult#isOk()} is false
-   * @param serviceResult
+   * Validates the given service result {@link Status}, throws a {@link WebApplicationException} when not {@link Status#OK}
+   * @param status result status
    */
-  static void validateServiceResult(ServiceResult<?> serviceResult) {
-    if (!serviceResult.isOk()) {
-      if (serviceResult.getStatus() == ServiceResult.Status.USER_ID_NOT_FOUND) {
+  static void validateServiceStatus(Status status) {
+    switch (status) {
+      case OK:
+        return;
+      case USER_ID_NOT_FOUND:
         throw new WebApplicationException("User not found.", Response.Status.NOT_FOUND);
-      } else {
+      default:
         throw new WebApplicationException("Unexpected value for ServiceResult.Status", Response.Status.INTERNAL_SERVER_ERROR);
-      }
     }
   }
 }

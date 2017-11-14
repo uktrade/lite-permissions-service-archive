@@ -5,6 +5,7 @@ import static java.util.Collections.emptyList;
 import com.google.inject.Singleton;
 import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
 import uk.gov.bis.lite.permissions.service.RegistrationService;
+import uk.gov.bis.lite.permissions.service.model.Status;
 import uk.gov.bis.lite.permissions.service.model.registration.MultipleRegistrationResult;
 import uk.gov.bis.lite.permissions.service.model.registration.SingleRegistrationResult;
 
@@ -48,27 +49,27 @@ public class RegistrationServiceMock implements RegistrationService {
 
   public SingleRegistrationResult getRegistration(String userId, String registrationReference) {
     if (userNotFound) {
-      return SingleRegistrationResult.userIdNotFound();
+      return new SingleRegistrationResult(Status.USER_ID_NOT_FOUND, null);
     }
     if (noResults) {
-      return SingleRegistrationResult.empty();
+      return new SingleRegistrationResult(Status.OK, null);
     }
     OgelRegistrationView registration = mockRegistrations
         .stream()
         .filter(or -> or.getRegistrationReference().equals(registrationReference))
         .findFirst()
         .get();
-    return SingleRegistrationResult.ok(registration);
+    return new SingleRegistrationResult(Status.OK, registration);
   }
 
   public MultipleRegistrationResult getRegistrations(String userId) {
     if (userNotFound) {
-      return MultipleRegistrationResult.userIdNotFound();
+      return new MultipleRegistrationResult(Status.USER_ID_NOT_FOUND, null);
     }
     if (noResults) {
-      return MultipleRegistrationResult.ok(emptyList());
+      return new MultipleRegistrationResult(Status.OK, null);
     }
-    return MultipleRegistrationResult.ok(mockRegistrations);
+    return new MultipleRegistrationResult(Status.OK, mockRegistrations);
   }
 
   public void setNoResults(boolean noResults) {

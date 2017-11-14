@@ -1,6 +1,6 @@
 package uk.gov.bis.lite.permissions.resource;
 
-import static uk.gov.bis.lite.permissions.resource.ResourceUtil.validateServiceResult;
+import static uk.gov.bis.lite.permissions.resource.ResourceUtil.validateServiceStatus;
 import static uk.gov.bis.lite.permissions.resource.ResourceUtil.validateUserIdToJwt;
 
 import com.google.common.collect.ImmutableList;
@@ -57,8 +57,8 @@ public class LicenceResource {
 
   List<LicenceView> getLicenceByRef(String userId, String ref) {
     SingleLicenceResult licenceResult = licenceService.getLicence(userId, ref);
-    validateServiceResult(licenceResult);
-    return licenceResult.getResult()
+    validateServiceStatus(licenceResult.getStatus());
+    return licenceResult.getLicenceView()
         .map(ImmutableList::of)
         .orElseThrow(() -> new WebApplicationException(String.format("No licence with ref \"%s\" found " +
           "for userId \"%s\"", ref, userId), Response.Status.NOT_FOUND));
@@ -66,15 +66,15 @@ public class LicenceResource {
 
   List<LicenceView> getAllLicences(String userId) {
     MultipleLicenceResult licencesResult = licenceService.getLicences(userId);
-    validateServiceResult(licencesResult);
-    return licencesResult.getResult();
+    validateServiceStatus(licencesResult.getStatus());
+    return licencesResult.getLicenceViews();
   }
 
   List<LicenceView> getLicencesByType(String userId, String type) {
     if (StringUtils.equalsIgnoreCase(type, LicenceService.LicenceTypeParam.SIEL.name())) {
       MultipleLicenceResult licencesResult = licenceService.getLicences(userId, LicenceService.LicenceTypeParam.SIEL);
-      validateServiceResult(licencesResult);
-      return licencesResult.getResult();
+      validateServiceStatus(licencesResult.getStatus());
+      return licencesResult.getLicenceViews();
     } else {
       throw new WebApplicationException(String.format("Invalid licence type \"%s\"", type), Response.Status.BAD_REQUEST);
     }
