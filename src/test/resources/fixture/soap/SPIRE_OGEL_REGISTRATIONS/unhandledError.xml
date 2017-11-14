@@ -1,0 +1,10 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.fivium.co.uk/fox/webservices/ispire/SPIRE_OGEL_REGISTRATIONS">
+  <soap:Header/>
+  <soap:Body>
+    <ns:getLicencesResponse>
+      <OGEL_REGISTRATION_LIST>
+        <ERROR>Some other error.</ERROR>
+      </OGEL_REGISTRATION_LIST>
+    </ns:getLicencesResponse>
+  </soap:Body>
+</soap:Envelope>

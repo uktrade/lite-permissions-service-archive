@@ -15,7 +15,7 @@ import org.junit.runner.RunWith;
 import ru.vyarus.dropwizard.guice.injector.lookup.InjectorLookup;
 import uk.gov.bis.lite.permissions.PactPermissionsApp;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
-import uk.gov.bis.lite.permissions.mocks.pact.RegistrationsServiceMock;
+import uk.gov.bis.lite.permissions.mocks.pact.RegistrationServiceMock;
 
 @RunWith(PactRunner.class)
 @Provider("lite-permissions-service")
@@ -31,11 +31,21 @@ public class PactProvider {
 
   @State("OGEL registrations exist for provided user")
   public void someRegistrationsState() {
-    InjectorLookup.getInjector(RULE.getApplication()).get().getInstance(RegistrationsServiceMock.class).setHasRegistrations(true);
+    RegistrationServiceMock mock = InjectorLookup.getInjector(RULE.getApplication()).get().getInstance(RegistrationServiceMock.class);
+    mock.resetState();
   }
 
   @State("no OGEL registrations exist for provided user")
   public void noRegistrationsState() {
-    InjectorLookup.getInjector(RULE.getApplication()).get().getInstance(RegistrationsServiceMock.class).setHasRegistrations(false);
+    RegistrationServiceMock mock = InjectorLookup.getInjector(RULE.getApplication()).get().getInstance(RegistrationServiceMock.class);
+    mock.resetState();
+    mock.setNoResults(true);
+  }
+
+  @State("provided user does not exist")
+  public void userDoesNotExistState() {
+    RegistrationServiceMock mock = InjectorLookup.getInjector(RULE.getApplication()).get().getInstance(RegistrationServiceMock.class);
+    mock.resetState();
+    mock.setUserNotFound(true);
   }
 }
