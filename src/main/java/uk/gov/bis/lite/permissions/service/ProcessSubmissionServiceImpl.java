@@ -13,11 +13,9 @@ import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.model.FailEvent;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
-import uk.gov.bis.lite.permissions.util.Util;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -27,27 +25,25 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProcessSubmissionServiceImpl.class);
 
-  private OgelSubmissionDao submissionDao;
-  private CustomerService customerService;
-  private OgelService ogelService;
-  private CallbackService callbackService;
-
-  private int maxMinutesRetryAfterFail;
-  private int maxCallbackFailCount;
-
-  private static final Set<OgelSubmission.FailReason> setStatusCompleteFailReasons = new HashSet<>(Arrays.asList(new OgelSubmission.FailReason[]{
+  private static final Set<OgelSubmission.FailReason> STATUS_COMPLETE_FAIL_REASONS = EnumSet.of(
       OgelSubmission.FailReason.BLACKLISTED,
       OgelSubmission.FailReason.PERMISSION_DENIED,
-      OgelSubmission.FailReason.SITE_ALREADY_REGISTERED}
-  ));
+      OgelSubmission.FailReason.SITE_ALREADY_REGISTERED);
 
   /**
    * Origin of any FailEvent: CUSTOMER, SITE, USER_ROLE, OGEL_CREATE, CALLBACK, UNKNOWN
    */
   public enum Origin {
-    CUSTOMER, SITE, USER_ROLE, OGEL_CREATE, CALLBACK, UNKNOWN;
+    CUSTOMER, SITE, USER_ROLE, OGEL_CREATE, CALLBACK, UNKNOWN
   }
 
+  private final OgelSubmissionDao submissionDao;
+  private final CustomerService customerService;
+  private final OgelService ogelService;
+  private final CallbackService callbackService;
+
+  private final int maxMinutesRetryAfterFail;
+  private final int maxCallbackFailCount;
 
   @Inject
   public ProcessSubmissionServiceImpl(OgelSubmissionDao submissionDao, CustomerService customerService,
@@ -76,15 +72,15 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
 
       // If no FailEvent we attempt callback
       boolean updateToScheduled = sub.hasFailEvent();
-      if(!updateToScheduled) {
-        if(!callbackService.completeCallback(sub)) {
+      if (!updateToScheduled) {
+        if (!callbackService.completeCallback(sub)) {
           // We have callback failure so we need to ensure OgelSubmission mode is set to SCHEDULED
           updateToScheduled = true;
         }
       }
 
       // Change mode of OgelSubmission to SCHEDULED if we have had a previous failure
-      if(updateToScheduled) {
+      if (updateToScheduled) {
         LOGGER.info("Setting submission MODE to SCHEDULED: SubID[{}]", submissionId);
         updateForProcessFailure(sub);
         sub.setScheduledMode();
@@ -268,7 +264,7 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
       sub.setLastFailDateTime();
 
       // Set status to complete with configured fail reason
-      if (setStatusCompleteFailReasons.contains(failReason)) {
+      if (STATUS_COMPLETE_FAIL_REASONS.contains(failReason)) {
         LOGGER.info("Found setStatusComplete FailReason - setting status to COMPLETE SubID[{}]", sub.getId());
         sub.updateStatusToComplete();
       }
@@ -327,33 +323,33 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
   }
 
   private OgelSubmission.Stage getNextStage(OgelSubmission.Stage stage) {
-    OgelSubmission.Stage nextStage = null;
     if (stage == OgelSubmission.Stage.CREATED) {
-      nextStage = OgelSubmission.Stage.CUSTOMER;
+      return OgelSubmission.Stage.CUSTOMER;
     } else if (stage == OgelSubmission.Stage.CUSTOMER) {
-      nextStage = OgelSubmission.Stage.SITE;
+      return OgelSubmission.Stage.SITE;
     } else if (stage == OgelSubmission.Stage.SITE) {
-      nextStage = OgelSubmission.Stage.USER_ROLE;
+      return OgelSubmission.Stage.USER_ROLE;
     } else if (stage == OgelSubmission.Stage.USER_ROLE) {
-      nextStage = OgelSubmission.Stage.OGEL;
+      return OgelSubmission.Stage.OGEL;
+    } else {
+      return null;
     }
-    return nextStage;
   }
 
   private boolean hasCompletedStage(OgelSubmission sub, OgelSubmission.Stage stage) {
-    boolean completed = false;
     if (stage == OgelSubmission.Stage.CREATED) {
-      completed = true;
+      return true;
     } else if (stage == OgelSubmission.Stage.CUSTOMER) {
-      completed = !Util.isBlank(sub.getCustomerRef());
+      return StringUtils.isNotBlank(sub.getCustomerRef());
     } else if (stage == OgelSubmission.Stage.SITE) {
-      completed = !Util.isBlank(sub.getSiteRef());
+      return StringUtils.isNotBlank(sub.getSiteRef());
     } else if (stage == OgelSubmission.Stage.USER_ROLE) {
-      completed = !sub.isRoleUpdate() || sub.isRoleUpdated();
+      return !sub.isRoleUpdate() || sub.isRoleUpdated();
     } else if (stage == OgelSubmission.Stage.OGEL) {
-      completed = !Util.isBlank(sub.getSpireRef());
+      return StringUtils.isNotBlank(sub.getSpireRef());
+    } else {
+      return false;
     }
-    return completed;
   }
 
   private boolean hasCompletedCurrentStage(OgelSubmission sub) {

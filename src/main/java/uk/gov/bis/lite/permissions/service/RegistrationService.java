@@ -1,17 +1,17 @@
 package uk.gov.bis.lite.permissions.service;
 
-import uk.gov.bis.lite.permissions.service.model.registration.MultipleRegistrationResult;
-import uk.gov.bis.lite.permissions.service.model.registration.SingleRegistrationResult;
+import uk.gov.bis.lite.permissions.service.model.RegistrationResult;
 
 public interface RegistrationService {
 
   /**
-   * Get registrations for userId, filtered to registrationReference.
+   * Get registrations for userId.
    */
-  SingleRegistrationResult getRegistration(String userId, String registrationReference);
+  RegistrationResult getRegistrations(String userId);
 
   /**
-   * * Get registrations for userId.
+   * Get registrations for userId, filtered to registrationReference.
    */
-  MultipleRegistrationResult getRegistrations(String userId);
+  RegistrationResult getRegistration(String userId, String reference);
+
 }

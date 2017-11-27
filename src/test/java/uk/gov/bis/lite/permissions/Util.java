@@ -1,47 +1,50 @@
 package uk.gov.bis.lite.permissions;
 
-
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.service.ProcessSubmissionServiceImpl;
 
+import java.util.Map;
+
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.Response;
+
 public class Util {
 
-  public final static String MOCK_CALLBACK_URL = "/callback";
-  public static int MOCK_ID = 1;
-  public static String SUBMISSION_REF = "SUBMISSION_REF";
-  public static String SPIRE_REF = "SPIRE_REF";
-  public static String CUSTOMER_REF = "CUSTOMER_REF";
-  public static String SITE_REF = "SITE_REF";
-  public static String USER_ID = "USER_ID";
-  public static String OGEL_TYPE = "OGEL_TYPE";
-
-  public static String ERROR_MESSAGE = "ERROR_MESSAGE";
+  public static final String MOCK_CALLBACK_URL = "/callback";
+  public static final int MOCK_ID = 1;
+  public static final String SUBMISSION_REF = "SUBMISSION_REF";
+  public static final String SPIRE_REF = "SPIRE_REF";
+  public static final String CUSTOMER_REF = "CUSTOMER_REF";
+  public static final String SITE_REF = "SITE_REF";
+  public static final String ERROR_MESSAGE = "ERROR_MESSAGE";
+  private static final String USER_ID = "USER_ID";
+  private static final String OGEL_TYPE = "OGEL_TYPE";
 
   // Stage
-  public static OgelSubmission.Stage STAGE_CREATED = OgelSubmission.Stage.CREATED;
-  public static OgelSubmission.Stage STAGE_CUSTOMER = OgelSubmission.Stage.CUSTOMER;
-  public static OgelSubmission.Stage STAGE_SITE = OgelSubmission.Stage.SITE;
-  public static OgelSubmission.Stage STAGE_USER_ROLE = OgelSubmission.Stage.USER_ROLE;
-  public static OgelSubmission.Stage STAGE_OGEL = OgelSubmission.Stage.OGEL;
+  public static final OgelSubmission.Stage STAGE_CREATED = OgelSubmission.Stage.CREATED;
+  public static final OgelSubmission.Stage STAGE_CUSTOMER = OgelSubmission.Stage.CUSTOMER;
+  public static final OgelSubmission.Stage STAGE_SITE = OgelSubmission.Stage.SITE;
+  public static final OgelSubmission.Stage STAGE_USER_ROLE = OgelSubmission.Stage.USER_ROLE;
+  public static final OgelSubmission.Stage STAGE_OGEL = OgelSubmission.Stage.OGEL;
 
   // Origins
-  public static ProcessSubmissionServiceImpl.Origin ORIGIN_SITE = ProcessSubmissionServiceImpl.Origin.SITE;
-  public static ProcessSubmissionServiceImpl.Origin ORIGIN_CUSTOMER = ProcessSubmissionServiceImpl.Origin.CUSTOMER;
-  public static ProcessSubmissionServiceImpl.Origin ORIGIN_OGEL_CREATE = ProcessSubmissionServiceImpl.Origin.OGEL_CREATE;
-  public static ProcessSubmissionServiceImpl.Origin ORIGIN_USER_ROLE = ProcessSubmissionServiceImpl.Origin.USER_ROLE;
-  public static ProcessSubmissionServiceImpl.Origin ORIGIN_CALLBACK = ProcessSubmissionServiceImpl.Origin.CALLBACK;
+  public static final ProcessSubmissionServiceImpl.Origin ORIGIN_SITE = ProcessSubmissionServiceImpl.Origin.SITE;
+  public static final ProcessSubmissionServiceImpl.Origin ORIGIN_CUSTOMER = ProcessSubmissionServiceImpl.Origin.CUSTOMER;
+  public static final ProcessSubmissionServiceImpl.Origin ORIGIN_OGEL_CREATE = ProcessSubmissionServiceImpl.Origin.OGEL_CREATE;
+  public static final ProcessSubmissionServiceImpl.Origin ORIGIN_USER_ROLE = ProcessSubmissionServiceImpl.Origin.USER_ROLE;
+  public static final ProcessSubmissionServiceImpl.Origin ORIGIN_CALLBACK = ProcessSubmissionServiceImpl.Origin.CALLBACK;
 
   // Status
-  public static OgelSubmission.Status STATUS_ACTIVE = OgelSubmission.Status.ACTIVE;
-  public static OgelSubmission.Status STATUS_COMPLETE = OgelSubmission.Status.COMPLETE;
-  public static OgelSubmission.Status STATUS_TERMINATED = OgelSubmission.Status.TERMINATED;
+  public static final OgelSubmission.Status STATUS_ACTIVE = OgelSubmission.Status.ACTIVE;
+  public static final OgelSubmission.Status STATUS_COMPLETE = OgelSubmission.Status.COMPLETE;
+  public static final OgelSubmission.Status STATUS_TERMINATED = OgelSubmission.Status.TERMINATED;
 
   // FailReasons
-  public static OgelSubmission.FailReason PERMISSION_DENIED = OgelSubmission.FailReason.PERMISSION_DENIED;
-  public static OgelSubmission.FailReason BLACKLISTED = OgelSubmission.FailReason.BLACKLISTED;
-  public static OgelSubmission.FailReason SITE_ALREADY_REGISTERED = OgelSubmission.FailReason.SITE_ALREADY_REGISTERED;
-  public static OgelSubmission.FailReason ENDPOINT_ERROR = OgelSubmission.FailReason.ENDPOINT_ERROR;
-  public static OgelSubmission.FailReason UNCLASSIFIED = OgelSubmission.FailReason.UNCLASSIFIED;
+  public static final OgelSubmission.FailReason PERMISSION_DENIED = OgelSubmission.FailReason.PERMISSION_DENIED;
+  public static final OgelSubmission.FailReason BLACKLISTED = OgelSubmission.FailReason.BLACKLISTED;
+  public static final OgelSubmission.FailReason SITE_ALREADY_REGISTERED = OgelSubmission.FailReason.SITE_ALREADY_REGISTERED;
+  public static final OgelSubmission.FailReason ENDPOINT_ERROR = OgelSubmission.FailReason.ENDPOINT_ERROR;
+  public static final OgelSubmission.FailReason UNCLASSIFIED = OgelSubmission.FailReason.UNCLASSIFIED;
 
   public static OgelSubmission getMockOgelSubmission(String userId) {
     OgelSubmission sub = getMockOgelSubmission();
@@ -92,4 +95,10 @@ public class Util {
     sub.setCallbackUrl(MOCK_CALLBACK_URL);
     return sub;
   }
+
+  public static Map<String, String> getResponseMap(Response response) {
+    return response.readEntity(new GenericType<Map<String, String>>() {
+    });
+  }
+
 }

@@ -2,17 +2,10 @@ package uk.gov.bis.lite.permissions.util;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.Optional;
 
 import javax.ws.rs.core.Response;
 
 public class Util {
-
-  public static boolean isBlank(String arg) {
-    return StringUtils.isBlank(arg);
-  }
 
   public static String generateHashFromString(String message) {
     byte[] resultByte = DigestUtils.md5(message);
@@ -46,11 +39,4 @@ public class Util {
     return "Status[" + status + "] Body[" + body + "]";
   }
 
-  public static String info(String name, String arg) {
-    return " [" + name + "|" + Optional.ofNullable(arg).map(Object::toString).orElse("null") + "] ";
-  }
-
-  public static String info(String name, Boolean arg) {
-    return " [" + name + "|" + Optional.ofNullable(arg).map(Object::toString).orElse("null") + "] ";
-  }
 }

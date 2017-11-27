@@ -9,7 +9,7 @@ public class CallbackView {
   private String siteId;
 
   public enum Result {
-    SUCCESS, PERMISSION_DENIED, SITE_ALREADY_REGISTERED, BLACKLISTED, FAILED;
+    SUCCESS, PERMISSION_DENIED, SITE_ALREADY_REGISTERED, BLACKLISTED, FAILED
   }
 
   public String getRequestId() {

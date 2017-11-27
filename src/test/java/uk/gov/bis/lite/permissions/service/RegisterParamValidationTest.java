@@ -28,24 +28,22 @@ public class RegisterParamValidationTest {
 
   @Test
   public void testRegisterParamValidation() throws Exception {
-    String PATH = "fixture/registerParam/";
-
     // Valid
-    assertThat(service.isRegisterParamValid(getRegisterParam(fixture(PATH + "valid.json")))).isEqualTo(true);
-    assertThat(service.isRegisterParamValid(getRegisterParam(fixture(PATH + "validNewSiteWithSiteName1.json")))).isEqualTo(true);
-    assertThat(service.isRegisterParamValid(getRegisterParam(fixture(PATH + "validNewSiteWithSiteName2.json")))).isEqualTo(true);
+    assertThat(service.isRegisterParamValid(getRegisterParam(fixture("fixture/registerParam/valid.json")))).isEqualTo(true);
+    assertThat(service.isRegisterParamValid(getRegisterParam(fixture("fixture/registerParam/validNewSiteWithSiteName1.json")))).isEqualTo(true);
+    assertThat(service.isRegisterParamValid(getRegisterParam(fixture("fixture/registerParam/validNewSiteWithSiteName2.json")))).isEqualTo(true);
 
     // Invalid
-    assertThat(service.isRegisterParamValid(getRegisterParam(fixture(PATH + "invalidNewCustomerExistingSite.json")))).isEqualTo(false);
-    assertThat(service.isRegisterParamValid(getRegisterParam(fixture(PATH + "invalidMandatoryFieldMissing1.json")))).isEqualTo(false);
-    assertThat(service.isRegisterParamValid(getRegisterParam(fixture(PATH + "invalidMandatoryFieldMissing2.json")))).isEqualTo(false);
-    assertThat(service.isRegisterParamValid(getRegisterParam(fixture(PATH + "invalidNoCustomer.json")))).isEqualTo(false);
-    assertThat(service.isRegisterParamValid(getRegisterParam(fixture(PATH + "invalidNoSite.json")))).isEqualTo(false);
-    assertThat(service.isRegisterParamValid(getRegisterParam(fixture(PATH + "invalidNewSite1.json")))).isEqualTo(false);
-    assertThat(service.isRegisterParamValid(getRegisterParam(fixture(PATH + "invalidNewSite2.json")))).isEqualTo(false);
-    assertThat(service.isRegisterParamValid(getRegisterParam(fixture(PATH + "invalidNewSite3.json")))).isEqualTo(false);
-    assertThat(service.isRegisterParamValid(getRegisterParam(fixture(PATH + "invalidNewSiteWithoutSiteName1.json")))).isEqualTo(false);
-    assertThat(service.isRegisterParamValid(getRegisterParam(fixture(PATH + "invalidNewSiteWithoutSiteName2.json")))).isEqualTo(false);
+    assertThat(service.isRegisterParamValid(getRegisterParam(fixture("fixture/registerParam/invalidNewCustomerExistingSite.json")))).isEqualTo(false);
+    assertThat(service.isRegisterParamValid(getRegisterParam(fixture("fixture/registerParam/invalidMandatoryFieldMissing1.json")))).isEqualTo(false);
+    assertThat(service.isRegisterParamValid(getRegisterParam(fixture("fixture/registerParam/invalidMandatoryFieldMissing2.json")))).isEqualTo(false);
+    assertThat(service.isRegisterParamValid(getRegisterParam(fixture("fixture/registerParam/invalidNoCustomer.json")))).isEqualTo(false);
+    assertThat(service.isRegisterParamValid(getRegisterParam(fixture("fixture/registerParam/invalidNoSite.json")))).isEqualTo(false);
+    assertThat(service.isRegisterParamValid(getRegisterParam(fixture("fixture/registerParam/invalidNewSite1.json")))).isEqualTo(false);
+    assertThat(service.isRegisterParamValid(getRegisterParam(fixture("fixture/registerParam/invalidNewSite2.json")))).isEqualTo(false);
+    assertThat(service.isRegisterParamValid(getRegisterParam(fixture("fixture/registerParam/invalidNewSite3.json")))).isEqualTo(false);
+    assertThat(service.isRegisterParamValid(getRegisterParam(fixture("fixture/registerParam/invalidNewSiteWithoutSiteName1.json")))).isEqualTo(false);
+    assertThat(service.isRegisterParamValid(getRegisterParam(fixture("fixture/registerParam/invalidNewSiteWithoutSiteName2.json")))).isEqualTo(false);
   }
 
   private RegisterParam getRegisterParam(String json) {

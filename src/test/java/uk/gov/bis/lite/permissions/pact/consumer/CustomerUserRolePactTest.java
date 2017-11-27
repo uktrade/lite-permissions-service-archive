@@ -1,6 +1,5 @@
 package uk.gov.bis.lite.permissions.pact.consumer;
 
-
 import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,16 +23,16 @@ import javax.ws.rs.client.ClientBuilder;
  */
 public class CustomerUserRolePactTest extends CustomerBasePactTest {
 
-  private CustomerService customerService;
-
-  private final static String PROVIDER = "lite-customer-service";
+  private static final String PROVIDER = "lite-customer-service";
 
   private static final String ADMIN_USER_ID = "ADMIN_USER_ID";
   private static final String USER_ID = "USER123";
   private static final String SITE_REF = "SITE123";
 
+  private CustomerService customerService;
+
   @Rule
-  public PactProviderRule mockProvider = new PactProviderRule(PROVIDER, this);
+  public final PactProviderRule mockProvider = new PactProviderRule(PROVIDER, this);
 
   @Before
   public void before() {
@@ -46,12 +45,12 @@ public class CustomerUserRolePactTest extends CustomerBasePactTest {
     return builder
         .given("user role update request is valid")
         .uponReceiving("request to update user role")
-          .path("/user-roles/user/" + USER_ID + "/site/" + SITE_REF)
-          .headers(headers())
-          .method("POST")
-          .body(userRoleParamPactDsl())
-            .willRespondWith()
-              .status(200)
+        .path("/user-roles/user/" + USER_ID + "/site/" + SITE_REF)
+        .headers(headers())
+        .method("POST")
+        .body(userRoleParamPactDsl())
+        .willRespondWith()
+        .status(200)
         .toFragment();
   }
 
@@ -61,12 +60,12 @@ public class CustomerUserRolePactTest extends CustomerBasePactTest {
     return builder
         .given("user role update request is invalid")
         .uponReceiving("request to update user role")
-          .path("/user-roles/user/" + USER_ID + "/site/" + SITE_REF)
-          .headers(headers())
-          .method("POST")
-          .body(userRoleParamPactDsl())
-            .willRespondWith()
-              .status(400)
+        .path("/user-roles/user/" + USER_ID + "/site/" + SITE_REF)
+        .headers(headers())
+        .method("POST")
+        .body(userRoleParamPactDsl())
+        .willRespondWith()
+        .status(400)
         .toFragment();
   }
 

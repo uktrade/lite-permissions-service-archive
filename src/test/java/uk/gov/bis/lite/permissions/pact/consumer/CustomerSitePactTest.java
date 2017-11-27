@@ -1,6 +1,5 @@
 package uk.gov.bis.lite.permissions.pact.consumer;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import au.com.dius.pact.consumer.Pact;
@@ -28,12 +27,13 @@ public class CustomerSitePactTest extends CustomerBasePactTest {
   private CustomerService customerService;
 
   private static final String CUSTOMER_ID = "CUSTOMER_ID";
-  private final static String PROVIDER = "lite-customer-service";
-  private final static String CONSUMER = "lite-permissions-service";
   private static final String SITE_ID_VALUE = "SITE_ID_VALUE";
 
+  private static final String PROVIDER = "lite-customer-service";
+  private static final String CONSUMER = "lite-permissions-service";
+
   @Rule
-  public PactProviderRule mockProvider = new PactProviderRule(PROVIDER, this);
+  public final PactProviderRule mockProvider = new PactProviderRule(PROVIDER, this);
 
   @Before
   public void before() {
@@ -46,15 +46,15 @@ public class CustomerSitePactTest extends CustomerBasePactTest {
     return builder
         .given("new site is valid")
         .uponReceiving("request to create a new site")
-          .path("/customer-sites/" + CUSTOMER_ID)
-          .headers(headers())
-          .method("POST")
-          .query("userId=userId")
-          .body(siteParamPactDsl())
-            .willRespondWith()
-              .headers(headers())
-              .status(200)
-              .body(siteViewPactDsl())
+        .path("/customer-sites/" + CUSTOMER_ID)
+        .headers(headers())
+        .method("POST")
+        .query("userId=userId")
+        .body(siteParamPactDsl())
+        .willRespondWith()
+        .headers(headers())
+        .status(200)
+        .body(siteViewPactDsl())
         .toFragment();
   }
 
@@ -65,13 +65,13 @@ public class CustomerSitePactTest extends CustomerBasePactTest {
     return builder
         .given("new site is invalid")
         .uponReceiving("request to create a new site")
-          .path("/customer-sites/" + CUSTOMER_ID)
-          .headers(headers())
-          .method("POST")
-          .query("userId=")
-          .body(siteParamPactDsl())
-            .willRespondWith()
-            .status(400)
+        .path("/customer-sites/" + CUSTOMER_ID)
+        .headers(headers())
+        .method("POST")
+        .query("userId=")
+        .body(siteParamPactDsl())
+        .willRespondWith()
+        .status(400)
         .toFragment();
   }
 
@@ -81,8 +81,7 @@ public class CustomerSitePactTest extends CustomerBasePactTest {
     OgelSubmission sub = ogelSubmission();
     sub.setCustomerRef(CUSTOMER_ID);
     Optional<String> refOpt = customerService.createSite(sub);
-    assertThat(refOpt).isPresent();
-    assertThat(refOpt.get()).isEqualTo(SITE_ID_VALUE);
+    assertThat(refOpt).hasValue(SITE_ID_VALUE);
   }
 
 

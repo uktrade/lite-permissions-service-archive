@@ -12,9 +12,9 @@ import static uk.gov.bis.lite.permissions.api.view.LicenceTestUtil.generateSpire
 import org.junit.Test;
 import uk.gov.bis.lite.common.spire.client.SpireRequest;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
+import uk.gov.bis.lite.permissions.service.model.LicenceResult;
+import uk.gov.bis.lite.permissions.service.model.LicenceTypeParam;
 import uk.gov.bis.lite.permissions.service.model.Status;
-import uk.gov.bis.lite.permissions.service.model.licence.MultipleLicenceResult;
-import uk.gov.bis.lite.permissions.service.model.licence.SingleLicenceResult;
 import uk.gov.bis.lite.permissions.spire.clients.SpireLicencesClient;
 import uk.gov.bis.lite.permissions.spire.exceptions.SpireUserNotFoundException;
 
@@ -22,23 +22,23 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class LicenceServiceImplTest {
+public class LicenceServiceTest {
 
-  private SpireLicencesClient client = mock(SpireLicencesClient.class);
+  private final SpireLicencesClient client = mock(SpireLicencesClient.class);
 
-  private LicenceServiceImpl service = new LicenceServiceImpl(client);
+  private final LicenceServiceImpl service = new LicenceServiceImpl(client);
 
   @Test
   public void getLicencesSingleTest() throws Exception {
     when(client.createRequest()).thenReturn(mock(SpireRequest.class));
     when(client.sendRequest(any()))
-        .thenReturn(Arrays.asList(generateSpireLicenceA()));
+        .thenReturn(Collections.singletonList(generateSpireLicenceA()));
 
-    MultipleLicenceResult licencesResult = service.getLicences("123456");
-    assertThat(licencesResult.getStatus()).isEqualTo(Status.OK);
-    List<LicenceView> licences = licencesResult.getLicenceViews();
-    assertThat(licences).hasSize(1);
-    assertLicenceViewA(licences.get(0));
+    LicenceResult licenceResult = service.getAllLicences("123456");
+    assertThat(licenceResult.getStatus()).isEqualTo(Status.OK);
+    assertThat(licenceResult.getErrorMessage()).isNull();
+    assertThat(licenceResult.getLicenceViews()).hasSize(1);
+    assertLicenceViewA(licenceResult.getLicenceViews().get(0));
   }
 
   @Test
@@ -47,9 +47,10 @@ public class LicenceServiceImplTest {
     when(client.sendRequest(any()))
         .thenReturn(Arrays.asList(generateSpireLicenceB(), generateSpireLicenceA()));
 
-    MultipleLicenceResult licencesResult = service.getLicences("123456");
-    assertThat(licencesResult.getStatus()).isEqualTo(Status.OK);
-    List<LicenceView> licences = licencesResult.getLicenceViews();
+    LicenceResult licenceResult = service.getAllLicences("123456");
+    assertThat(licenceResult.getStatus()).isEqualTo(Status.OK);
+    assertThat(licenceResult.getErrorMessage()).isNull();
+    List<LicenceView> licences = licenceResult.getLicenceViews();
     assertThat(licences).hasSize(2);
     // Ordering tested here as REF-123 (Licence A) < REF-456 (Licence B)
     assertLicenceViewB(licences.get(1));
@@ -62,10 +63,10 @@ public class LicenceServiceImplTest {
     when(client.sendRequest(any()))
         .thenReturn(Collections.emptyList());
 
-    MultipleLicenceResult licencesResult = service.getLicences("123456");
-    assertThat(licencesResult.getStatus()).isEqualTo(Status.OK);
-    List<LicenceView> licences = licencesResult.getLicenceViews();
-    assertThat(licences).isEmpty();
+    LicenceResult licenceResult = service.getAllLicences("123456");
+    assertThat(licenceResult.getStatus()).isEqualTo(Status.OK);
+    assertThat(licenceResult.getErrorMessage()).isNull();
+    assertThat(licenceResult.getLicenceViews()).isEmpty();
   }
 
   @Test
@@ -73,31 +74,34 @@ public class LicenceServiceImplTest {
     when(client.createRequest()).thenReturn(mock(SpireRequest.class));
     when(client.sendRequest(any())).thenThrow(new SpireUserNotFoundException("User not found"));
 
-    MultipleLicenceResult licencesResult = service.getLicences("123456");
-    assertThat(licencesResult.getStatus()).isEqualTo(Status.USER_ID_NOT_FOUND);
-    assertThat(licencesResult.getLicenceViews()).isEmpty();
+    LicenceResult licenceResult = service.getAllLicences("123456");
+    assertThat(licenceResult.getStatus()).isEqualTo(Status.USER_ID_NOT_FOUND);
+    assertThat(licenceResult.getErrorMessage()).isEqualTo("Unable to find user with user id 123456");
+    assertThat(licenceResult.getLicenceViews()).isNull();
   }
 
   @Test
   public void getLicenceRefMatchesTest() throws Exception {
     when(client.createRequest()).thenReturn(mock(SpireRequest.class));
     when(client.sendRequest(any()))
-        .thenReturn(Arrays.asList(generateSpireLicenceA()));
+        .thenReturn(Collections.singletonList(generateSpireLicenceA()));
 
-    SingleLicenceResult licenceResult = service.getLicence("123456", "REF-123");
+    LicenceResult licenceResult = service.getLicenceByRef("123456", "REF-123");
     assertThat(licenceResult.getStatus()).isEqualTo(Status.OK);
-    assertLicenceViewA(licenceResult.getLicenceView().get());
+    assertThat(licenceResult.getErrorMessage()).isNull();
+    assertThat(licenceResult.getLicenceViews()).hasSize(1);
+    assertLicenceViewA(licenceResult.getLicenceViews().get(0));
   }
 
   @Test
   public void getLicenceRefNoMatchesTest() throws Exception {
     when(client.createRequest()).thenReturn(mock(SpireRequest.class));
-    when(client.sendRequest(any()))
-        .thenReturn(Collections.emptyList());
+    when(client.sendRequest(any())).thenReturn(Collections.emptyList());
 
-    SingleLicenceResult licenceResult = service.getLicence("123456", "REF-9999999");
-    assertThat(licenceResult.getStatus()).isEqualTo(Status.OK);
-    assertThat(licenceResult.getLicenceView().isPresent()).isFalse();
+    LicenceResult licenceResult = service.getLicenceByRef("123456", "REF-9999999");
+    assertThat(licenceResult.getStatus()).isEqualTo(Status.REGISTRATION_NOT_FOUND);
+    assertThat(licenceResult.getErrorMessage()).isEqualTo("No licence with reference REF-9999999 found for userId 123456");
+    assertThat(licenceResult.getLicenceViews()).isNull();
   }
 
   @Test
@@ -105,34 +109,23 @@ public class LicenceServiceImplTest {
     when(client.createRequest()).thenReturn(mock(SpireRequest.class));
     when(client.sendRequest(any())).thenThrow(new SpireUserNotFoundException("User not found"));
 
-    SingleLicenceResult licenceResult = service.getLicence("123456", "REF-123");
+    LicenceResult licenceResult = service.getLicenceByRef("123456", "REF-123");
     assertThat(licenceResult.getStatus()).isEqualTo(Status.USER_ID_NOT_FOUND);
-    assertThat(licenceResult.getLicenceView()).isEmpty();
+    assertThat(licenceResult.getErrorMessage()).isEqualTo("Unable to find user with user id 123456");
+    assertThat(licenceResult.getLicenceViews()).isNull();
   }
 
   @Test
   public void getLicenceTypeMatchesTest() throws Exception {
     when(client.createRequest()).thenReturn(mock(SpireRequest.class));
     when(client.sendRequest(any()))
-        .thenReturn(Arrays.asList(generateSpireLicenceA()));
+        .thenReturn(Collections.singletonList(generateSpireLicenceA()));
 
-    MultipleLicenceResult licencesResult = service.getLicences("123456", LicenceService.LicenceTypeParam.SIEL);
-    assertThat(licencesResult.getStatus()).isEqualTo(Status.OK);
-    List<LicenceView> licences = licencesResult.getLicenceViews();
-    assertThat(licences).hasSize(1);
-    assertLicenceViewA(licences.get(0));
-  }
-
-  @Test
-  public void getLicenceTypeNoMatchesTest() throws Exception {
-    when(client.createRequest()).thenReturn(mock(SpireRequest.class));
-    when(client.sendRequest(any()))
-        .thenReturn(Collections.emptyList());
-
-    MultipleLicenceResult licencesResult = service.getLicences("123456", LicenceService.LicenceTypeParam.OIEL);
-    assertThat(licencesResult.getStatus()).isEqualTo(Status.OK);
-    List<LicenceView> licences = licencesResult.getLicenceViews();
-    assertThat(licences).isEmpty();
+    LicenceResult licenceResult = service.getLicencesByType("123456", LicenceTypeParam.SIEL);
+    assertThat(licenceResult.getStatus()).isEqualTo(Status.OK);
+    assertThat(licenceResult.getErrorMessage()).isNull();
+    assertThat(licenceResult.getLicenceViews()).hasSize(1);
+    assertLicenceViewA(licenceResult.getLicenceViews().get(0));
   }
 
   @Test
@@ -140,8 +133,9 @@ public class LicenceServiceImplTest {
     when(client.createRequest()).thenReturn(mock(SpireRequest.class));
     when(client.sendRequest(any())).thenThrow(new SpireUserNotFoundException("User not found"));
 
-    MultipleLicenceResult licencesResult = service.getLicences("123456", LicenceService.LicenceTypeParam.SIEL);
-    assertThat(licencesResult.getStatus()).isEqualTo(Status.USER_ID_NOT_FOUND);
-    assertThat(licencesResult.getLicenceViews()).isEmpty();
+    LicenceResult licenceResult = service.getLicencesByType("123456", LicenceTypeParam.SIEL);
+    assertThat(licenceResult.getStatus()).isEqualTo(Status.USER_ID_NOT_FOUND);
+    assertThat(licenceResult.getErrorMessage()).isEqualTo("Unable to find user with user id 123456");
+    assertThat(licenceResult.getLicenceViews()).isNull();
   }
 }

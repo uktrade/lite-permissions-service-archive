@@ -10,7 +10,7 @@ public class OgelRegistrationView {
   private Status status;
 
   public enum Status {
-    EXTANT, DEREGISTERED, SURRENDERED, UNKNOWN;
+    EXTANT, DEREGISTERED, SURRENDERED, UNKNOWN
   }
 
   public OgelRegistrationView() {

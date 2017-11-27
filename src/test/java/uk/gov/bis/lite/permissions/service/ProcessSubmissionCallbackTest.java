@@ -2,6 +2,7 @@ package uk.gov.bis.lite.permissions.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.inject.Injector;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
@@ -9,21 +10,21 @@ import org.flywaydb.core.Flyway;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import ru.vyarus.dropwizard.guice.injector.lookup.InjectorLookup;
 import uk.gov.bis.lite.permissions.TestPermissionsApp;
+import uk.gov.bis.lite.permissions.Util;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.mocks.CustomerServiceMock;
 import uk.gov.bis.lite.permissions.mocks.OgelServiceMock;
 import uk.gov.bis.lite.permissions.model.FailEvent;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
-import uk.gov.bis.lite.permissions.Util;
 
 import java.util.List;
 
 /**
- * Integration tests for ProcessSubmissionService with mocked CustomerService and OgelService
- * Testing fail to callback logic, and terminations
- * Utilises in memory DB
+ * Integration tests for ProcessSubmissionService with mocked CustomerService and OgelService Testing fail to callback
+ * logic, and terminations Utilises in memory DB
  */
 public class ProcessSubmissionCallbackTest {
 
@@ -43,11 +44,11 @@ public class ProcessSubmissionCallbackTest {
     flyway.setDataSource(dsf.getUrl(), dsf.getUser(), dsf.getPassword());
     flyway.migrate();
 
-    TestPermissionsApp app = APP_RULE.getApplication();
-    ogelServiceMock = (OgelServiceMock) app.getInstance(OgelService.class);
-    processSubmissionService = app.getInstance(ProcessSubmissionService.class);
-    submissionDao = app.getInstance(OgelSubmissionDao.class);
-    customerServiceMock = (CustomerServiceMock) app.getInstance(CustomerService.class);
+    Injector injector = InjectorLookup.getInjector(APP_RULE.getApplication()).get();
+    ogelServiceMock = (OgelServiceMock) injector.getInstance(OgelService.class);
+    processSubmissionService = injector.getInstance(ProcessSubmissionService.class);
+    submissionDao = injector.getInstance(OgelSubmissionDao.class);
+    customerServiceMock = (CustomerServiceMock) injector.getInstance(CustomerService.class);
   }
 
   @Test
@@ -56,7 +57,7 @@ public class ProcessSubmissionCallbackTest {
     String SUB_REF = "SuccessToCallback";
 
     // Setup
-    resetAllMocks(true);
+    resetAllMocks();
     submissionDao.create(Util.getMockSubmission(SUB_REF));
 
     // Process OgelSubmission
@@ -72,7 +73,7 @@ public class ProcessSubmissionCallbackTest {
     String SUB_REF = "CustomerPermissionDeniedToCallback";
 
     // Setup
-    resetAllMocks(true);
+    resetAllMocks();
     customerServiceMock.setCreateCustomerSuccess(false);
     customerServiceMock.setFailEvent(new FailEvent(Util.PERMISSION_DENIED, Util.ORIGIN_CUSTOMER, Util.ERROR_MESSAGE));
     submissionDao.create(Util.getMockSubmission(SUB_REF));
@@ -92,19 +93,19 @@ public class ProcessSubmissionCallbackTest {
     String SUB_REF3 = "OgelSiteAlreadyRegisteredToCallback";
 
     // Setup and process
-    resetAllMocks(true);
+    resetAllMocks();
     ogelServiceMock.setCreateOgelSuccess(false);
     ogelServiceMock.setFailEvent(new FailEvent(Util.PERMISSION_DENIED, Util.ORIGIN_OGEL_CREATE, Util.ERROR_MESSAGE));
     submissionDao.create(Util.getMockSubmission(SUB_REF1));
     processSubmissionService.doProcessOgelSubmission(findBy(SUB_REF1));
 
-    resetAllMocks(true);
+    resetAllMocks();
     ogelServiceMock.setCreateOgelSuccess(false);
     ogelServiceMock.setFailEvent(new FailEvent(Util.BLACKLISTED, Util.ORIGIN_OGEL_CREATE, Util.ERROR_MESSAGE));
     submissionDao.create(Util.getMockSubmission(SUB_REF2));
     processSubmissionService.doProcessOgelSubmission(findBy(SUB_REF2));
 
-    resetAllMocks(true);
+    resetAllMocks();
     ogelServiceMock.setCreateOgelSuccess(false);
     ogelServiceMock.setFailEvent(new FailEvent(Util.SITE_ALREADY_REGISTERED, Util.ORIGIN_OGEL_CREATE, Util.ERROR_MESSAGE));
     submissionDao.create(Util.getMockSubmission(SUB_REF3));
@@ -122,7 +123,7 @@ public class ProcessSubmissionCallbackTest {
     String SUB_REF = "SitePermissionDeniedToCallback";
 
     // Setup
-    resetAllMocks(true);
+    resetAllMocks();
     customerServiceMock.setCreateSiteSuccess(false);
     customerServiceMock.setFailEvent(new FailEvent(Util.PERMISSION_DENIED, Util.ORIGIN_SITE, Util.ERROR_MESSAGE));
     submissionDao.create(Util.getMockSubmission(SUB_REF));
@@ -141,7 +142,7 @@ public class ProcessSubmissionCallbackTest {
     String SUB_REF = "runUserRoleRepeatingFailToCompleted";
 
     // Setup
-    resetAllMocks(true);
+    resetAllMocks();
     customerServiceMock.setUpdateUserRoleSuccess(false);
     customerServiceMock.setFailEvent(new FailEvent(Util.ENDPOINT_ERROR, Util.ORIGIN_USER_ROLE, Util.ERROR_MESSAGE));
     submissionDao.create(Util.getMockSubmission(SUB_REF));
@@ -163,15 +164,14 @@ public class ProcessSubmissionCallbackTest {
   }
 
   /**
-   * Sets all mock calls to respond with a 'success'
-   * Resets all mock call counts to 0
+   * Sets all mock calls to respond with a 'success' Resets all mock call counts to 0
    */
-  private void resetAllMocks(boolean arg) {
-    customerServiceMock.setAllSuccess(arg);
+  private void resetAllMocks() {
+    customerServiceMock.setAllSuccess(true);
     customerServiceMock.resetAllCounts();
     customerServiceMock.resetFailEvent();
 
-    ogelServiceMock.setCreateOgelSuccess(arg);
+    ogelServiceMock.setCreateOgelSuccess(true);
     ogelServiceMock.resetCreateOgelCallCount();
     ogelServiceMock.resetFailEvent();
   }

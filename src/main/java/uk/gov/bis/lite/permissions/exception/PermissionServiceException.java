@@ -8,8 +8,4 @@ public class PermissionServiceException extends WebApplicationException {
     super(message);
   }
 
-  public PermissionServiceException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
 }

@@ -8,12 +8,6 @@ import uk.gov.bis.lite.permissions.service.RegisterService;
 @Singleton
 public class RegisterServiceMock implements RegisterService {
 
-  private String mockSubmissionRef;
-
-  public RegisterServiceMock(String mockSubmissionRef) {
-    this.mockSubmissionRef = mockSubmissionRef;
-  }
-
   @Override
   public OgelSubmission getOgelSubmission(RegisterParam param) {
     return null;
@@ -21,7 +15,7 @@ public class RegisterServiceMock implements RegisterService {
 
   @Override
   public String register(OgelSubmission sub, String callbackUrl) {
-    return mockSubmissionRef;
+    return "SUB1";
   }
 
   public boolean isRegisterParamValid(RegisterParam registerParam) {

@@ -3,6 +3,7 @@ package uk.gov.bis.lite.permissions.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
+import com.google.inject.Injector;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
@@ -10,17 +11,17 @@ import org.flywaydb.core.Flyway;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import ru.vyarus.dropwizard.guice.injector.lookup.InjectorLookup;
 import uk.gov.bis.lite.permissions.TestPermissionsApp;
+import uk.gov.bis.lite.permissions.Util;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.mocks.CustomerServiceMock;
 import uk.gov.bis.lite.permissions.mocks.OgelServiceMock;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
-import uk.gov.bis.lite.permissions.Util;
 
 /**
- * Integration tests for ProcessSubmissionService with mocked CustomerService and OgelService
- * Utilises in memory DB
+ * Integration tests for ProcessSubmissionService with mocked CustomerService and OgelService Utilises in memory DB
  */
 public class ProcessSubmissionServiceTest {
 
@@ -40,11 +41,11 @@ public class ProcessSubmissionServiceTest {
     flyway.setDataSource(dsf.getUrl(), dsf.getUser(), dsf.getPassword());
     flyway.migrate();
 
-    TestPermissionsApp app = APP_RULE.getApplication();
-    processSubmissionService = app.getInstance(ProcessSubmissionService.class);
-    submissionDao = app.getInstance(OgelSubmissionDao.class);
-    customerServiceMock = (CustomerServiceMock) app.getInstance(CustomerService.class);
-    ogelServiceMock = (OgelServiceMock) app.getInstance(OgelService.class);
+    Injector injector = InjectorLookup.getInjector(APP_RULE.getApplication()).get();
+    processSubmissionService = injector.getInstance(ProcessSubmissionService.class);
+    submissionDao = injector.getInstance(OgelSubmissionDao.class);
+    customerServiceMock = (CustomerServiceMock) injector.getInstance(CustomerService.class);
+    ogelServiceMock = (OgelServiceMock) injector.getInstance(OgelService.class);
   }
 
   @Test
@@ -53,7 +54,7 @@ public class ProcessSubmissionServiceTest {
     String SUB_REF = "SuccessAll";
 
     // Setup
-    resetAllMocks(true);
+    resetAllMocks();
     submissionDao.create(Util.getMockSubmission(SUB_REF));
 
     // Process OgelSubmission
@@ -78,7 +79,7 @@ public class ProcessSubmissionServiceTest {
     String SUB_REF = "FailOnCustomer";
 
     // Setup
-    resetAllMocks(true);
+    resetAllMocks();
     customerServiceMock.setCreateCustomerSuccess(false);
     submissionDao.create(Util.getMockSubmission(SUB_REF));
 
@@ -103,7 +104,7 @@ public class ProcessSubmissionServiceTest {
     String SUB_REF = "FailOnSite";
 
     // Setup
-    resetAllMocks(true);
+    resetAllMocks();
     customerServiceMock.setCreateSiteSuccess(false);
     submissionDao.create(Util.getMockSubmission(SUB_REF));
 
@@ -128,7 +129,7 @@ public class ProcessSubmissionServiceTest {
     String SUB_REF = "FailOnUserRole";
 
     // Setup
-    resetAllMocks(true);
+    resetAllMocks();
     customerServiceMock.setUpdateUserRoleSuccess(false);
     submissionDao.create(Util.getMockSubmission(SUB_REF));
 
@@ -153,7 +154,7 @@ public class ProcessSubmissionServiceTest {
     String SUB_REF = "FailOnOgel";
 
     // Setup
-    resetAllMocks(true);
+    resetAllMocks();
     ogelServiceMock.setCreateOgelSuccess(false);
     submissionDao.create(Util.getMockSubmission(SUB_REF));
 
@@ -174,12 +175,11 @@ public class ProcessSubmissionServiceTest {
 
 
   /**
-   * Sets all mock calls to respond with a 'success'
-   * Resets all mock call counts to 0
+   * Sets all mock calls to respond with a 'success' Resets all mock call counts to 0
    */
-  private void resetAllMocks(boolean arg) {
-    customerServiceMock.setAllSuccess(arg);
-    ogelServiceMock.setCreateOgelSuccess(arg);
+  private void resetAllMocks() {
+    customerServiceMock.setAllSuccess(true);
+    ogelServiceMock.setCreateOgelSuccess(true);
     customerServiceMock.resetAllCounts();
     ogelServiceMock.resetCreateOgelCallCount();
   }

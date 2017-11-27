@@ -37,7 +37,7 @@ public class PermissionsAppConfig extends Configuration {
   @Valid
   @NotNull
   @JsonProperty("database")
-  private DataSourceFactory database = new DataSourceFactory();
+  private DataSourceFactory database;
 
   @NotEmpty
   private String adminLogin;

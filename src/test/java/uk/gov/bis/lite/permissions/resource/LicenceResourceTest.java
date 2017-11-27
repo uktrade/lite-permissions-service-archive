@@ -13,29 +13,29 @@ import com.google.common.collect.ImmutableList;
 import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.testing.junit.ResourceTestRule;
-import org.assertj.core.api.AssertionsForClassTypes;
 import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
 import org.junit.Rule;
 import org.junit.Test;
 import uk.gov.bis.lite.common.jwt.LiteJwtAuthFilterHelper;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
+import uk.gov.bis.lite.permissions.Util;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
 import uk.gov.bis.lite.permissions.service.LicenceService;
+import uk.gov.bis.lite.permissions.service.model.LicenceResult;
+import uk.gov.bis.lite.permissions.service.model.LicenceTypeParam;
 import uk.gov.bis.lite.permissions.service.model.Status;
-import uk.gov.bis.lite.permissions.service.model.licence.MultipleLicenceResult;
-import uk.gov.bis.lite.permissions.service.model.licence.SingleLicenceResult;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
 public class LicenceResourceTest {
-  private static final String URL = "/licences";
-  private static String JWT_SHARED_SECRET = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
+
+  private static final String URL = "/licences/user";
+  private static final String JWT_SHARED_SECRET = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
 
   private final LicenceService licenceService = mock(LicenceService.class);
 
@@ -49,8 +49,8 @@ public class LicenceResourceTest {
 
   @Test
   public void noParamsSingleLicenceTest() throws Exception {
-    when(licenceService.getLicences("123456"))
-        .thenReturn(new MultipleLicenceResult(Status.OK, ImmutableList.of(generateLicenceViewA())));
+    when(licenceService.getAllLicences("123456"))
+        .thenReturn(new LicenceResult(Status.OK, null, ImmutableList.of(generateLicenceViewA())));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -61,7 +61,6 @@ public class LicenceResourceTest {
     assertThat(response.getStatus()).isEqualTo(200);
 
     List<LicenceView> results = Arrays.asList(response.readEntity(LicenceView[].class));
-    assertThat(results).isNotNull();
     assertThat(results).hasSize(1);
 
     LicenceView lv = results.get(0);
@@ -70,8 +69,8 @@ public class LicenceResourceTest {
 
   @Test
   public void noParamsMultipleLicencesTest() throws Exception {
-    when(licenceService.getLicences("123456"))
-        .thenReturn(new MultipleLicenceResult(Status.OK, ImmutableList.of(generateLicenceViewA(), generateLicenceViewB())));
+    when(licenceService.getAllLicences("123456"))
+        .thenReturn(new LicenceResult(Status.OK, null, ImmutableList.of(generateLicenceViewA(), generateLicenceViewB())));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -82,7 +81,6 @@ public class LicenceResourceTest {
     assertThat(response.getStatus()).isEqualTo(200);
 
     List<LicenceView> results = Arrays.asList(response.readEntity(LicenceView[].class));
-    assertThat(results).isNotNull();
     assertThat(results).hasSize(2);
 
     assertLicenceViewA(results.get(0));
@@ -91,8 +89,8 @@ public class LicenceResourceTest {
 
   @Test
   public void noParamsNoLicencesTest() throws Exception {
-    when(licenceService.getLicences("123456"))
-        .thenReturn(new MultipleLicenceResult(Status.OK, Collections.emptyList()));
+    when(licenceService.getAllLicences("123456"))
+        .thenReturn(new LicenceResult(Status.OK, null, Collections.emptyList()));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -103,12 +101,11 @@ public class LicenceResourceTest {
     assertThat(response.getStatus()).isEqualTo(200);
 
     List<LicenceView> results = Arrays.asList(response.readEntity(LicenceView[].class));
-    assertThat(results).isNotNull();
     assertThat(results).hasSize(0);
   }
 
   @Test
-  public void noParamsNotAuthedTest() throws Exception {
+  public void noParamsNotAuthenticatedTest() throws Exception {
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
         .request()
@@ -116,16 +113,21 @@ public class LicenceResourceTest {
         .get();
 
     assertThat(response.getStatus()).isEqualTo(401);
+
+    Map<String, String> map = Util.getResponseMap(response);
+    assertThat(map).hasSize(2);
+    assertThat(map).containsEntry("code", "401");
+    assertThat(map).containsEntry("message", "userId 123456 does not match value supplied in token 999999");
   }
 
   @Test
   public void refParamSingleLicenceTest() throws Exception {
-    when(licenceService.getLicence("123456", "REF-123"))
-        .thenReturn(new SingleLicenceResult(Status.OK, generateLicenceViewA()));
+    when(licenceService.getLicenceByRef("123456", "REF-123"))
+        .thenReturn(new LicenceResult(Status.OK, null, ImmutableList.of(generateLicenceViewA())));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
-        .queryParam("ref", "REF-123")
+        .queryParam("licenceReference", "REF-123")
         .request()
         .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "123456"))
         .get();
@@ -133,7 +135,6 @@ public class LicenceResourceTest {
     assertThat(response.getStatus()).isEqualTo(200);
 
     List<LicenceView> results = Arrays.asList(response.readEntity(LicenceView[].class));
-    assertThat(results).isNotNull();
     assertThat(results).hasSize(1);
 
     assertLicenceViewA(results.get(0));
@@ -141,53 +142,65 @@ public class LicenceResourceTest {
 
   @Test
   public void refParamNoLicenceTest() throws Exception {
-    when(licenceService.getLicence("123456", "REF-123"))
-        .thenReturn(new SingleLicenceResult(Status.OK, null));
+    when(licenceService.getLicenceByRef("123456", "REF-123"))
+        .thenReturn(new LicenceResult(Status.REGISTRATION_NOT_FOUND,
+            "No licence with reference REF-123 found for userId 123456",
+            null));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
-        .queryParam("ref", "REF-123")
+        .queryParam("licenceReference", "REF-123")
         .request()
         .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "123456"))
         .get();
 
-    Map<String, String> map = response.readEntity(new GenericType<Map<String, String>>(){});
-    assertThat(map.entrySet().size()).isEqualTo(2);
-    assertThat(map.get("code")).isEqualTo("404");
-    assertThat(map.get("message")).contains("No licence with ref \"REF-123\" found for userId \"123456\"");
+    Map<String, String> map = Util.getResponseMap(response);
+    assertThat(map).hasSize(2);
+    assertThat(map).containsEntry("code", "404");
+    assertThat(map).containsEntry("message", "No licence with reference REF-123 found for userId 123456");
   }
 
   @Test
   public void refParamNoUserIdFoundTest() throws Exception {
-    when(licenceService.getLicence("123456", "REF-123"))
-        .thenReturn(new SingleLicenceResult(Status.USER_ID_NOT_FOUND, null));
+    when(licenceService.getLicenceByRef("123456", "REF-123"))
+        .thenReturn(new LicenceResult(Status.USER_ID_NOT_FOUND, "Unable to find user with user id 123456", null));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
-        .queryParam("ref", "REF-123")
+        .queryParam("licenceReference", "REF-123")
         .request()
         .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "123456"))
         .get();
 
     assertThat(response.getStatus()).isEqualTo(404);
+
+    Map<String, String> map = Util.getResponseMap(response);
+    assertThat(map).hasSize(2);
+    assertThat(map).containsEntry("code", "404");
+    assertThat(map).containsEntry("message", "Unable to find user with user id 123456");
   }
 
   @Test
-  public void refParamNotAuthedTest() throws Exception {
+  public void refParamNotAuthenticatedTest() throws Exception {
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
-        .queryParam("ref", "REF-123")
+        .queryParam("licenceReference", "REF-123")
         .request()
         .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "999999"))
         .get();
 
     assertThat(response.getStatus()).isEqualTo(401);
+
+    Map<String, String> map = Util.getResponseMap(response);
+    assertThat(map).hasSize(2);
+    assertThat(map).containsEntry("code", "401");
+    assertThat(map).containsEntry("message", "userId 123456 does not match value supplied in token 999999");
   }
 
   @Test
   public void typeParamSingleLicenceTest() throws Exception {
-    when(licenceService.getLicences("123456", LicenceService.LicenceTypeParam.SIEL))
-        .thenReturn(new MultipleLicenceResult(Status.OK, ImmutableList.of(generateLicenceViewA())));
+    when(licenceService.getLicencesByType("123456", LicenceTypeParam.SIEL))
+        .thenReturn(new LicenceResult(Status.OK, null, ImmutableList.of(generateLicenceViewA())));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -199,15 +212,14 @@ public class LicenceResourceTest {
     assertThat(response.getStatus()).isEqualTo(200);
 
     List<LicenceView> results = Arrays.asList(response.readEntity(LicenceView[].class));
-    assertThat(results).isNotNull();
     assertThat(results).hasSize(1);
     assertLicenceViewA(results.get(0));
   }
 
   @Test
   public void typeParamNoUserFoundTest() throws Exception {
-    when(licenceService.getLicences("123456", LicenceService.LicenceTypeParam.SIEL))
-        .thenReturn(new MultipleLicenceResult(Status.USER_ID_NOT_FOUND, null));
+    when(licenceService.getLicencesByType("123456", LicenceTypeParam.SIEL))
+        .thenReturn(new LicenceResult(Status.USER_ID_NOT_FOUND, "Unable to find user with user id 123456", null));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
@@ -217,6 +229,11 @@ public class LicenceResourceTest {
         .get();
 
     assertThat(response.getStatus()).isEqualTo(404);
+
+    Map<String, String> map = Util.getResponseMap(response);
+    assertThat(map).hasSize(2);
+    assertThat(map).containsEntry("code", "404");
+    assertThat(map).containsEntry("message", "Unable to find user with user id 123456");
   }
 
   @Test
@@ -230,14 +247,14 @@ public class LicenceResourceTest {
 
     assertThat(response.getStatus()).isEqualTo(400);
 
-    Map<String, String> map = response.readEntity(new GenericType<Map<String, String>>(){});
-    AssertionsForClassTypes.assertThat(map.entrySet().size()).isEqualTo(2);
-    AssertionsForClassTypes.assertThat(map.get("code")).isEqualTo("400");
-    AssertionsForClassTypes.assertThat(map.get("message")).contains("Invalid licence type");
+    Map<String, String> map = Util.getResponseMap(response);
+    assertThat(map).hasSize(2);
+    assertThat(map).containsEntry("code", "400");
+    assertThat(map).containsEntry("message", "query param type must be one of [SIEL]");
   }
 
   @Test
-  public void typeParamNotAuthedTest() throws Exception {
+  public void typeParamNotAuthenticatedTest() throws Exception {
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
         .queryParam("type", "SIEL")
@@ -246,26 +263,33 @@ public class LicenceResourceTest {
         .get();
 
     assertThat(response.getStatus()).isEqualTo(401);
+
+    Map<String, String> map = Util.getResponseMap(response);
+    assertThat(map).hasSize(2);
+    assertThat(map).containsEntry("code", "401");
+    assertThat(map).containsEntry("message", "userId 123456 does not match value supplied in token 999999");
   }
 
   @Test
   public void typeAndRefParamPriorityTest() throws Exception {
-   when(licenceService.getLicence("123456", "REF-123"))
-        .thenReturn(new SingleLicenceResult(Status.OK, null));
+    when(licenceService.getLicenceByRef("123456", "REF-123"))
+        .thenReturn(new LicenceResult(Status.TOO_MANY_REGISTRATIONS,
+            "Too many results from spire client, expected 1 but got 2",
+            null));
 
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
         .queryParam("type", "SIEL")
-        .queryParam("ref", "REF-123")
+        .queryParam("licenceReference", "REF-123")
         .request()
         .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "123456"))
         .get();
 
-    assertThat(response.getStatus()).isEqualTo(404);
+    assertThat(response.getStatus()).isEqualTo(400);
 
-    Map<String, String> map = response.readEntity(new GenericType<Map<String, String>>(){});
-    assertThat(map.entrySet().size()).isEqualTo(2);
-    assertThat(map.get("code")).isEqualTo("404");
-    assertThat(map.get("message")).contains("No licence with ref \"REF-123\" found for userId \"123456\"");
+    Map<String, String> map = Util.getResponseMap(response);
+    assertThat(map).hasSize(2);
+    assertThat(map).containsEntry("code", "400");
+    assertThat(map).containsEntry("message", "Too many results from spire client, expected 1 but got 2");
   }
 }

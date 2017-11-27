@@ -32,17 +32,17 @@ public class CustomerServiceTest {
       .addResource(new CreateCustomerEndpoint())
       .addResource(new UserRoleEndpoint()).build();
 
-  private CustomerService customerService;
+  private static final String CUSTOMER_ID = "CUSTOMER_ID";
+  private static final String SITE_ID = "SITE_ID";
+  private static final String SUCCESS = "SUCCESS";
+  private static final String FORBIDDEN = "FORBIDDEN";
+  private static final String BAD_REQUEST = "BAD_REQUEST";
 
-  private static String CUSTOMER_ID = "CUSTOMER_ID";
-  private static String SITE_ID = "SITE_ID";
-
-  private static String SUCCESS = "SUCCESS";
-  private static String FORBIDDEN = "FORBIDDEN";
-  private static String BAD_REQUEST = "BAD_REQUEST";
   private static String createSiteMode = SUCCESS;
   private static String createCustomerMode = SUCCESS;
   private static String updateUserRoleMode = SUCCESS;
+
+  private CustomerService customerService;
 
   @Before
   public void before() {
@@ -147,54 +147,59 @@ public class CustomerServiceTest {
 
   @Path("/")
   public static class CreateCustomerEndpoint {
+
     @POST
     @Path("/create-customer")
     public Response createCustomer(CustomerParam param) {
-      if (createCustomerMode.equals(SUCCESS)) {
-        return Response.ok(fixture("fixture/createCustomerCustomerView.json"), MediaType.APPLICATION_JSON_TYPE.withCharset("utf-8")).build();
+      switch (createCustomerMode) {
+        case SUCCESS:
+          return Response.ok(fixture("fixture/createCustomerCustomerView.json"), MediaType.APPLICATION_JSON_TYPE.withCharset("utf-8")).build();
+        case BAD_REQUEST:
+          return Response.status(Response.Status.BAD_REQUEST).build();
+        default:
+          return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
       }
-      if (createCustomerMode.equals(BAD_REQUEST)) {
-        return Response.status(Response.Status.BAD_REQUEST).build();
-      }
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }
 
   @Path("/")
   public static class CreateSiteEndpoint {
+
     @POST
     @Path("/customer-sites/{customerId}")
     public Response createSite(@PathParam("customerId") String customerId) {
-      if (createSiteMode.equals(SUCCESS)) {
-        return Response.ok(fixture("fixture/createSiteSiteView.json"), MediaType.APPLICATION_JSON_TYPE.withCharset("utf-8")).build();
+      switch (createSiteMode) {
+        case SUCCESS:
+          return Response.ok(fixture("fixture/createSiteSiteView.json"), MediaType.APPLICATION_JSON_TYPE.withCharset("utf-8")).build();
+        case FORBIDDEN:
+          return Response.status(Response.Status.FORBIDDEN).build();
+        case BAD_REQUEST:
+          return Response.status(Response.Status.BAD_REQUEST).build();
+        default:
+          return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
       }
-      if (createSiteMode.equals(FORBIDDEN)) {
-        return Response.status(Response.Status.FORBIDDEN).build();
-      }
-      if (createSiteMode.equals(BAD_REQUEST)) {
-        return Response.status(Response.Status.BAD_REQUEST).build();
-      }
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }
 
   @Path("/")
   public static class UserRoleEndpoint {
+
     @POST
     @Path("/user-roles/user/{userId}/site/{siteRef}")
     public Response userRole(@NotNull @PathParam("userId") String userId,
                              @NotNull @PathParam("siteRef") String siteRef,
                              UserRoleParam param) {
-      if (updateUserRoleMode.equals(SUCCESS)) {
-        return Response.ok().build();
+      switch (updateUserRoleMode) {
+        case SUCCESS:
+          return Response.ok().build();
+        case BAD_REQUEST:
+          return Response.status(Response.Status.BAD_REQUEST)
+              .entity(ImmutableMap.of("code", Response.Status.BAD_REQUEST, "message", "error"))
+              .type(MediaType.APPLICATION_JSON_TYPE)
+              .build();
+        default:
+          return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
       }
-      if (updateUserRoleMode.equals(BAD_REQUEST)) {
-        return Response.status(Response.Status.BAD_REQUEST)
-            .entity(ImmutableMap.of("code", Response.Status.BAD_REQUEST, "message", "error"))
-            .type(MediaType.APPLICATION_JSON_TYPE)
-            .build();
-      }
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }
 

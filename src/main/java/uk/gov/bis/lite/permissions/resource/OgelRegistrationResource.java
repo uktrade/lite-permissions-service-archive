@@ -3,17 +3,13 @@ package uk.gov.bis.lite.permissions.resource;
 import static uk.gov.bis.lite.permissions.resource.ResourceUtil.validateServiceStatus;
 import static uk.gov.bis.lite.permissions.resource.ResourceUtil.validateUserIdToJwt;
 
-import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import io.dropwizard.auth.Auth;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
 import uk.gov.bis.lite.permissions.service.RegistrationService;
-import uk.gov.bis.lite.permissions.service.model.registration.MultipleRegistrationResult;
-import uk.gov.bis.lite.permissions.service.model.registration.SingleRegistrationResult;
+import uk.gov.bis.lite.permissions.service.model.RegistrationResult;
 
 import java.util.List;
 
@@ -23,15 +19,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 @Path("")
 public class OgelRegistrationResource {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(OgelRegistrationResource.class);
-  private RegistrationService registrationService;
+  private final RegistrationService registrationService;
 
   @Inject
   public OgelRegistrationResource(RegistrationService registrationService) {
@@ -39,32 +32,20 @@ public class OgelRegistrationResource {
   }
 
   @GET
-  @Produces({MediaType.APPLICATION_JSON})
+  @Produces(MediaType.APPLICATION_JSON)
   @Path("/ogel-registrations/user/{userId}")
   public List<OgelRegistrationView> viewOgelRegistrations(@NotNull @PathParam("userId") String userId,
                                                           @QueryParam("registrationReference") String registrationReference,
                                                           @Auth LiteJwtUser user) {
     validateUserIdToJwt(userId, user);
+    RegistrationResult registrationResult;
     if (StringUtils.isNotBlank(registrationReference)) {
-      return getRegistrationByRef(userId, registrationReference);
+      registrationResult = registrationService.getRegistration(userId, registrationReference);
     } else {
-      return getAllRegistrations(userId);
+      registrationResult = registrationService.getRegistrations(userId);
     }
+    validateServiceStatus(registrationResult.getStatus(), registrationResult.getErrorMessage());
+    return registrationResult.getOgelRegistrationViews();
   }
 
-  private List<OgelRegistrationView> getAllRegistrations(String userId) {
-    MultipleRegistrationResult registrations = registrationService.getRegistrations(userId);
-    validateServiceStatus(registrations.getStatus());
-    return registrations.getRegistrationViews();
-  }
-
-  private List<OgelRegistrationView> getRegistrationByRef(String userId, String registrationReference) {
-    SingleRegistrationResult registration = registrationService.getRegistration(userId, registrationReference);
-    validateServiceStatus(registration.getStatus());
-
-    return registration.getRegistrationView()
-        .map(ImmutableList::of)
-        .orElseThrow(() -> new WebApplicationException(String.format("No licence with ref \"%s\" found " +
-            "for userId \"%s\"", registrationReference, userId), Response.Status.NOT_FOUND));
-  }
 }

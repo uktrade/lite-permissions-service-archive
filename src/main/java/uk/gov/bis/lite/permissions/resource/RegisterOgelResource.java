@@ -35,8 +35,8 @@ public class RegisterOgelResource {
   }
 
   @POST
-  @Consumes({MediaType.APPLICATION_JSON})
-  @Produces({MediaType.APPLICATION_JSON})
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   @Path("/register-ogel")
   public Response registerOgel(RegisterParam registerParam, @QueryParam("callbackUrl") String callbackUrl) {
     LOGGER.info("************ register-ogel ************ ");

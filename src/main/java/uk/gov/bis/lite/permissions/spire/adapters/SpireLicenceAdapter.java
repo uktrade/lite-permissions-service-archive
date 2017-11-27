@@ -31,6 +31,7 @@ public class SpireLicenceAdapter {
 
   /**
    * Parses dates matching the SPIRE format, i.e 31/12/2000
+   *
    * @param spireDate
    * @return
    */
@@ -49,7 +50,7 @@ public class SpireLicenceAdapter {
     }
   }
 
-  static <E extends Enum<E>> E parseSpireEnum(Class<E> enumClass, String value) {
+  private static <E extends Enum<E>> E parseSpireEnum(Class<E> enumClass, String value) {
     if (StringUtils.isEmpty(value)) {
       return null;
     } else {

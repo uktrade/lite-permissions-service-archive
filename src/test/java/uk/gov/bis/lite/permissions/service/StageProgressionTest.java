@@ -1,6 +1,5 @@
 package uk.gov.bis.lite.permissions.service;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Before;
@@ -18,11 +17,11 @@ import uk.gov.bis.lite.permissions.model.OgelSubmission;
  */
 public class StageProgressionTest {
 
-  private ProcessSubmissionService service;
+  private static final String CUSTOMER_REF = "CUSTOMER_REF";
+  private static final String SITE_REF = "SITE_REF";
+  private static final String SPIRE_REF = "SPIRE_REF";
 
-  private String CUSTOMER_REF = "CUSTOMER_REF";
-  private String SITE_REF = "SITE_REF";
-  private String SPIRE_REF = "SPIRE_REF";
+  private ProcessSubmissionService service;
 
   @Before
   public void before() {

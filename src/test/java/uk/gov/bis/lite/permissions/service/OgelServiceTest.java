@@ -1,6 +1,5 @@
 package uk.gov.bis.lite.permissions.service;
 
-
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
@@ -23,22 +22,21 @@ import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.spire.clients.SpireReferenceClient;
 import uk.gov.bis.lite.permissions.spire.errorhandlers.OgelErrorNodeErrorHandler;
 
-
 public class OgelServiceTest {
 
-  private static String USER_ID_SUCCESS = "USER_ID_SUCCESS";
-  private static String USER_ID_SOAP_FAULT = "USER_ID_SOAP_FAULT";
-  private static String USER_ID_ERROR = "USER_ID_ERROR";
-  private static String USER_ID_USER_LACKS_PRIVILEGES = "USER_ID_USER_LACKS_PRIVILEGES";
-  private static String USER_ID_BLACKLISTED = "USER_ID_BLACKLISTED";
-  private static String USER_ID_SITE_ALREADY_REGISTERED = "USER_ID_SITE_ALREADY_REGISTERED";
-  private static String USER_ID_INVALID_OGEL_REF = "USER_ID_INVALID_OGEL_REF";
-
   @ClassRule
-  public static WireMockClassRule wireMockClassRule = new WireMockClassRule(options().dynamicPort());
+  public static final WireMockClassRule wireMockClassRule = new WireMockClassRule(options().dynamicPort());
+
+  private static final String USER_ID_SUCCESS = "USER_ID_SUCCESS";
+  private static final String USER_ID_SOAP_FAULT = "USER_ID_SOAP_FAULT";
+  private static final String USER_ID_ERROR = "USER_ID_ERROR";
+  private static final String USER_ID_USER_LACKS_PRIVILEGES = "USER_ID_USER_LACKS_PRIVILEGES";
+  private static final String USER_ID_BLACKLISTED = "USER_ID_BLACKLISTED";
+  private static final String USER_ID_SITE_ALREADY_REGISTERED = "USER_ID_SITE_ALREADY_REGISTERED";
+  private static final String USER_ID_INVALID_OGEL_REF = "USER_ID_INVALID_OGEL_REF";
+  private static final ProcessSubmissionServiceImpl.Origin OGEL_CREATE = ProcessSubmissionServiceImpl.Origin.OGEL_CREATE;
 
   private static OgelService ogelService;
-  private static ProcessSubmissionServiceImpl.Origin OGEL_CREATE = ProcessSubmissionServiceImpl.Origin.OGEL_CREATE;
 
   @BeforeClass
   public static void before() {
@@ -125,7 +123,6 @@ public class OgelServiceTest {
   private static void initStubs() {
 
     String OGEL_URL = "/spire/fox/ispire/SPIRE_CREATE_OGEL_APP";
-    String PATH = "fixture/soap/SPIRE_CREATE_OGEL_APP/";
     String CONTENT_TYPE = "Content-Type";
     String TEXT_XML = "text/xml";
 
@@ -135,7 +132,7 @@ public class OgelServiceTest {
         .willReturn(aResponse()
             .withStatus(200)
             .withHeader(CONTENT_TYPE, TEXT_XML)
-            .withBody(fixture(PATH + "createOgelSuccess.xml"))));
+            .withBody(fixture("fixture/soap/SPIRE_CREATE_OGEL_APP/createOgelSuccess.xml"))));
 
     // Error
     stubFor(post(urlEqualTo(OGEL_URL))
@@ -143,7 +140,7 @@ public class OgelServiceTest {
         .willReturn(aResponse()
             .withStatus(200)
             .withHeader(CONTENT_TYPE, TEXT_XML)
-            .withBody(fixture(PATH + "error.xml"))));
+            .withBody(fixture("fixture/soap/SPIRE_CREATE_OGEL_APP/error.xml"))));
 
     // Soap Fault Stub
     stubFor(post(urlEqualTo(OGEL_URL))
@@ -151,7 +148,7 @@ public class OgelServiceTest {
         .willReturn(aResponse()
             .withStatus(200)
             .withHeader(CONTENT_TYPE, TEXT_XML)
-            .withBody(fixture(PATH + "soapFault.xml"))));
+            .withBody(fixture("fixture/soap/SPIRE_CREATE_OGEL_APP/soapFault.xml"))));
 
     // User lacks privileges
     stubFor(post(urlEqualTo(OGEL_URL))
@@ -159,7 +156,7 @@ public class OgelServiceTest {
         .willReturn(aResponse()
             .withStatus(200)
             .withHeader(CONTENT_TYPE, TEXT_XML)
-            .withBody(fixture(PATH + "userLacksPrivileges.xml"))));
+            .withBody(fixture("fixture/soap/SPIRE_CREATE_OGEL_APP/userLacksPrivileges.xml"))));
 
     // Site already registered
     stubFor(post(urlEqualTo(OGEL_URL))
@@ -167,7 +164,7 @@ public class OgelServiceTest {
         .willReturn(aResponse()
             .withStatus(200)
             .withHeader(CONTENT_TYPE, TEXT_XML)
-            .withBody(fixture(PATH + "siteAlreadyRegistered.xml"))));
+            .withBody(fixture("fixture/soap/SPIRE_CREATE_OGEL_APP/siteAlreadyRegistered.xml"))));
 
     // Blacklisted
     stubFor(post(urlEqualTo(OGEL_URL))
@@ -175,7 +172,7 @@ public class OgelServiceTest {
         .willReturn(aResponse()
             .withStatus(200)
             .withHeader(CONTENT_TYPE, TEXT_XML)
-            .withBody(fixture(PATH + "blacklisted.xml"))));
+            .withBody(fixture("fixture/soap/SPIRE_CREATE_OGEL_APP/blacklisted.xml"))));
 
     // Invalid ogel ref
     stubFor(post(urlEqualTo(OGEL_URL))
@@ -183,7 +180,7 @@ public class OgelServiceTest {
         .willReturn(aResponse()
             .withStatus(200)
             .withHeader(CONTENT_TYPE, TEXT_XML)
-            .withBody(fixture(PATH + "invalidOgelRef.xml"))));
+            .withBody(fixture("fixture/soap/SPIRE_CREATE_OGEL_APP/invalidOgelRef.xml"))));
 
   }
 }
