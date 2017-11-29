@@ -1,17 +1,13 @@
 package uk.gov.bis.lite.permissions.service;
 
-import uk.gov.bis.lite.permissions.service.model.licence.MultipleLicenceResult;
-import uk.gov.bis.lite.permissions.service.model.licence.SingleLicenceResult;
+import uk.gov.bis.lite.permissions.service.model.LicenceResult;
+import uk.gov.bis.lite.permissions.service.model.LicenceTypeParam;
 
 public interface LicenceService {
-  enum LicenceTypeParam {
-    SIEL,
-    OIEL
-  }
 
-  SingleLicenceResult getLicence(String userId, String reference);
+  LicenceResult getLicenceByRef(String userId, String reference);
 
-  MultipleLicenceResult getLicences(String userId);
+  LicenceResult getAllLicences(String userId);
 
-  MultipleLicenceResult getLicences(String userId, LicenceTypeParam type);
+  LicenceResult getLicencesByType(String userId, LicenceTypeParam type);
 }

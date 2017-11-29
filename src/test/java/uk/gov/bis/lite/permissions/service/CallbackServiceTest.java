@@ -17,6 +17,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 /**
  * Tests CallbackService and CallbackView state
@@ -27,11 +28,9 @@ public class CallbackServiceTest {
   public static final ResourceTestRule resources = ResourceTestRule.builder()
       .addResource(new CallbackEndpoint()).build();
 
-  private CallbackServiceImpl callbackService;
+  private static boolean callbackSuccessful = true;
 
-  private static String SUCCESS = "SUCCESS";
-  private static String FAILED = "FAILED";
-  private static String callbackEndpointResult = SUCCESS;
+  private CallbackServiceImpl callbackService;
 
   @Before
   public void before() {
@@ -41,12 +40,11 @@ public class CallbackServiceTest {
   /**
    * CallbackService tests
    */
-
   @Test
   public void testCallbackSuccess() throws Exception {
 
     // Setup
-    setCallbackEndpointSuccess();
+    callbackSuccessful = true;
     OgelSubmission sub = getMockOgelSubmission();
 
     // Test
@@ -60,7 +58,7 @@ public class CallbackServiceTest {
   public void testCallbackFailure() throws Exception {
 
     // Setup
-    setCallbackEndpointFailed();
+    callbackSuccessful = false;
     OgelSubmission sub = getMockOgelSubmission();
 
     // Test
@@ -145,35 +143,25 @@ public class CallbackServiceTest {
 
     CallbackView view6 = callbackService.getCallbackView(sub);
     assertEquals(view6.getResult(), CallbackView.Result.FAILED);
-
   }
 
   /**
    * Mocked Callback Endpoint
    */
-
   @Path("/")
   public static class CallbackEndpoint {
+
     @POST
-    @Consumes({MediaType.APPLICATION_JSON})
+    @Consumes(MediaType.APPLICATION_JSON)
     @Path(Util.MOCK_CALLBACK_URL)
     public Response callback(CallbackView view) {
-      if (callbackEndpointResult.equals(SUCCESS)) {
+      if (callbackSuccessful) {
         return Response.ok().build();
+      } else {
+        return Response.status(Status.INTERNAL_SERVER_ERROR).build();
       }
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
-  }
 
-  /**
-   * Util Methods
-   */
-  private void setCallbackEndpointSuccess() {
-    callbackEndpointResult = SUCCESS;
-  }
-
-  private void setCallbackEndpointFailed() {
-    callbackEndpointResult = FAILED;
   }
 
 }

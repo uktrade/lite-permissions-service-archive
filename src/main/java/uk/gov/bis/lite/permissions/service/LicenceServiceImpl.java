@@ -4,10 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import uk.gov.bis.lite.common.spire.client.SpireRequest;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
-import uk.gov.bis.lite.permissions.exception.LicenceServiceException;
+import uk.gov.bis.lite.permissions.service.model.LicenceResult;
+import uk.gov.bis.lite.permissions.service.model.LicenceTypeParam;
 import uk.gov.bis.lite.permissions.service.model.Status;
-import uk.gov.bis.lite.permissions.service.model.licence.MultipleLicenceResult;
-import uk.gov.bis.lite.permissions.service.model.licence.SingleLicenceResult;
 import uk.gov.bis.lite.permissions.spire.adapters.SpireLicenceAdapter;
 import uk.gov.bis.lite.permissions.spire.clients.SpireLicencesClient;
 import uk.gov.bis.lite.permissions.spire.exceptions.SpireUserNotFoundException;
@@ -27,7 +26,7 @@ public class LicenceServiceImpl implements LicenceService {
   }
 
   @Override
-  public SingleLicenceResult getLicence(String userId, String reference) {
+  public LicenceResult getLicenceByRef(String userId, String reference) {
     SpireRequest spireRequest = client.createRequest();
     spireRequest.addChild("userId", userId);
     spireRequest.addChild("reference", reference);
@@ -37,19 +36,21 @@ public class LicenceServiceImpl implements LicenceService {
           .map(SpireLicenceAdapter::adapt)
           .collect(Collectors.toList());
       if (licences.isEmpty()) {
-        return new SingleLicenceResult(Status.OK, null);
+        String errorMessage = String.format("No licence with reference %s found for userId %s", reference, userId);
+        return new LicenceResult(Status.REGISTRATION_NOT_FOUND, errorMessage, null);
       } else if (licences.size() == 1) {
-        return new SingleLicenceResult(Status.OK, licences.get(0));
+        return new LicenceResult(Status.OK, null, licences);
       } else {
-        throw new LicenceServiceException(String.format("Too many results from spire client, expected 1 but got %d", licences.size()));
+        String errorMessage = String.format("Too many results from spire client, expected 1 but got %d", licences.size());
+        return new LicenceResult(Status.TOO_MANY_REGISTRATIONS, errorMessage, null);
       }
     } catch (SpireUserNotFoundException e) {
-      return new SingleLicenceResult(Status.USER_ID_NOT_FOUND, null);
+      return userNotFound(userId);
     }
   }
 
   @Override
-  public MultipleLicenceResult getLicences(String userId) {
+  public LicenceResult getAllLicences(String userId) {
     SpireRequest spireRequest = client.createRequest();
     spireRequest.addChild("userId", userId);
     try {
@@ -58,14 +59,14 @@ public class LicenceServiceImpl implements LicenceService {
           .map(SpireLicenceAdapter::adapt)
           .sorted(Comparator.comparing(LicenceView::getLicenceRef))
           .collect(Collectors.toList());
-      return new MultipleLicenceResult(Status.OK, licenceViews);
+      return new LicenceResult(Status.OK, null, licenceViews);
     } catch (SpireUserNotFoundException e) {
-      return new MultipleLicenceResult(Status.USER_ID_NOT_FOUND, null);
+      return userNotFound(userId);
     }
   }
 
   @Override
-  public MultipleLicenceResult getLicences(String userId, LicenceTypeParam type) {
+  public LicenceResult getLicencesByType(String userId, LicenceTypeParam type) {
     SpireRequest spireRequest = client.createRequest();
     spireRequest.addChild("userId", userId);
     spireRequest.addChild("type", type.name());
@@ -75,9 +76,15 @@ public class LicenceServiceImpl implements LicenceService {
           .map(SpireLicenceAdapter::adapt)
           .sorted(Comparator.comparing(LicenceView::getLicenceRef))
           .collect(Collectors.toList());
-      return new MultipleLicenceResult(Status.OK, licenceViews);
+      return new LicenceResult(Status.OK, null, licenceViews);
     } catch (SpireUserNotFoundException e) {
-      return new MultipleLicenceResult(Status.USER_ID_NOT_FOUND, null);
+      return userNotFound(userId);
     }
   }
+
+  private LicenceResult userNotFound(String userId) {
+    String errorMessage = "Unable to find user with user id " + userId;
+    return new LicenceResult(Status.USER_ID_NOT_FOUND, errorMessage, null);
+  }
+
 }

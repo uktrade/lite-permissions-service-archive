@@ -24,23 +24,24 @@ import uk.gov.bis.lite.permissions.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Singleton
 public class RegisterServiceImpl implements RegisterService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RegisterServiceImpl.class);
+  private static final ObjectMapper MAPPER = new ObjectMapper();
 
-  private OgelSubmissionDao submissionDao;
-  private org.quartz.Scheduler scheduler;
-  private ProcessSubmissionService processSubmissionService;
-  private ObjectMapper mapper;
+  private final OgelSubmissionDao submissionDao;
+  private final org.quartz.Scheduler scheduler;
+  private final ProcessSubmissionService processSubmissionService;
+
 
   @Inject
   public RegisterServiceImpl(OgelSubmissionDao submissionDao, org.quartz.Scheduler scheduler, ProcessSubmissionService processSubmissionService) {
     this.submissionDao = submissionDao;
     this.scheduler = scheduler;
     this.processSubmissionService = processSubmissionService;
-    this.mapper = new ObjectMapper();
   }
 
   /**
@@ -54,7 +55,7 @@ public class RegisterServiceImpl implements RegisterService {
     sub.setRoleUpdate(param.roleUpdateRequired());
     sub.setCalledBack(false);
     try {
-      sub.setJson(mapper.writeValueAsString(param));
+      sub.setJson(MAPPER.writeValueAsString(param));
     } catch (JsonProcessingException e) {
       LOGGER.error("JsonProcessingException", e);
     }
@@ -208,13 +209,8 @@ public class RegisterServiceImpl implements RegisterService {
    * and at least one part of address must be not null/blank - to be valid
    */
   private boolean registerAddressParamValid(RegisterAddressParam param) {
-    boolean valid = false;
-    if (param != null && !StringUtils.isBlank(param.getCountry())) {
-      if (!StringUtils.isBlank(param.getLine1()) || !StringUtils.isBlank(param.getLine2()) || !StringUtils.isBlank(param.getTown())
-          || !StringUtils.isBlank(param.getPostcode()) || !StringUtils.isBlank(param.getCounty())) {
-        valid = true;
-      }
-    }
-    return valid;
+    return param != null && StringUtils.isNotBlank(param.getCountry()) &&
+        Stream.of(param.getLine1(), param.getLine2(), param.getTown(), param.getPostcode(), param.getCounty())
+            .anyMatch(StringUtils::isNotBlank);
   }
 }

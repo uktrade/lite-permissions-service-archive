@@ -1,6 +1,5 @@
 package uk.gov.bis.lite.permissions.resource;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.bis.lite.permissions.spire.SpireLicenceUtil.generateToken;
 
@@ -13,6 +12,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.bis.lite.common.jwt.LiteJwtAuthFilterHelper;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
+import uk.gov.bis.lite.permissions.Util;
 import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
 import uk.gov.bis.lite.permissions.mocks.RegistrationServiceMock;
 
@@ -22,20 +22,14 @@ import java.util.Map;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
-public class ResourceOgelRegistrationTest {
+public class OgelRegistrationResourceTest {
 
-  private int OK = Response.Status.OK.getStatusCode();
-  private int NOT_FOUND = Response.Status.NOT_FOUND.getStatusCode();
-  private int UNAUTHORIZED = Response.Status.UNAUTHORIZED.getStatusCode();
-
-  private static int MOCK_REGISTRATIONS_NUMBER = 3;
-  private static String MOCK_REGISTRATION_TAG = "SPIRE";
-  private static String JWT_SHARED_SECRET = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
-  private static RegistrationServiceMock mockRegistrationsService = new RegistrationServiceMock(MOCK_REGISTRATION_TAG, MOCK_REGISTRATIONS_NUMBER);
+  private static final String JWT_SHARED_SECRET = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
+  private static final RegistrationServiceMock MOCK_REGISTRATIONS_SERVICE = new RegistrationServiceMock();
 
   @Before
   public void setUp() throws Exception {
-    mockRegistrationsService.resetState();
+    MOCK_REGISTRATIONS_SERVICE.resetState();
   }
 
   @ClassRule
@@ -43,7 +37,7 @@ public class ResourceOgelRegistrationTest {
       .setTestContainerFactory(new GrizzlyWebTestContainerFactory())
       .addProvider(new AuthDynamicFeature(LiteJwtAuthFilterHelper.buildAuthFilter(JWT_SHARED_SECRET)))
       .addProvider(new AuthValueFactoryProvider.Binder<>(LiteJwtUser.class))
-      .addResource(new OgelRegistrationResource(mockRegistrationsService)).build();
+      .addResource(new OgelRegistrationResource(MOCK_REGISTRATIONS_SERVICE)).build();
 
   @Test
   public void viewOgelRegistrations() {
@@ -53,8 +47,8 @@ public class ResourceOgelRegistrationTest {
         .request()
         .header("Authorization", "Bearer " + token)
         .get();
-    assertThat(status(response)).isEqualTo(OK);
-    assertThat(getOgelRegistrationsResponse(response).size()).isEqualTo(MOCK_REGISTRATIONS_NUMBER);
+    assertThat(response.getStatus()).isEqualTo(200);
+    assertThat(getOgelRegistrationsResponse(response)).hasSize(1);
   }
 
   @Test
@@ -63,7 +57,8 @@ public class ResourceOgelRegistrationTest {
         .target("/ogel-registrations/user/1")
         .request()
         .get();
-    assertThat(status(response)).isEqualTo(UNAUTHORIZED);
+    assertThat(response.getStatus()).isEqualTo(401);
+    assertThat(response.readEntity(String.class)).isEqualTo("Credentials are required to access this resource.");
   }
 
   @Test
@@ -74,29 +69,43 @@ public class ResourceOgelRegistrationTest {
         .request()
         .header("Authorization", "Bearer " + token)
         .get();
-    assertThat(status(response)).isEqualTo(UNAUTHORIZED);
-    Map<String, String> map = response.readEntity(new GenericType<Map<String, String>>(){});
-    assertThat(map.entrySet().size()).isEqualTo(2);
-    assertThat(map.get("code")).isEqualTo(Integer.toString(UNAUTHORIZED));
-    assertThat(map.get("message")).contains("userId \"1\" does not match value supplied in token (999)");
+    assertThat(response.getStatus()).isEqualTo(401);
+
+    Map<String, String> map = Util.getResponseMap(response);
+    assertThat(map).hasSize(2);
+    assertThat(map).containsEntry("code", "401");
+    assertThat(map).containsEntry("message", "userId 1 does not match value supplied in token 999");
   }
 
   @Test
-  public void viewOgelRegistrationsWithParam1() {
+  public void viewOgelRegistrationsNoResults() {
+    MOCK_REGISTRATIONS_SERVICE.setNoResults(true);
     String token = generateToken(JWT_SHARED_SECRET, "1");
     Response response = resources.getJerseyTest()
         .target("/ogel-registrations/user/1")
-        .queryParam("registrationReference", MOCK_REGISTRATION_TAG + "1")
         .request()
         .header("Authorization", "Bearer " + token)
         .get();
-    assertThat(status(response)).isEqualTo(OK);
-    assertThat(getOgelRegistrationsResponse(response).size()).isEqualTo(1);
+    assertThat(response.getStatus()).isEqualTo(200);
+    assertThat(getOgelRegistrationsResponse(response).isEmpty());
   }
 
   @Test
-  public void viewOgelRegistrationsWithParam2() {
-    mockRegistrationsService.setUserNotFound(true); // Update mockRegistrationsService first
+  public void viewOgelRegistrationsWithReference() {
+    String token = generateToken(JWT_SHARED_SECRET, "1");
+    Response response = resources.getJerseyTest()
+        .target("/ogel-registrations/user/1")
+        .queryParam("registrationReference", "REG_REF")
+        .request()
+        .header("Authorization", "Bearer " + token)
+        .get();
+    assertThat(response.getStatus()).isEqualTo(200);
+    assertThat(getOgelRegistrationsResponse(response)).hasSize(1);
+  }
+
+  @Test
+  public void viewOgelRegistrationsWithReferenceUserNotFound() {
+    MOCK_REGISTRATIONS_SERVICE.setUserNotFound(true);
     String token = generateToken(JWT_SHARED_SECRET, "1");
     Response response = resources.getJerseyTest()
         .target("/ogel-registrations/user/1")
@@ -104,43 +113,38 @@ public class ResourceOgelRegistrationTest {
         .request()
         .header("Authorization", "Bearer " + token)
         .get();
-    assertThat(status(response)).isEqualTo(NOT_FOUND);
+    assertThat(response.getStatus()).isEqualTo(404);
+
+    Map<String, String> map = Util.getResponseMap(response);
+    assertThat(map).hasSize(2);
+    assertThat(map).containsEntry("code", "404");
+    assertThat(map).containsEntry("message", "Unable to find user with user id 1");
   }
 
   @Test
-  public void viewOgelRegistrationsWithParam3() {
-    mockRegistrationsService.setNoResults(true);
+  public void viewOgelRegistrationsWithReferenceNoResults() {
+    MOCK_REGISTRATIONS_SERVICE.setNoResults(true);
     String token = generateToken(JWT_SHARED_SECRET, "1");
     Response response = resources.getJerseyTest()
         .target("/ogel-registrations/user/1")
-        .queryParam("registrationReference", MOCK_REGISTRATION_TAG + "1")
+        .queryParam("registrationReference", "REG_REF")
         .request()
         .header("Authorization", "Bearer " + token)
         .get();
-    assertThat(status(response)).isEqualTo(NOT_FOUND);
-  }
+    assertThat(response.getStatus()).isEqualTo(404);
 
-  @Test
-  public void viewOgelRegistrationsNoResults() {
-    mockRegistrationsService.setNoResults(true); // Update mockRegistrationsService first
-    String token = generateToken(JWT_SHARED_SECRET, "1");
-    Response response = resources.getJerseyTest()
-        .target("/ogel-registrations/user/1")
-        .request()
-        .header("Authorization", "Bearer " + token)
-        .get();
-    assertThat(status(response)).isEqualTo(OK);
-    assertThat(getOgelRegistrationsResponse(response).isEmpty()).isTrue();
+    Map<String, String> map = Util.getResponseMap(response);
+    assertThat(map).hasSize(2);
+    assertThat(map).containsEntry("code", "404");
+    assertThat(map).containsEntry("message", "No licence with reference REG_REF found for userId 1");
   }
 
   /**
    * Private Methods
    */
   private List<OgelRegistrationView> getOgelRegistrationsResponse(Response response) {
-    return (List<OgelRegistrationView>) response.readEntity(List.class);
+    return response.readEntity(new GenericType<List<OgelRegistrationView>>() {
+    });
   }
 
-  private int status(Response response) {
-    return response.getStatus();
-  }
 }

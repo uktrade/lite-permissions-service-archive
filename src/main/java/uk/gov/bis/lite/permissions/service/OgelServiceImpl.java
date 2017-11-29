@@ -18,7 +18,7 @@ public class OgelServiceImpl implements OgelService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(OgelServiceImpl.class);
 
-  private SpireReferenceClient createOgelAppReferenceClient;
+  private final SpireReferenceClient createOgelAppReferenceClient;
 
   @Inject
   public OgelServiceImpl(SpireReferenceClient createOgelAppReferenceClient) {

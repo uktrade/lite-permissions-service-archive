@@ -64,25 +64,13 @@ public class CustomerServiceMock implements CustomerService {
   }
 
   public void resetAllCounts() {
-    resetCustomerCallCount();
-    resetSiteCallCount();
-    resetUserRoleCallCount();
+    this.customerCallCount = 0;
+    this.siteCallCount = 0;
+    this.uerRoleCallCount = 0;
   }
 
   public void resetFailEvent() {
     this.failEvent = null;
-  }
-
-  public void resetCustomerCallCount() {
-    this.customerCallCount = 0;
-  }
-
-  public void resetSiteCallCount() {
-    this.siteCallCount = 0;
-  }
-
-  public void resetUserRoleCallCount() {
-    this.uerRoleCallCount = 0;
   }
 
   public void setCreateCustomerSuccess(boolean createCustomerSuccess) {

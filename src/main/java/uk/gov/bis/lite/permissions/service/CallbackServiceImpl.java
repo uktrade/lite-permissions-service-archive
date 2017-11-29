@@ -20,7 +20,7 @@ public class CallbackServiceImpl implements CallbackService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CallbackServiceImpl.class);
 
-  private Client httpClient;
+  private final Client httpClient;
 
   @Inject
   public CallbackServiceImpl(Client httpClient) {
@@ -62,7 +62,7 @@ public class CallbackServiceImpl implements CallbackService {
       view.setRegistrationReference(sub.getSpireRef()); // set Registration reference
       view.setResult(CallbackView.Result.SUCCESS);      // set Result to SUCCESS
     } else {
-      if(sub.hasFailReason()) {
+      if (sub.hasFailReason()) {
         view.setResult(sub.getFailReason().toResult()); // set Result from FailReason mapping
       } else {
         view.setResult(CallbackView.Result.FAILED);     // set Result to FAILED

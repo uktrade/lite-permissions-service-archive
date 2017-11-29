@@ -3,8 +3,6 @@ package uk.gov.bis.lite.permissions.resource;
 import com.google.inject.Inject;
 import io.dropwizard.auth.Auth;
 import io.dropwizard.auth.PrincipalImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.api.view.OgelSubmissionView;
 import uk.gov.bis.lite.permissions.service.SubmissionService;
 
@@ -25,8 +23,7 @@ import javax.ws.rs.core.Response;
 @Path("")
 public class OgelSubmissionResource {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(OgelRegistrationResource.class);
-  private SubmissionService submissionService;
+  private final SubmissionService submissionService;
 
   @Inject
   public OgelSubmissionResource(SubmissionService submissionService) {
@@ -34,24 +31,25 @@ public class OgelSubmissionResource {
   }
 
   @GET
-  @Produces({MediaType.APPLICATION_JSON})
+  @Produces(MediaType.APPLICATION_JSON)
   @Path("/ogel-submissions")
   public List<OgelSubmissionView> viewOgelSubmissions(@Auth PrincipalImpl user, @DefaultValue("PENDING") @QueryParam("filter") String filter) {
     return submissionService.getOgelSubmissions(filter);
   }
 
   @GET
-  @Produces({MediaType.APPLICATION_JSON})
+  @Produces(MediaType.APPLICATION_JSON)
   @Path("/ogel-submissions/{id}")
   public OgelSubmissionView viewOgelSubmission(@Auth PrincipalImpl user, @NotNull @PathParam("id") int id) {
     if (!submissionService.ogelSubmissionExists(id)) {
       throw new WebApplicationException("Ogel Submission not found", Response.Status.NOT_FOUND);
+    } else {
+      return submissionService.getOgelSubmission(id);
     }
-    return submissionService.getOgelSubmission(id);
   }
 
   @DELETE
-  @Produces({MediaType.APPLICATION_JSON})
+  @Produces(MediaType.APPLICATION_JSON)
   @Path("/ogel-submissions")
   public Response cancelScheduledSubmissions(@Auth PrincipalImpl user) {
     submissionService.cancelPendingScheduledOgelSubmissions();
@@ -59,14 +57,15 @@ public class OgelSubmissionResource {
   }
 
   @DELETE
-  @Produces({MediaType.APPLICATION_JSON})
+  @Produces(MediaType.APPLICATION_JSON)
   @Path("/ogel-submissions/{id}")
   public Response cancelScheduledSubmission(@Auth PrincipalImpl user, @NotNull @PathParam("id") int id) {
     if (!submissionService.ogelSubmissionExists(id)) {
       return Response.status(Response.Status.NOT_FOUND).build();
+    } else {
+      submissionService.cancelScheduledOgelSubmission(id);
+      return Response.status(Response.Status.OK).build();
     }
-    submissionService.cancelScheduledOgelSubmission(id);
-    return Response.status(Response.Status.OK).build();
   }
 
 }

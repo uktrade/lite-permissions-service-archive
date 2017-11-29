@@ -14,7 +14,6 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
 import org.skife.jdbi.v2.DBI;
-import ru.vyarus.dropwizard.guice.module.support.ConfigurationAwareModule;
 import uk.gov.bis.lite.common.jersey.filter.ClientCorrelationIdFilter;
 import uk.gov.bis.lite.common.spire.client.SpireClientConfig;
 import uk.gov.bis.lite.common.spire.client.SpireRequestConfig;
@@ -49,9 +48,7 @@ import uk.gov.bis.lite.permissions.spire.parsers.OgelRegistrationParser;
 
 import javax.ws.rs.client.Client;
 
-public class GuiceModule extends AbstractModule implements ConfigurationAwareModule<PermissionsAppConfig> {
-
-  private PermissionsAppConfig config;
+public class GuiceModule extends AbstractModule {
 
   @Provides
   @Singleton
@@ -119,19 +116,19 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
   }
 
   @Provides
-  @javax.inject.Named("customerServiceUrl")
+  @Named("customerServiceUrl")
   String provideCustomerServiceUrl(PermissionsAppConfig config) {
     return config.getCustomerServiceUrl();
   }
 
   @Provides
-  @javax.inject.Named("maxMinutesRetryAfterFail")
+  @Named("maxMinutesRetryAfterFail")
   int provideMaxMinutesRetryAfterFail(PermissionsAppConfig config) {
     return Integer.parseInt(config.getMaxMinutesRetryAfterFail());
   }
 
   @Provides
-  @javax.inject.Named("maxCallbackFailCount")
+  @Named("maxCallbackFailCount")
   int provideCallbackFailCount(PermissionsAppConfig config) {
     return Integer.parseInt(config.getMaxCallbackFailCount());
   }
@@ -146,11 +143,6 @@ public class GuiceModule extends AbstractModule implements ConfigurationAwareMod
   @Provides
   public Scheduler provideScheduler() throws SchedulerException {
     return new StdSchedulerFactory().getScheduler();
-  }
-
-  @Override
-  public void setConfiguration(PermissionsAppConfig config) {
-    this.config = config;
   }
 
 }

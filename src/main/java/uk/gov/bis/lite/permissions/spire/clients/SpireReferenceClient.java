@@ -10,12 +10,6 @@ public class SpireReferenceClient extends SpireClient<String> {
 
   public SpireReferenceClient(SpireParser<String> parser,
                               SpireClientConfig clientConfig,
-                              SpireRequestConfig requestConfig) {
-    super(parser, clientConfig, requestConfig);
-  }
-
-  public SpireReferenceClient(SpireParser<String> parser,
-                              SpireClientConfig clientConfig,
                               SpireRequestConfig requestConfig,
                               ErrorHandler errorHandler) {
     super(parser, clientConfig, requestConfig, errorHandler);

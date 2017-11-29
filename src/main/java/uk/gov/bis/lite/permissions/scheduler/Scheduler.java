@@ -21,7 +21,7 @@ public class Scheduler implements Managed {
 
   private final org.quartz.Scheduler scheduler;
   private final PermissionsAppConfig config;
-  private ProcessSubmissionService processSubmissionService;
+  private final ProcessSubmissionService processSubmissionService;
 
   public static final String JOB_PROCESS_SERVICE_NAME = "processSubmissionService";
   public static final String SUBMISSION_ID = "SUBMISSION_ID";

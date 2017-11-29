@@ -31,7 +31,6 @@ import uk.gov.bis.lite.permissions.util.SimpleAuthenticator;
 
 public class PermissionsApp extends Application<PermissionsAppConfig> {
 
-  private GuiceBundle<PermissionsAppConfig> guiceBundle;
   private final Module module;
 
   public PermissionsApp() {
@@ -43,13 +42,9 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
     this.module = module;
   }
 
-  public <T> T getInstance(Class<T> type) {
-    return getGuiceBundle().getInjector().getInstance(type);
-  }
-
   @Override
   public void initialize(Bootstrap<PermissionsAppConfig> bootstrap) {
-    guiceBundle = new GuiceBundle.Builder<PermissionsAppConfig>()
+    GuiceBundle<PermissionsAppConfig> guiceBundle = new GuiceBundle.Builder<PermissionsAppConfig>()
         .modules(module)
         .installers(ResourceInstaller.class, ManagedInstaller.class)
         .extensions(RegisterOgelResource.class, OgelRegistrationResource.class, OgelSubmissionResource.class, LicenceResource.class, Scheduler.class)
@@ -69,10 +64,8 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
 
     JwtAuthFilter<LiteJwtUser> liteJwtUserJwtAuthFilter = LiteJwtAuthFilterHelper.buildAuthFilter(jwtSharedSecret);
 
-    PolymorphicAuthDynamicFeature authFeature = new PolymorphicAuthDynamicFeature(
-        ImmutableMap.of(
-            PrincipalImpl.class, basicAuthFilter,
-            LiteJwtUser.class, liteJwtUserJwtAuthFilter));
+    PolymorphicAuthDynamicFeature authFeature = new PolymorphicAuthDynamicFeature<>(
+        ImmutableMap.of(PrincipalImpl.class, basicAuthFilter, LiteJwtUser.class, liteJwtUserJwtAuthFilter));
 
     AbstractBinder authBinder = new PolymorphicAuthValueFactoryProvider.Binder<>(
         ImmutableSet.of(PrincipalImpl.class, LiteJwtUser.class));
@@ -87,10 +80,6 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
     flyway.setDataSource(dataSourceFactory.getUrl(), dataSourceFactory.getUser(), dataSourceFactory.getPassword());
     flyway.migrate();
 
-  }
-
-  public GuiceBundle<PermissionsAppConfig> getGuiceBundle() {
-    return guiceBundle;
   }
 
   public static void main(String[] args) throws Exception {

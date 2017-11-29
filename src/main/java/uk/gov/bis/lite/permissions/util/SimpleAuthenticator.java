@@ -1,15 +1,16 @@
 package uk.gov.bis.lite.permissions.util;
 
-
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
 import io.dropwizard.auth.PrincipalImpl;
 import io.dropwizard.auth.basic.BasicCredentials;
 
+import java.util.Optional;
+
 public class SimpleAuthenticator implements Authenticator<BasicCredentials, PrincipalImpl> {
 
-  private String login;
-  private String password;
+  private final String login;
+  private final String password;
 
   public SimpleAuthenticator(String login, String password) {
     this.login = login;
@@ -17,10 +18,11 @@ public class SimpleAuthenticator implements Authenticator<BasicCredentials, Prin
   }
 
   @Override
-  public java.util.Optional<PrincipalImpl> authenticate(BasicCredentials credentials) throws AuthenticationException {
+  public Optional<PrincipalImpl> authenticate(BasicCredentials credentials) throws AuthenticationException {
     if (password.equals(credentials.getPassword()) && login.equals(credentials.getUsername())) {
-      return java.util.Optional.of(new PrincipalImpl(credentials.getUsername()));
+      return Optional.of(new PrincipalImpl(credentials.getUsername()));
+    } else {
+      return Optional.empty();
     }
-    return java.util.Optional.empty();
   }
 }

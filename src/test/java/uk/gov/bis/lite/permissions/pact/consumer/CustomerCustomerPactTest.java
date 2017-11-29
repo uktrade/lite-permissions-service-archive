@@ -1,6 +1,5 @@
 package uk.gov.bis.lite.permissions.pact.consumer;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import au.com.dius.pact.consumer.Pact;
@@ -26,14 +25,14 @@ import javax.ws.rs.client.ClientBuilder;
  */
 public class CustomerCustomerPactTest extends CustomerBasePactTest {
 
-  private CustomerService customerService;
-
   private static final String COMPANY_NUMBER_SUCCESS = "COMPANY_NUMBER_SUCCESS";
   private static final String COMPANY_NUMBER_FAIL = "COMPANY_NUMBER_FAIL";
   private static final String CUSTOMER_ID_VALUE = "CUSTOMER_ID_VALUE";
 
+  private CustomerService customerService;
+
   @Rule
-  public PactProviderRule mockProvider = new PactProviderRule(PROVIDER, this);
+  public final PactProviderRule mockProvider = new PactProviderRule(PROVIDER, this);
 
   @Before
   public void before() {
@@ -46,14 +45,14 @@ public class CustomerCustomerPactTest extends CustomerBasePactTest {
     return builder
         .given("new customer is valid")
         .uponReceiving("request to create a new customer")
-          .path("/create-customer")
-          .headers(headers())
-          .method("POST")
-          .body(customerParamPactDsl())
-          .willRespondWith()
-            .headers(headers())
-            .status(200)
-            .body(customerViewPactDsl())
+        .path("/create-customer")
+        .headers(headers())
+        .method("POST")
+        .body(customerParamPactDsl())
+        .willRespondWith()
+        .headers(headers())
+        .status(200)
+        .body(customerViewPactDsl())
         .toFragment();
   }
 
@@ -63,11 +62,11 @@ public class CustomerCustomerPactTest extends CustomerBasePactTest {
     return builder
         .given("new customer is invalid")
         .uponReceiving("request to create a new customer")
-          .path("/create-customer")
-          .headers(headers())
-          .method("POST")
-          .willRespondWith()
-            .status(400)
+        .path("/create-customer")
+        .headers(headers())
+        .method("POST")
+        .willRespondWith()
+        .status(400)
         .toFragment();
   }
 
@@ -77,12 +76,12 @@ public class CustomerCustomerPactTest extends CustomerBasePactTest {
     return builder
         .given("customer successfully retrieved")
         .uponReceiving("request to get customer")
-          .path("/search-customers/registered-number/" + COMPANY_NUMBER_SUCCESS)
-          .method("GET")
-          .willRespondWith()
-            .status(200)
-            .headers(headers())
-            .body(customerViewPactDsl())
+        .path("/search-customers/registered-number/" + COMPANY_NUMBER_SUCCESS)
+        .method("GET")
+        .willRespondWith()
+        .status(200)
+        .headers(headers())
+        .body(customerViewPactDsl())
         .toFragment();
   }
 
@@ -92,10 +91,10 @@ public class CustomerCustomerPactTest extends CustomerBasePactTest {
     return builder
         .given("customer not found")
         .uponReceiving("request to get customer")
-          .path("/search-customers/registered-number/" + COMPANY_NUMBER_FAIL)
-          .method("GET")
-          .willRespondWith()
-            .status(404)
+        .path("/search-customers/registered-number/" + COMPANY_NUMBER_FAIL)
+        .method("GET")
+        .willRespondWith()
+        .status(404)
         .toFragment();
   }
 
@@ -103,8 +102,7 @@ public class CustomerCustomerPactTest extends CustomerBasePactTest {
   @PactVerification(value = PROVIDER, fragment = "createCustomerSuccess")
   public void testCreateCustomerSuccessServicePact() throws Exception {
     Optional<String> customerRefOpt = customerService.createCustomer(ogelSubmission());
-    assertThat(customerRefOpt).isPresent();
-    assertThat(customerRefOpt.get()).isEqualTo(CUSTOMER_ID_VALUE);
+    assertThat(customerRefOpt).hasValue(CUSTOMER_ID_VALUE);
   }
 
   @Test
@@ -119,8 +117,7 @@ public class CustomerCustomerPactTest extends CustomerBasePactTest {
   @PactVerification(value = PROVIDER, fragment = "customerByCompanyNumberSuccess")
   public void testCustomerByCompanyNumberSuccessServicePact() throws Exception {
     Optional<String> customerRefOpt = customerService.getCustomerIdByCompanyNumber(COMPANY_NUMBER_SUCCESS);
-    assertThat(customerRefOpt).isPresent();
-    assertThat(customerRefOpt.get()).isEqualTo(CUSTOMER_ID_VALUE);
+    assertThat(customerRefOpt).hasValue(CUSTOMER_ID_VALUE);
   }
 
   @Test

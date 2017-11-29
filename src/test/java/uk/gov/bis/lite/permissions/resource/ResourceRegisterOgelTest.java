@@ -18,16 +18,12 @@ import javax.ws.rs.core.Response;
 
 public class ResourceRegisterOgelTest {
 
-  private int OK = Response.Status.OK.getStatusCode();
-  private int NOT_OK = Response.Status.BAD_REQUEST.getStatusCode();
-
-  private static String MOCK_USER_ID = "ID1";
-  private static String MOCK_OGEL_TYPE = "TYPE1";
-  private static String MOCK_SAR_REF = "SAR1";
-  private static String MOCK_SITE_REF = "SITE1";
-  private static String MOCK_SUBMISSION_REF = "SUB1";
-  private static RegisterServiceMock mockRegisterService = new RegisterServiceMock(MOCK_SUBMISSION_REF);
-  private static SubmissionServiceMock mockSubmissionService = new SubmissionServiceMock();
+  private static final String MOCK_USER_ID = "ID1";
+  private static final String MOCK_OGEL_TYPE = "TYPE1";
+  private static final String MOCK_SAR_REF = "SAR1";
+  private static final String MOCK_SITE_REF = "SITE1";
+  private static final RegisterServiceMock mockRegisterService = new RegisterServiceMock();
+  private static final SubmissionServiceMock mockSubmissionService = new SubmissionServiceMock();
 
   @ClassRule
   public static final ResourceTestRule resources = ResourceTestRule.builder()
@@ -37,7 +33,7 @@ public class ResourceRegisterOgelTest {
   public void invalidRegisterOgel() {
     Response response = request("/register-ogel", MediaType.APPLICATION_JSON)
         .post(Entity.entity(new RegisterParam(), MediaType.APPLICATION_JSON));
-    assertThat(status(response)).isEqualTo(NOT_OK);
+    assertThat(response.getStatus()).isEqualTo(400);
   }
 
   @Test
@@ -45,7 +41,7 @@ public class ResourceRegisterOgelTest {
     mockSubmissionService.setSubmissionCurrentlyExists(true); // Update mockSubmissionService first
     Response response = request("/register-ogel", MediaType.APPLICATION_JSON)
         .post(Entity.entity(getValidRegisterOgel(), MediaType.APPLICATION_JSON));
-    assertThat(status(response)).isEqualTo(NOT_OK);
+    assertThat(response.getStatus()).isEqualTo(400);
   }
 
   @Test
@@ -53,8 +49,8 @@ public class ResourceRegisterOgelTest {
     mockSubmissionService.setSubmissionCurrentlyExists(false);  // Update mockSubmissionService first
     Response response = request("/register-ogel", MediaType.APPLICATION_JSON)
         .post(Entity.entity(getValidRegisterOgel(), MediaType.APPLICATION_JSON));
-    assertThat(status(response)).isEqualTo(OK);
-    assertThat(getResponseRequestId(response)).isEqualTo(MOCK_SUBMISSION_REF);
+    assertThat(response.getStatus()).isEqualTo(200);
+    assertThat(getResponseRequestId(response)).isEqualTo("SUB1");
   }
 
   /**
@@ -66,10 +62,6 @@ public class ResourceRegisterOgelTest {
 
   private WebTarget target(String url) {
     return resources.client().target(url);
-  }
-
-  private int status(Response response) {
-    return response.getStatus();
   }
 
   private RegisterParam getValidRegisterOgel() {

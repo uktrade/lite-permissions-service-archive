@@ -24,7 +24,7 @@ public class LicenceErrorHandlerTest {
     errorHandler = new LicenceErrorHandler();
   }
 
-  static SpireResponse createSpireResponse(String soapMessageString) throws Exception {
+  private static SpireResponse createSpireResponse(String soapMessageString) throws Exception {
     InputStream is = new ByteArrayInputStream(soapMessageString.getBytes());
     SOAPMessage soapMessage = MessageFactory.newInstance().createMessage(null, is);
     return new SpireResponse(soapMessage);

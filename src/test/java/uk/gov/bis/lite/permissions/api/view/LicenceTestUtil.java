@@ -157,7 +157,7 @@ public class LicenceTestUtil {
         .setExternalDocumentUrl("http://www.example.org");
   }
 
-  public static SpireLicence generateSpireLicenceC() {
+  private static SpireLicence generateSpireLicenceC() {
     return new SpireLicence()
         .setReference("REF-789")
         .setOriginalApplicationReference("OREF-789")

@@ -1,8 +1,6 @@
 package uk.gov.bis.lite.permissions.service;
 
 import com.google.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.api.view.OgelSubmissionView;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
@@ -13,15 +11,13 @@ import java.util.stream.Collectors;
 
 public class SubmissionServiceImpl implements SubmissionService {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(SubmissionServiceImpl.class);
-
-  private OgelSubmissionDao submissionDao;
+  private final OgelSubmissionDao submissionDao;
 
   /**
    * Used to filter OgelSubmission queries
    */
   private enum Filter {
-    PENDING, CANCELLED, FINISHED;
+    PENDING, CANCELLED, FINISHED
   }
 
   @Inject

@@ -12,18 +12,16 @@ import static uk.gov.bis.lite.permissions.api.view.LicenceTestUtil.assertLicence
 import static uk.gov.bis.lite.permissions.api.view.LicenceTestUtil.assertLicenceViewC;
 import static uk.gov.bis.lite.permissions.spire.SpireLicenceUtil.generateToken;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.Test;
+import uk.gov.bis.lite.permissions.Util;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
 /**
@@ -32,17 +30,12 @@ import javax.ws.rs.core.Response;
  * GET     /licences/{userId} (uk.gov.bis.lite.permissions.resource.LicenceResource)
  * </pre>
  */
-public class LicenceEndpointsIntegrationTest extends BaseIntegrationTest {
+public class LicenceIntegrationTest extends BaseIntegrationTest {
 
-  private static final String LICENCES_URL = "/licences/";
+  private static final String LICENCES_URL = "/licences/user/";
   private static final String JWT_SHARED_SECRET = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
 
-  private static final ObjectMapper MAPPER;
-
-  static {
-    MAPPER = new ObjectMapper();
-    MAPPER.registerModule(new JavaTimeModule());
-  }
+  private static final ObjectMapper MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
 
   private void stubForBody(String body) {
     stubFor(post(urlEqualTo("/spire/fox/ispire/SPIRE_LICENCES"))
@@ -164,7 +157,7 @@ public class LicenceEndpointsIntegrationTest extends BaseIntegrationTest {
   public void filterLicencesByRefExistsTest() throws Exception {
     stubForBody(fixture("fixture/soap/SPIRE_LICENCES/singleLicence.xml"));
 
-    Response response = get(LICENCES_URL + "123456", "ref", "REF-123");
+    Response response = get(LICENCES_URL + "123456", "licenceReference", "REF-123");
 
     assertThat(response.getStatus()).isEqualTo(200);
     assertThat(response.getHeaderString("Content-Type")).isEqualTo("application/json");
@@ -178,32 +171,30 @@ public class LicenceEndpointsIntegrationTest extends BaseIntegrationTest {
   public void filterLicencesByRefExistsTooManyLicencesTest() throws Exception {
     stubForBody(fixture("fixture/soap/SPIRE_LICENCES/multipleLicences.xml"));
 
-    Response response = get(LICENCES_URL + "123456", "ref", "REF-123");
+    Response response = get(LICENCES_URL + "123456", "licenceReference", "REF-123");
 
     assertThat(response.getStatus()).isEqualTo(400);
     assertThat(response.getHeaderString("Content-Type")).isEqualTo("application/json");
 
-    TypeReference<HashMap<String, String>> typeRef = new TypeReference<HashMap<String, String>>() {};
-    Map<String, String> map = MAPPER.readValue(response.readEntity(String.class), typeRef);
-
-    System.out.println(map.get("code"));
-
-    System.out.println(map.get("message"));
+    Map<String, String> map = Util.getResponseMap(response);
+    assertThat(map).hasSize(2);
+    assertThat(map).containsEntry("code", "400");
+    assertThat(map).containsEntry("message", "Too many results from spire client, expected 1 but got 3");
   }
 
   @Test
   public void filterLicencesByRefDoesNotExistTest() throws Exception {
     stubForBody(fixture("fixture/soap/SPIRE_LICENCES/noLicences.xml"));
 
-    Response response = get(LICENCES_URL + "123456", "ref", "REF-999");
+    Response response = get(LICENCES_URL + "123456", "licenceReference", "REF-999");
 
     assertThat(response.getStatus()).isEqualTo(404);
     assertThat(response.getHeaderString("Content-Type")).isEqualTo("application/json");
 
-    Map<String, String> map = response.readEntity(new GenericType<Map<String, String>>(){});
-    assertThat(map.entrySet().size()).isEqualTo(2);
-    assertThat(map.get("code")).isEqualTo("404");
-    assertThat(map.get("message")).contains("No licence with ref \"REF-999\" found for userId \"123456\"");
+    Map<String, String> map = Util.getResponseMap(response);
+    assertThat(map).hasSize(2);
+    assertThat(map).containsEntry("code", "404");
+    assertThat(map).containsEntry("message", "No licence with reference REF-999 found for userId 123456");
   }
 
   @Test

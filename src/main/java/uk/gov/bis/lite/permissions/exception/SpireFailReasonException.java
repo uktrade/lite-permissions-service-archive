@@ -6,7 +6,7 @@ import javax.ws.rs.WebApplicationException;
 
 public class SpireFailReasonException extends WebApplicationException {
 
-  private OgelSubmission.FailReason failReason;
+  private final OgelSubmission.FailReason failReason;
 
   /**
    * SpireForbiddenException

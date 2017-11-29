@@ -34,16 +34,15 @@ import javax.ws.rs.core.Response;
 public class CustomerServiceImpl implements CustomerService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CustomerServiceImpl.class);
+  private static final ObjectMapper MAPPER = new ObjectMapper();
 
-  private String customerServiceUrl;
-  private Client httpClient;
-  private ObjectMapper objectMapper;
+  private final String customerServiceUrl;
+  private final Client httpClient;
 
   @Inject
   public CustomerServiceImpl(Client httpClient, @Named("customerServiceUrl") String customerServiceUrl) {
     this.httpClient = httpClient;
     this.customerServiceUrl = customerServiceUrl;
-    this.objectMapper = new ObjectMapper();
   }
 
   /**
@@ -219,7 +218,7 @@ public class CustomerServiceImpl implements CustomerService {
     String json = sub.getJson();
     RegisterParam param;
     try {
-      param = objectMapper.readValue(json, RegisterParam.class);
+      param = MAPPER.readValue(json, RegisterParam.class);
     } catch (IOException e) {
       String info = "Unable to deserialize Json for OgelSubmission SubID[" + sub.getId() + "]";
       LOGGER.error(info);

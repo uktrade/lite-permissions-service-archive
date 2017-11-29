@@ -3,13 +3,10 @@ package uk.gov.bis.lite.permissions.scheduler;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.service.ProcessSubmissionService;
 
 public class ProcessImmediateJob implements Job {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessImmediateJob.class);
   private ProcessSubmissionService processSubmissionService;
   private int submissionId;
 

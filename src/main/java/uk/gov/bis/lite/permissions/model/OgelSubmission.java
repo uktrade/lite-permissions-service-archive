@@ -1,16 +1,12 @@
 package uk.gov.bis.lite.permissions.model;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.api.view.CallbackView;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class OgelSubmission {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(OgelSubmission.class);
 
   private int id;
   private String userId;
@@ -37,14 +33,15 @@ public class OgelSubmission {
 
   private transient FailEvent failEvent = null;
 
-  private static DateTimeFormatter ogelSubmissionDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+  private static final DateTimeFormatter OGEL_SUBMISSION_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
   /**
    * IMMEDIATE      - submission is being processed immediately, through all stages
    * SCHEDULED      - submission processed by scheduled jobs
    */
+
   public enum Mode {
-    IMMEDIATE, SCHEDULED;
+    IMMEDIATE, SCHEDULED
   }
 
   /**
@@ -55,7 +52,7 @@ public class OgelSubmission {
    * OGEL       - we need to create Ogel via Spire
    */
   public enum Stage {
-    CREATED, CUSTOMER, SITE, USER_ROLE, OGEL;
+    CREATED, CUSTOMER, SITE, USER_ROLE, OGEL
   }
 
   /**
@@ -64,7 +61,7 @@ public class OgelSubmission {
    * TERMINATED  - processing has been terminated
    */
   public enum Status {
-    ACTIVE, COMPLETE, TERMINATED;
+    ACTIVE, COMPLETE, TERMINATED
   }
 
   /**
@@ -106,8 +103,7 @@ public class OgelSubmission {
   }
 
   /**
-   * RequestId is used to identify a submission to external services. It is made up
-   * from the submissionRef plus the id
+   * RequestId is used to identify a submission to external services. It is made up from the submissionRef plus the id
    */
   public String getRequestId() {
     return submissionRef + id;
@@ -163,19 +159,19 @@ public class OgelSubmission {
   public LocalDateTime getFirstFailDateTime() {
     LocalDateTime date = null;
     if (!StringUtils.isBlank(firstFail)) {
-      date = LocalDateTime.parse(firstFail, ogelSubmissionDateFormatter);
+      date = LocalDateTime.parse(firstFail, OGEL_SUBMISSION_DATE_FORMATTER);
     }
     return date;
   }
 
   public void setFirstFailDateTime() {
     LocalDateTime now = LocalDateTime.now();
-    firstFail = now.format(ogelSubmissionDateFormatter);
+    firstFail = now.format(OGEL_SUBMISSION_DATE_FORMATTER);
   }
 
   public void setLastFailDateTime() {
     LocalDateTime now = LocalDateTime.now();
-    lastFail = now.format(ogelSubmissionDateFormatter);
+    lastFail = now.format(OGEL_SUBMISSION_DATE_FORMATTER);
   }
 
   public void setScheduledMode() {

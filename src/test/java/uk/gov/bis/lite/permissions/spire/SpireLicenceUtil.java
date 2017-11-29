@@ -6,10 +6,10 @@ import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwx.HeaderParameterNames;
 import org.jose4j.keys.HmacKey;
 import org.jose4j.lang.JoseException;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class SpireLicenceUtil {
+
   public static String generateToken(String jwtSharedSecret, String subject) {
     JwtClaims claims = new JwtClaims();
     claims.setIssuer("Some lite application");
@@ -18,8 +18,8 @@ public class SpireLicenceUtil {
     claims.setIssuedAtToNow();
     claims.setNotBeforeMinutesInThePast(2);
     claims.setSubject(subject);
-    claims.setClaim("email","example@example.com");
-    claims.setClaim("fullName","Mr Test");
+    claims.setClaim("email", "example@example.com");
+    claims.setClaim("fullName", "Mr Test");
 
     JsonWebSignature jws = new JsonWebSignature();
     jws.setPayload(claims.toJson());
