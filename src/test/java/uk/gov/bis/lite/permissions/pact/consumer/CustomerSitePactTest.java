@@ -32,12 +32,14 @@ public class CustomerSitePactTest extends CustomerBasePactTest {
   private static final String PROVIDER = "lite-customer-service";
   private static final String CONSUMER = "lite-permissions-service";
 
+  private static final String JWT_SHARED_SECRET = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
+
   @Rule
   public final PactProviderRule mockProvider = new PactProviderRule(PROVIDER, this);
 
   @Before
   public void before() {
-    customerService = new CustomerServiceImpl(ClientBuilder.newClient(), mockProvider.getConfig().url());
+    customerService = new CustomerServiceImpl(ClientBuilder.newClient(), mockProvider.getConfig().url(), JWT_SHARED_SECRET);
   }
 
   @Pact(provider = PROVIDER, consumer = CONSUMER)

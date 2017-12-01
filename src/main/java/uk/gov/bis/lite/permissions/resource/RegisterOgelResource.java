@@ -2,8 +2,10 @@ package uk.gov.bis.lite.permissions.resource;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
+import io.dropwizard.auth.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.permissions.api.param.RegisterParam;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.service.RegisterService;
@@ -38,7 +40,7 @@ public class RegisterOgelResource {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/register-ogel")
-  public Response registerOgel(RegisterParam registerParam, @QueryParam("callbackUrl") String callbackUrl) {
+  public Response registerOgel(RegisterParam registerParam, @QueryParam("callbackUrl") String callbackUrl, @Auth LiteJwtUser liteJwtUser) {
     LOGGER.info("************ register-ogel ************ ");
 
     // Check if RegisterParam request is valid
@@ -53,7 +55,7 @@ public class RegisterOgelResource {
     }
 
     // Creates and persists an OgelSubmission
-    OgelSubmission sub = registerService.getOgelSubmission(registerParam);
+    OgelSubmission sub = registerService.getOgelSubmission(registerParam, liteJwtUser);
     String requestId = registerService.register(sub, callbackUrl);
 
     LOGGER.info("************ register-ogel : {}", requestId);

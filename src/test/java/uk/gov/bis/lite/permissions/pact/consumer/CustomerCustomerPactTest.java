@@ -28,6 +28,7 @@ public class CustomerCustomerPactTest extends CustomerBasePactTest {
   private static final String COMPANY_NUMBER_SUCCESS = "COMPANY_NUMBER_SUCCESS";
   private static final String COMPANY_NUMBER_FAIL = "COMPANY_NUMBER_FAIL";
   private static final String CUSTOMER_ID_VALUE = "CUSTOMER_ID_VALUE";
+  private static final String JWT_SHARED_SECRET = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
 
   private CustomerService customerService;
 
@@ -36,7 +37,7 @@ public class CustomerCustomerPactTest extends CustomerBasePactTest {
 
   @Before
   public void before() {
-    customerService = new CustomerServiceImpl(ClientBuilder.newClient(), mockProvider.getConfig().url());
+    customerService = new CustomerServiceImpl(ClientBuilder.newClient(), mockProvider.getConfig().url(), JWT_SHARED_SECRET);
   }
 
   @Pact(provider = PROVIDER, consumer = CONSUMER)

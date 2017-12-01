@@ -14,6 +14,7 @@ import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.permissions.api.param.RegisterAddressParam;
 import uk.gov.bis.lite.permissions.api.param.RegisterParam;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
@@ -47,13 +48,14 @@ public class RegisterServiceImpl implements RegisterService {
   /**
    * Returns new OgelSubmission from RegisterParam
    */
-  public OgelSubmission getOgelSubmission(RegisterParam param) {
+  public OgelSubmission getOgelSubmission(RegisterParam param, LiteJwtUser liteJwtUser) {
     OgelSubmission sub = new OgelSubmission(param.getUserId(), param.getOgelType());
     sub.setCustomerRef(param.getExistingCustomer());
     sub.setSiteRef(param.getExistingSite());
     sub.setSubmissionRef(generateSubmissionReference(param));
     sub.setRoleUpdate(param.roleUpdateRequired());
     sub.setCalledBack(false);
+    sub.setLiteJwtUser(liteJwtUser);
     try {
       sub.setJson(MAPPER.writeValueAsString(param));
     } catch (JsonProcessingException e) {

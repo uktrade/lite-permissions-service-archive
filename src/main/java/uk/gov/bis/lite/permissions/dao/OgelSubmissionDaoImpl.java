@@ -8,6 +8,7 @@ import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.sqlobject.Transaction;
 import uk.gov.bis.lite.permissions.dao.sqlite.OgelSubmissionInterface;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
+import uk.gov.bis.lite.permissions.util.LiteJwtUserUtil;
 
 import java.util.List;
 
@@ -106,7 +107,8 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
           sub.isRoleUpdate(),
           sub.isRoleUpdated(),
           sub.getAdminUserId(),
-          sub.getCallBackFailCount());
+          sub.getCallBackFailCount(),
+          LiteJwtUserUtil.toJson(sub.getLiteJwtUser()));
     }
   }
 
@@ -132,6 +134,7 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
           sub.getLastFailMessage(),
           failReason,
           sub.getCallBackFailCount(),
+          LiteJwtUserUtil.toJson(sub.getLiteJwtUser()),
           sub.getId());
     }
   }

@@ -37,6 +37,7 @@ public class CustomerServiceTest {
   private static final String SUCCESS = "SUCCESS";
   private static final String FORBIDDEN = "FORBIDDEN";
   private static final String BAD_REQUEST = "BAD_REQUEST";
+  private static final String JWT_SHARED_SECRET = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
 
   private static String createSiteMode = SUCCESS;
   private static String createCustomerMode = SUCCESS;
@@ -46,7 +47,7 @@ public class CustomerServiceTest {
 
   @Before
   public void before() {
-    customerService = new CustomerServiceImpl(resources.client(), "/");
+    customerService = new CustomerServiceImpl(resources.client(), "/", JWT_SHARED_SECRET);
   }
 
   @Test

@@ -28,6 +28,7 @@ public class CustomerUserRolePactTest extends CustomerBasePactTest {
   private static final String ADMIN_USER_ID = "ADMIN_USER_ID";
   private static final String USER_ID = "USER123";
   private static final String SITE_REF = "SITE123";
+  private static final String JWT_SHARED_SECRET = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
 
   private CustomerService customerService;
 
@@ -36,7 +37,7 @@ public class CustomerUserRolePactTest extends CustomerBasePactTest {
 
   @Before
   public void before() {
-    customerService = new CustomerServiceImpl(ClientBuilder.newClient(), mockProvider.getConfig().url());
+    customerService = new CustomerServiceImpl(ClientBuilder.newClient(), mockProvider.getConfig().url(), JWT_SHARED_SECRET);
   }
 
   @Pact(provider = PROVIDER, consumer = CONSUMER)

@@ -145,4 +145,10 @@ public class GuiceModule extends AbstractModule {
     return new StdSchedulerFactory().getScheduler();
   }
 
+  @Provides
+  @Named("jwtSharedSecret")
+  String provideJwtSharedSecret(PermissionsAppConfig config) {
+    return config.getJwtSharedSecret();
+  }
+
 }
