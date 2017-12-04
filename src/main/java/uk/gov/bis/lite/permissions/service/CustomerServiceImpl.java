@@ -58,7 +58,7 @@ public class CustomerServiceImpl implements CustomerService {
     // We first attempt to get Customer using the companyNumber
     String companyNumber = getCustomerParam(sub).getCompaniesHouseNumber();
     if (!StringUtils.isBlank(companyNumber)) {
-      Optional<String> customerId = getCustomerIdByCompanyNumber(companyNumber);
+      Optional<String> customerId = getCustomerIdByCompanyNumber(sub, companyNumber);
       if (customerId.isPresent()) {
         return customerId;
       }
@@ -147,12 +147,14 @@ public class CustomerServiceImpl implements CustomerService {
    * Uses CustomerService to get CustomerId from the companyNumber
    */
   @VisibleForTesting
-  public Optional<String> getCustomerIdByCompanyNumber(String companyNumber) {
+  public Optional<String> getCustomerIdByCompanyNumber(OgelSubmission sub, String companyNumber) {
     String customerSearchByCompanyNumberPath = "/search-customers/registered-number/{chNumber}";
     WebTarget target = httpClient.target(customerServiceUrl)
         .path(customerSearchByCompanyNumberPath.replace("{chNumber}", companyNumber));
     try {
-      Response response = target.request().get();
+      Response response = target.request()
+          .header(HttpHeaders.AUTHORIZATION, jwtAuthorizationHeader(sub.getLiteJwtUser()))
+          .get();
       if (isOk(response)) {
         CustomerView customer = response.readEntity(CustomerView.class);
         return Optional.of(customer.getCustomerId());

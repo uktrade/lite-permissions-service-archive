@@ -12,7 +12,7 @@ public interface CustomerService {
 
   Optional<String> createSite(OgelSubmission sub);
 
-  Optional<String> getCustomerIdByCompanyNumber(String companyNumber);
+  Optional<String> getCustomerIdByCompanyNumber(OgelSubmission sub, String companyNumber);
 
   boolean updateUserRole(OgelSubmission sub);
 

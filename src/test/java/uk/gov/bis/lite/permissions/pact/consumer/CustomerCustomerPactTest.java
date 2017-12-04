@@ -117,14 +117,16 @@ public class CustomerCustomerPactTest extends CustomerBasePactTest {
   @Test
   @PactVerification(value = PROVIDER, fragment = "customerByCompanyNumberSuccess")
   public void testCustomerByCompanyNumberSuccessServicePact() throws Exception {
-    Optional<String> customerRefOpt = customerService.getCustomerIdByCompanyNumber(COMPANY_NUMBER_SUCCESS);
+    OgelSubmission sub = new OgelSubmission("userId", "ogelType");
+    Optional<String> customerRefOpt = customerService.getCustomerIdByCompanyNumber(sub, COMPANY_NUMBER_SUCCESS);
     assertThat(customerRefOpt).hasValue(CUSTOMER_ID_VALUE);
   }
 
   @Test
   @PactVerification(value = PROVIDER, fragment = "customerByCompanyNumberFail")
   public void testCustomerByCompanyNumberFailServicePact() throws Exception {
-    assertThat(customerService.getCustomerIdByCompanyNumber(COMPANY_NUMBER_FAIL)).isNotPresent();
+    OgelSubmission sub = new OgelSubmission("userId", "ogelType");
+    assertThat(customerService.getCustomerIdByCompanyNumber(sub, COMPANY_NUMBER_FAIL)).isNotPresent();
   }
 
   private PactDslJsonBody customerViewPactDsl() {
