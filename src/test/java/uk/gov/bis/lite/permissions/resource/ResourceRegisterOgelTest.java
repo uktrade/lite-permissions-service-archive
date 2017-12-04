@@ -92,6 +92,6 @@ public class ResourceRegisterOgelTest {
 
   private String jwtAuthorizationHeader() {
     LiteJwtUser liteJwtUser = new LiteJwtUser("123456", "test@test.com", "Mr Test");
-    return "Bearer " + LiteJwtUserHelper.generateTokenFromLiteJwtUser(JWT_SHARED_SECRET, "lite-ogel-registration", liteJwtUser);
+    return "Bearer " + LiteJwtUserHelper.generateTokenFromLiteJwtUser(JWT_SHARED_SECRET, "some-lite-service", liteJwtUser);
   }
 }
