@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
+import uk.gov.bis.lite.common.jwt.LiteJwtUserHelper;
 
 import java.io.IOException;
 
@@ -31,5 +32,9 @@ public class LiteJwtUserUtil {
       LOGGER.error("IOException", e);
       return null;
     }
+  }
+
+  public static String jwtAuthorizationHeader(LiteJwtUser liteJwtUser, String jwtSharedSecret) {
+    return "Bearer " + LiteJwtUserHelper.generateTokenFromLiteJwtUser(jwtSharedSecret, "lite-ogel-registration", liteJwtUser);
   }
 }

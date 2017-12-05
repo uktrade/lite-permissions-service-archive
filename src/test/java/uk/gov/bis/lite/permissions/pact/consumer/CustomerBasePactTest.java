@@ -5,6 +5,7 @@ import static io.dropwizard.testing.FixtureHelpers.fixture;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
+import uk.gov.bis.lite.permissions.JwtTestHelper;
 import uk.gov.bis.lite.permissions.api.param.RegisterParam;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
@@ -67,6 +68,7 @@ class CustomerBasePactTest {
         sub.setAdminUserId(adminUserId);
       }
     }
+    sub.setLiteJwtUser(JwtTestHelper.LITE_JWT_USER);
     return sub;
   }
 }

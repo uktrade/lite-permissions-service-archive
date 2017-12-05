@@ -12,6 +12,7 @@ import au.com.dius.pact.model.PactFragment;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import uk.gov.bis.lite.permissions.JwtTestHelper;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.service.CustomerService;
 import uk.gov.bis.lite.permissions.service.CustomerServiceImpl;
@@ -19,6 +20,7 @@ import uk.gov.bis.lite.permissions.service.CustomerServiceImpl;
 import java.util.Optional;
 
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.HttpHeaders;
 
 /**
  * CustomerCustomerPactTest
@@ -47,6 +49,7 @@ public class CustomerCustomerPactTest extends CustomerBasePactTest {
         .given("new customer is valid")
         .uponReceiving("request to create a new customer")
         .path("/create-customer")
+        .matchHeader(HttpHeaders.AUTHORIZATION, JwtTestHelper.JWT_AUTHORIZATION_HEADER_REGEX, JwtTestHelper.JWT_AUTHORIZATION_HEADER_VALUE)
         .headers(headers())
         .method("POST")
         .body(customerParamPactDsl())
@@ -64,6 +67,7 @@ public class CustomerCustomerPactTest extends CustomerBasePactTest {
         .given("new customer is invalid")
         .uponReceiving("request to create a new customer")
         .path("/create-customer")
+        .matchHeader(HttpHeaders.AUTHORIZATION, JwtTestHelper.JWT_AUTHORIZATION_HEADER_REGEX, JwtTestHelper.JWT_AUTHORIZATION_HEADER_VALUE)
         .headers(headers())
         .method("POST")
         .willRespondWith()
@@ -78,6 +82,7 @@ public class CustomerCustomerPactTest extends CustomerBasePactTest {
         .given("customer successfully retrieved")
         .uponReceiving("request to get customer")
         .path("/search-customers/registered-number/" + COMPANY_NUMBER_SUCCESS)
+        .matchHeader(HttpHeaders.AUTHORIZATION, JwtTestHelper.JWT_AUTHORIZATION_HEADER_REGEX, JwtTestHelper.JWT_AUTHORIZATION_HEADER_VALUE)
         .method("GET")
         .willRespondWith()
         .status(200)
@@ -93,6 +98,7 @@ public class CustomerCustomerPactTest extends CustomerBasePactTest {
         .given("customer not found")
         .uponReceiving("request to get customer")
         .path("/search-customers/registered-number/" + COMPANY_NUMBER_FAIL)
+        .matchHeader(HttpHeaders.AUTHORIZATION, JwtTestHelper.JWT_AUTHORIZATION_HEADER_REGEX, JwtTestHelper.JWT_AUTHORIZATION_HEADER_VALUE)
         .method("GET")
         .willRespondWith()
         .status(404)
@@ -117,16 +123,14 @@ public class CustomerCustomerPactTest extends CustomerBasePactTest {
   @Test
   @PactVerification(value = PROVIDER, fragment = "customerByCompanyNumberSuccess")
   public void testCustomerByCompanyNumberSuccessServicePact() throws Exception {
-    OgelSubmission sub = new OgelSubmission("userId", "ogelType");
-    Optional<String> customerRefOpt = customerService.getCustomerIdByCompanyNumber(sub, COMPANY_NUMBER_SUCCESS);
+    Optional<String> customerRefOpt = customerService.getCustomerIdByCompanyNumber(ogelSubmission(), COMPANY_NUMBER_SUCCESS);
     assertThat(customerRefOpt).hasValue(CUSTOMER_ID_VALUE);
   }
 
   @Test
   @PactVerification(value = PROVIDER, fragment = "customerByCompanyNumberFail")
   public void testCustomerByCompanyNumberFailServicePact() throws Exception {
-    OgelSubmission sub = new OgelSubmission("userId", "ogelType");
-    assertThat(customerService.getCustomerIdByCompanyNumber(sub, COMPANY_NUMBER_FAIL)).isNotPresent();
+    assertThat(customerService.getCustomerIdByCompanyNumber(ogelSubmission(), COMPANY_NUMBER_FAIL)).isNotPresent();
   }
 
   private PactDslJsonBody customerViewPactDsl() {

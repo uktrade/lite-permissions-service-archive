@@ -11,6 +11,7 @@ import au.com.dius.pact.model.PactFragment;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import uk.gov.bis.lite.permissions.JwtTestHelper;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.service.CustomerService;
 import uk.gov.bis.lite.permissions.service.CustomerServiceImpl;
@@ -18,6 +19,7 @@ import uk.gov.bis.lite.permissions.service.CustomerServiceImpl;
 import java.util.Optional;
 
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.HttpHeaders;
 
 /**
  * CustomerSitePactTest
@@ -49,6 +51,7 @@ public class CustomerSitePactTest extends CustomerBasePactTest {
         .given("new site is valid")
         .uponReceiving("request to create a new site")
         .path("/customer-sites/" + CUSTOMER_ID)
+        .matchHeader(HttpHeaders.AUTHORIZATION, JwtTestHelper.JWT_AUTHORIZATION_HEADER_REGEX, JwtTestHelper.JWT_AUTHORIZATION_HEADER_VALUE)
         .headers(headers())
         .method("POST")
         .query("userId=userId")
@@ -68,6 +71,7 @@ public class CustomerSitePactTest extends CustomerBasePactTest {
         .given("new site is invalid")
         .uponReceiving("request to create a new site")
         .path("/customer-sites/" + CUSTOMER_ID)
+        .matchHeader(HttpHeaders.AUTHORIZATION, JwtTestHelper.JWT_AUTHORIZATION_HEADER_REGEX, JwtTestHelper.JWT_AUTHORIZATION_HEADER_VALUE)
         .headers(headers())
         .method("POST")
         .query("userId=")

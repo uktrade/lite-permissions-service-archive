@@ -10,6 +10,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.bis.lite.customer.api.param.CustomerParam;
 import uk.gov.bis.lite.customer.api.param.UserRoleParam;
+import uk.gov.bis.lite.permissions.JwtTestHelper;
 import uk.gov.bis.lite.permissions.Util;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
@@ -224,6 +225,7 @@ public class CustomerServiceTest {
     String newSiteJson = fixture("fixture/registerForRoleUpdate.json");
     OgelSubmission sub = new OgelSubmission("userId", "ogelType");
     sub.setSiteRef(SITE_ID);
+    sub.setLiteJwtUser(JwtTestHelper.LITE_JWT_USER);
     sub.setJson(newSiteJson);
     return sub;
   }
@@ -232,6 +234,7 @@ public class CustomerServiceTest {
     String newSiteJson = fixture("fixture/createCustomer.json");
     OgelSubmission sub = new OgelSubmission("userId", "ogelType");
     sub.setJson(newSiteJson);
+    sub.setLiteJwtUser(JwtTestHelper.LITE_JWT_USER);
     return sub;
   }
 
@@ -240,6 +243,7 @@ public class CustomerServiceTest {
     OgelSubmission sub = new OgelSubmission("userId", "ogelType");
     sub.setCustomerRef(CUSTOMER_ID);
     sub.setJson(newSiteJson);
+    sub.setLiteJwtUser(JwtTestHelper.LITE_JWT_USER);
     return sub;
   }
 

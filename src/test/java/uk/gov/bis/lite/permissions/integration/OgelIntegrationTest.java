@@ -51,7 +51,7 @@ public class OgelIntegrationTest extends BaseIntegrationTest {
         .target(localUrl(REGISTER_OGEL_URL))
         .queryParam("callbackUrl", "http://localhost:" + wireMockClassRule.port() + "/callback")
         .request()
-        .header(HttpHeaders.AUTHORIZATION, jwtAuthorizationHeader("123456"))
+        .header(HttpHeaders.AUTHORIZATION, jwtAuthorizationHeader())
         .post(Entity.entity(fixture("fixture/integration/registerOgel/registerOgelNewCustomer.json"), MediaType.APPLICATION_JSON_TYPE));
 
     assertThat(response.getStatus()).isEqualTo(200);
@@ -131,8 +131,8 @@ public class OgelIntegrationTest extends BaseIntegrationTest {
         .willReturn(aResponse().withStatus(200)));
   }
 
-  private String jwtAuthorizationHeader(String userId) {
-    LiteJwtUser liteJwtUser = new LiteJwtUser(userId, "test@test.com", "Mr Test");
+  private String jwtAuthorizationHeader() {
+    LiteJwtUser liteJwtUser = new LiteJwtUser("123456", "test@test.com", "Mr Test");
     return "Bearer " + LiteJwtUserHelper.generateTokenFromLiteJwtUser(JWT_SHARED_SECRET, "some-lite-service", liteJwtUser);
   }
 }
