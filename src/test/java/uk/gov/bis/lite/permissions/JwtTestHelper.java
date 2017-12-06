@@ -37,6 +37,8 @@ public class JwtTestHelper {
 
   public static final String JWT_SHARED_SECRET = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
 
-  public static final LiteJwtUser LITE_JWT_USER =
-      new LiteJwtUser("123456", "example@example.com", "Mr Test");
+  public static final LiteJwtUser LITE_JWT_USER = new LiteJwtUser()
+      .setUserId("123456")
+      .setEmail("example@example.com")
+      .setFullName("Mr Test");
 }

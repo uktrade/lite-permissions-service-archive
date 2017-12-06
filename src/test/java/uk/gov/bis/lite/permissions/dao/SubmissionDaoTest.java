@@ -101,7 +101,10 @@ public class SubmissionDaoTest {
     sub.setSpireRef("SPIRE1");
     sub.setMode(Mode.SCHEDULED);
     sub.setStage(Stage.CREATED);
-    sub.setLiteJwtUser(new LiteJwtUser("123456", "test@test.com", "Mr Test"));
+    sub.setLiteJwtUser(new LiteJwtUser()
+        .setUserId("123456")
+        .setEmail("test@test.com")
+        .setFullName("Mr Test"));
     sub.setFailReason(FailReason.ENDPOINT_ERROR);
 
     int subId = submissionDao.create(sub);
