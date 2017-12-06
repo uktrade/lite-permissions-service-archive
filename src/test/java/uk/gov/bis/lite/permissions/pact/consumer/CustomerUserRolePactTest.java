@@ -12,11 +12,13 @@ import au.com.dius.pact.model.PactFragment;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import uk.gov.bis.lite.permissions.JwtTestHelper;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.service.CustomerService;
 import uk.gov.bis.lite.permissions.service.CustomerServiceImpl;
 
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.HttpHeaders;
 
 /**
  * CustomerUserRolePactTest
@@ -47,6 +49,7 @@ public class CustomerUserRolePactTest extends CustomerBasePactTest {
         .given("user role update request is valid")
         .uponReceiving("request to update user role")
         .path("/user-roles/user/" + USER_ID + "/site/" + SITE_REF)
+        .matchHeader(HttpHeaders.AUTHORIZATION, JwtTestHelper.JWT_AUTHORIZATION_HEADER_REGEX, JwtTestHelper.JWT_AUTHORIZATION_HEADER_VALUE)
         .headers(headers())
         .method("POST")
         .body(userRoleParamPactDsl())
@@ -62,6 +65,7 @@ public class CustomerUserRolePactTest extends CustomerBasePactTest {
         .given("user role update request is invalid")
         .uponReceiving("request to update user role")
         .path("/user-roles/user/" + USER_ID + "/site/" + SITE_REF)
+        .matchHeader(HttpHeaders.AUTHORIZATION, JwtTestHelper.JWT_AUTHORIZATION_HEADER_REGEX, JwtTestHelper.JWT_AUTHORIZATION_HEADER_VALUE)
         .headers(headers())
         .method("POST")
         .body(userRoleParamPactDsl())
