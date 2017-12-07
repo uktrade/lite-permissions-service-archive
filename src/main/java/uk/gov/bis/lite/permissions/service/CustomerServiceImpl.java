@@ -8,6 +8,7 @@ import com.google.inject.name.Named;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.bis.lite.common.jwt.LiteJwtUserHelper;
 import uk.gov.bis.lite.customer.api.param.AddressParam;
 import uk.gov.bis.lite.customer.api.param.CustomerParam;
 import uk.gov.bis.lite.customer.api.param.SiteParam;
@@ -19,7 +20,6 @@ import uk.gov.bis.lite.permissions.api.param.RegisterParam;
 import uk.gov.bis.lite.permissions.exception.PermissionServiceException;
 import uk.gov.bis.lite.permissions.model.FailEvent;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
-import uk.gov.bis.lite.permissions.util.LiteJwtUserUtil;
 import uk.gov.bis.lite.permissions.util.Util;
 
 import java.io.IOException;
@@ -40,13 +40,14 @@ public class CustomerServiceImpl implements CustomerService {
 
   private final Client httpClient;
   private final String customerServiceUrl;
-  private final String jwtSharedSecret;
+  private final LiteJwtUserHelper liteJwtUserHelper;
+
 
   @Inject
-  public CustomerServiceImpl(Client httpClient, @Named("customerServiceUrl") String customerServiceUrl, @Named("jwtSharedSecret") String jwtSharedSecret) {
+  public CustomerServiceImpl(Client httpClient, @Named("customerServiceUrl") String customerServiceUrl, LiteJwtUserHelper liteJwtUserHelper) {
     this.httpClient = httpClient;
     this.customerServiceUrl = customerServiceUrl;
-    this.jwtSharedSecret = jwtSharedSecret;
+    this.liteJwtUserHelper = liteJwtUserHelper;
   }
 
   /**
@@ -84,7 +85,7 @@ public class CustomerServiceImpl implements CustomerService {
     WebTarget target = httpClient.target(customerServiceUrl).queryParam("userId", userId).path(path);
     try {
       Response response = target.request()
-          .header(HttpHeaders.AUTHORIZATION, LiteJwtUserUtil.jwtAuthorizationHeader(sub.getLiteJwtUser(), jwtSharedSecret))
+          .header(HttpHeaders.AUTHORIZATION, liteJwtUserHelper.generateTokenInAuthHeaderFormat(sub.getLiteJwtUser()))
           .post(Entity.json(getSiteParam(sub)));
       if (isOk(response)) {
         return Optional.of(response.readEntity(SiteView.class).getSiteId());
@@ -110,7 +111,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     WebTarget target = httpClient.target(customerServiceUrl).path(path);
     Response response = target.request()
-        .header(HttpHeaders.AUTHORIZATION, LiteJwtUserUtil.jwtAuthorizationHeader(sub.getLiteJwtUser(), jwtSharedSecret))
+        .header(HttpHeaders.AUTHORIZATION, liteJwtUserHelper.generateTokenInAuthHeaderFormat(sub.getLiteJwtUser()))
         .post(Entity.json(getUserRoleParam(sub)));
     if (isOk(response)) {
       return true;
@@ -130,7 +131,7 @@ public class CustomerServiceImpl implements CustomerService {
     WebTarget target = httpClient.target(customerServiceUrl).path("/create-customer");
     try {
       Response response = target.request()
-          .header(HttpHeaders.AUTHORIZATION, LiteJwtUserUtil.jwtAuthorizationHeader(sub.getLiteJwtUser(), jwtSharedSecret))
+          .header(HttpHeaders.AUTHORIZATION, liteJwtUserHelper.generateTokenInAuthHeaderFormat(sub.getLiteJwtUser()))
           .post(Entity.json(getCustomerParam(sub)));
       if (isOk(response)) {
         return Optional.of(response.readEntity(CustomerView.class).getCustomerId());
@@ -153,7 +154,7 @@ public class CustomerServiceImpl implements CustomerService {
         .path(customerSearchByCompanyNumberPath.replace("{chNumber}", companyNumber));
     try {
       Response response = target.request()
-          .header(HttpHeaders.AUTHORIZATION, LiteJwtUserUtil.jwtAuthorizationHeader(sub.getLiteJwtUser(), jwtSharedSecret))
+          .header(HttpHeaders.AUTHORIZATION, liteJwtUserHelper.generateTokenInAuthHeaderFormat(sub.getLiteJwtUser()))
           .get();
       if (isOk(response)) {
         CustomerView customer = response.readEntity(CustomerView.class);

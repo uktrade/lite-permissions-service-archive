@@ -10,10 +10,12 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.bis.lite.permissions.spire.SpireLicenceUtil.generateToken;
 
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.junit.Test;
+import uk.gov.bis.lite.common.jwt.LiteJwtConfig;
+import uk.gov.bis.lite.common.jwt.LiteJwtUser;
+import uk.gov.bis.lite.common.jwt.LiteJwtUserHelper;
 import uk.gov.bis.lite.permissions.Util;
 import uk.gov.bis.lite.permissions.api.view.OgelRegistrationView;
 
@@ -21,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 public class OgelRegistrationIntegrationTest extends BaseIntegrationTest {
@@ -29,6 +32,13 @@ public class OgelRegistrationIntegrationTest extends BaseIntegrationTest {
   private static final String INVALID_USER_ID = "111000";
   private static final String OGEL_REGISTRATIONS_URL = "/ogel-registrations/user/";
   private static final String JWT_SHARED_SECRET = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
+
+  private final LiteJwtUserHelper liteJwtUserHelper = new LiteJwtUserHelper(new LiteJwtConfig(JWT_SHARED_SECRET, "some-lite-service"));
+
+  private String jwtAuthorizationHeader(String userId) {
+    LiteJwtUser liteJwtUser = new LiteJwtUser().setUserId(userId).setEmail("example@example.com").setFullName("Mr Test");
+    return liteJwtUserHelper.generateTokenInAuthHeaderFormat(liteJwtUser);
+  }
 
   @Test
   public void getOgelRegistrationsValidUser() {
@@ -42,7 +52,7 @@ public class OgelRegistrationIntegrationTest extends BaseIntegrationTest {
     Response response = JerseyClientBuilder.createClient()
         .target(localUrl(OGEL_REGISTRATIONS_URL + USER_ID))
         .request()
-        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, USER_ID))
+        .header(HttpHeaders.AUTHORIZATION, jwtAuthorizationHeader(USER_ID))
         .get();
 
     List<OgelRegistrationView> actualResponse = response.readEntity(new GenericType<List<OgelRegistrationView>>() {
@@ -73,7 +83,7 @@ public class OgelRegistrationIntegrationTest extends BaseIntegrationTest {
     Response response = JerseyClientBuilder.createClient()
         .target(localUrl(OGEL_REGISTRATIONS_URL + INVALID_USER_ID))
         .request()
-        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, INVALID_USER_ID))
+        .header(HttpHeaders.AUTHORIZATION, jwtAuthorizationHeader(INVALID_USER_ID))
         .get();
 
     assertThat(response.getStatus()).isEqualTo(404);
@@ -103,7 +113,7 @@ public class OgelRegistrationIntegrationTest extends BaseIntegrationTest {
     Response response = JerseyClientBuilder.createClient()
         .target(localUrl(OGEL_REGISTRATIONS_URL + USER_ID))
         .request()
-        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, INVALID_USER_ID))
+        .header(HttpHeaders.AUTHORIZATION, jwtAuthorizationHeader(INVALID_USER_ID))
         .get();
 
     assertThat(response.getStatus()).isEqualTo(401);

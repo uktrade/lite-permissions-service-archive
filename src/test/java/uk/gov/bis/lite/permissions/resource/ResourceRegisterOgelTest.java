@@ -8,6 +8,7 @@ import io.dropwizard.testing.junit.ResourceTestRule;
 import org.junit.ClassRule;
 import org.junit.Test;
 import uk.gov.bis.lite.common.jwt.LiteJwtAuthFilterHelper;
+import uk.gov.bis.lite.common.jwt.LiteJwtConfig;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.common.jwt.LiteJwtUserHelper;
 import uk.gov.bis.lite.permissions.api.RegisterOgelResponse;
@@ -91,7 +92,8 @@ public class ResourceRegisterOgelTest {
   }
 
   private String jwtAuthorizationHeader() {
-    LiteJwtUser liteJwtUser = new LiteJwtUser("123456", "test@test.com", "Mr Test");
-    return "Bearer " + LiteJwtUserHelper.generateTokenFromLiteJwtUser(JWT_SHARED_SECRET, "some-lite-service", liteJwtUser);
+    LiteJwtUserHelper liteJwtUserHelper = new LiteJwtUserHelper(new LiteJwtConfig(JWT_SHARED_SECRET, "some-lite-service"));
+    LiteJwtUser liteJwtUser = new LiteJwtUser().setUserId("123456").setEmail("test@test.com").setFullName("Mr Test");
+    return liteJwtUserHelper.generateTokenInAuthHeaderFormat(liteJwtUser);
   }
 }

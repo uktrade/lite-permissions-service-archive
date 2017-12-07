@@ -1,6 +1,7 @@
 package uk.gov.bis.lite.permissions.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
@@ -11,8 +12,6 @@ import java.io.IOException;
 public class LiteJwtUserUtil {
   private static Logger LOGGER = LoggerFactory.getLogger(LiteJwtUserUtil.class);
 
-  LiteJwtUserUtil() {
-  }
 
   public static String toJson(LiteJwtUser liteJwtUser) {
     try {
@@ -32,9 +31,5 @@ public class LiteJwtUserUtil {
       LOGGER.error("IOException", e);
       return null;
     }
-  }
-
-  public static String jwtAuthorizationHeader(LiteJwtUser liteJwtUser, String jwtSharedSecret) {
-    return "Bearer " + LiteJwtUserHelper.generateTokenFromLiteJwtUser(jwtSharedSecret, "lite-ogel-registration", liteJwtUser);
   }
 }

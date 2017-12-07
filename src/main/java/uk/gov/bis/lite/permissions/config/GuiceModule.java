@@ -15,6 +15,7 @@ import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
 import org.skife.jdbi.v2.DBI;
 import uk.gov.bis.lite.common.jersey.filter.ClientCorrelationIdFilter;
+import uk.gov.bis.lite.common.jwt.LiteJwtConfig;
 import uk.gov.bis.lite.common.spire.client.SpireClientConfig;
 import uk.gov.bis.lite.common.spire.client.SpireRequestConfig;
 import uk.gov.bis.lite.common.spire.client.parser.ReferenceParser;
@@ -149,6 +150,11 @@ public class GuiceModule extends AbstractModule {
   @Named("jwtSharedSecret")
   String provideJwtSharedSecret(PermissionsAppConfig config) {
     return config.getJwtSharedSecret();
+  }
+
+  @Provides
+  LiteJwtConfig provideLiteJwtConfig(PermissionsAppConfig config) {
+    return new LiteJwtConfig(config.getJwtSharedSecret(), "lite-permissions-service");
   }
 
 }

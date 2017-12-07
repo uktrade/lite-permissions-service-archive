@@ -18,6 +18,7 @@ import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.JerseyInvocation;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.junit.Test;
+import uk.gov.bis.lite.common.jwt.LiteJwtConfig;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.common.jwt.LiteJwtUserHelper;
 import uk.gov.bis.lite.permissions.api.view.OgelSubmissionView;
@@ -136,6 +137,7 @@ public class OgelIntegrationTest extends BaseIntegrationTest {
         .setUserId("123456")
         .setEmail("test@test.com")
         .setFullName("Mr Test");
-    return "Bearer " + LiteJwtUserHelper.generateTokenFromLiteJwtUser(JWT_SHARED_SECRET, "some-lite-service", liteJwtUser);
+    LiteJwtUserHelper liteJwtUserHelper = new LiteJwtUserHelper(new LiteJwtConfig(JWT_SHARED_SECRET, "some-lite-service"));
+    return liteJwtUserHelper.generateTokenInAuthHeaderFormat(liteJwtUser);
   }
 }

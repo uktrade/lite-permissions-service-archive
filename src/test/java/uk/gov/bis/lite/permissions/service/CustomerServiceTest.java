@@ -8,6 +8,8 @@ import io.dropwizard.testing.junit.ResourceTestRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import uk.gov.bis.lite.common.jwt.LiteJwtConfig;
+import uk.gov.bis.lite.common.jwt.LiteJwtUserHelper;
 import uk.gov.bis.lite.customer.api.param.CustomerParam;
 import uk.gov.bis.lite.customer.api.param.UserRoleParam;
 import uk.gov.bis.lite.permissions.JwtTestHelper;
@@ -48,7 +50,8 @@ public class CustomerServiceTest {
 
   @Before
   public void before() {
-    customerService = new CustomerServiceImpl(resources.client(), "/", JWT_SHARED_SECRET);
+    LiteJwtUserHelper liteJwtUserHelper = new LiteJwtUserHelper(new LiteJwtConfig(JWT_SHARED_SECRET, "lite-permissions-service"));
+    customerService = new CustomerServiceImpl(resources.client(), "/", liteJwtUserHelper);
   }
 
   @Test
