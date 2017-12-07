@@ -48,7 +48,7 @@ public class RegisterServiceImpl implements RegisterService {
   /**
    * Returns new OgelSubmission from RegisterParam
    */
-  public OgelSubmission getOgelSubmission(RegisterParam param, LiteJwtUser liteJwtUser) {
+  public OgelSubmission createOgelSubmission(RegisterParam param, LiteJwtUser liteJwtUser) {
     OgelSubmission sub = new OgelSubmission(param.getUserId(), param.getOgelType());
     sub.setCustomerRef(param.getExistingCustomer());
     sub.setSiteRef(param.getExistingSite());

@@ -10,7 +10,7 @@ import uk.gov.bis.lite.permissions.service.RegisterService;
 public class RegisterServiceMock implements RegisterService {
 
   @Override
-  public OgelSubmission getOgelSubmission(RegisterParam param, LiteJwtUser liteJwtUser) {
+  public OgelSubmission createOgelSubmission(RegisterParam param, LiteJwtUser liteJwtUser) {
     return null;
   }
 

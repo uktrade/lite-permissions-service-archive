@@ -55,7 +55,7 @@ public class RegisterOgelResource {
     }
 
     // Creates and persists an OgelSubmission
-    OgelSubmission sub = registerService.getOgelSubmission(registerParam, liteJwtUser);
+    OgelSubmission sub = registerService.createOgelSubmission(registerParam, liteJwtUser);
     String requestId = registerService.register(sub, callbackUrl);
 
     LOGGER.info("************ register-ogel : {}", requestId);

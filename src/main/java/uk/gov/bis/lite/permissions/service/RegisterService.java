@@ -6,7 +6,7 @@ import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
 public interface RegisterService {
 
-  OgelSubmission getOgelSubmission(RegisterParam param, LiteJwtUser liteJwtUser);
+  OgelSubmission createOgelSubmission(RegisterParam param, LiteJwtUser liteJwtUser);
 
   String register(OgelSubmission sub, String callbackUrl);
 
