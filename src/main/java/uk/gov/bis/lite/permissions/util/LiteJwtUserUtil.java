@@ -10,16 +10,13 @@ import uk.gov.bis.lite.common.jwt.LiteJwtUserHelper;
 import java.io.IOException;
 
 public class LiteJwtUserUtil {
-  private static Logger LOGGER = LoggerFactory.getLogger(LiteJwtUserUtil.class);
-
 
   public static String toJson(LiteJwtUser liteJwtUser) {
     try {
       ObjectMapper mapper = new ObjectMapper();
       return mapper.writeValueAsString(liteJwtUser);
     } catch (IOException e) {
-      LOGGER.error("IOException", e);
-      return null;
+      throw new RuntimeException("Exception while attempting to serialize a liteJwtUser to json", e);
     }
   }
 
@@ -28,8 +25,7 @@ public class LiteJwtUserUtil {
       ObjectMapper mapper = new ObjectMapper();
       return mapper.readValue(liteJwtUserJson, LiteJwtUser.class);
     } catch (IOException e) {
-      LOGGER.error("IOException", e);
-      return null;
+      throw new RuntimeException("Exception while attempting to deserialize a liteJwtUser from json", e);
     }
   }
 }
