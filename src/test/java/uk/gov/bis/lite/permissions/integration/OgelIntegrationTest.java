@@ -93,6 +93,18 @@ public class OgelIntegrationTest extends BaseIntegrationTest {
         .withRequestBody(equalToJson(fixture("fixture/integration/registerOgel/callBackRequest.json"))));
   }
 
+  @Test
+  public void registerOgelUnauthorized() {
+    initRegisterOgelStubs();
+    Response response = JerseyClientBuilder.createClient()
+        .target(localUrl(REGISTER_OGEL_URL))
+        .queryParam("callbackUrl", "http://localhost:" + wireMockClassRule.port() + "/callback")
+        .request()
+        .post(Entity.entity(fixture("fixture/integration/registerOgel/registerOgelNewCustomer.json"), MediaType.APPLICATION_JSON_TYPE));
+
+    assertThat(response.getStatus()).isEqualTo(401);
+  }
+
   private void initRegisterOgelStubs() {
     // return customer not found for new customer
     stubFor(get(urlEqualTo("/search-customers/registered-number/GB6788"))

@@ -67,6 +67,13 @@ public class ResourceRegisterOgelTest {
     assertThat(getResponseRequestId(response)).isEqualTo("SUB1");
   }
 
+  @Test
+  public void missingAuthorizationHeader() {
+    Response response = request("/register-ogel", MediaType.APPLICATION_JSON)
+        .post(Entity.entity(getValidRegisterOgel(), MediaType.APPLICATION_JSON));
+    assertThat(response.getStatus()).isEqualTo(401);
+  }
+
   /**
    * private methods
    */
