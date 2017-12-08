@@ -8,6 +8,7 @@ import com.google.inject.name.Named;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.bis.lite.common.jwt.LiteJwtUserHelper;
 import uk.gov.bis.lite.customer.api.param.AddressParam;
 import uk.gov.bis.lite.customer.api.param.CustomerParam;
 import uk.gov.bis.lite.customer.api.param.SiteParam;
@@ -28,6 +29,7 @@ import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 @Singleton
@@ -36,13 +38,16 @@ public class CustomerServiceImpl implements CustomerService {
   private static final Logger LOGGER = LoggerFactory.getLogger(CustomerServiceImpl.class);
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
-  private final String customerServiceUrl;
   private final Client httpClient;
+  private final String customerServiceUrl;
+  private final LiteJwtUserHelper liteJwtUserHelper;
+
 
   @Inject
-  public CustomerServiceImpl(Client httpClient, @Named("customerServiceUrl") String customerServiceUrl) {
+  public CustomerServiceImpl(Client httpClient, @Named("customerServiceUrl") String customerServiceUrl, LiteJwtUserHelper liteJwtUserHelper) {
     this.httpClient = httpClient;
     this.customerServiceUrl = customerServiceUrl;
+    this.liteJwtUserHelper = liteJwtUserHelper;
   }
 
   /**
@@ -54,7 +59,7 @@ public class CustomerServiceImpl implements CustomerService {
     // We first attempt to get Customer using the companyNumber
     String companyNumber = getCustomerParam(sub).getCompaniesHouseNumber();
     if (!StringUtils.isBlank(companyNumber)) {
-      Optional<String> customerId = getCustomerIdByCompanyNumber(companyNumber);
+      Optional<String> customerId = getCustomerIdByCompanyNumber(sub, companyNumber);
       if (customerId.isPresent()) {
         return customerId;
       }
@@ -68,7 +73,6 @@ public class CustomerServiceImpl implements CustomerService {
    * Returns siteRef if successful, notifies FailService if there is an error
    */
   public Optional<String> createSite(OgelSubmission sub) {
-
     String createSitePath = "/customer-sites/{customerId}";
     String path = createSitePath.replace("{customerId}", sub.getCustomerRef());
 
@@ -80,7 +84,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     WebTarget target = httpClient.target(customerServiceUrl).queryParam("userId", userId).path(path);
     try {
-      Response response = target.request().post(Entity.json(getSiteParam(sub)));
+      Response response = target.request()
+          .header(HttpHeaders.AUTHORIZATION, liteJwtUserHelper.generateTokenInAuthHeaderFormat(sub.getLiteJwtUser()))
+          .post(Entity.json(getSiteParam(sub)));
       if (isOk(response)) {
         return Optional.of(response.readEntity(SiteView.class).getSiteId());
       } else if (isForbidden(response)) {
@@ -99,13 +105,14 @@ public class CustomerServiceImpl implements CustomerService {
    * Returns TRUE if successful, notifies FailService if there is an error
    */
   public boolean updateUserRole(OgelSubmission sub) {
-
     String userRolePath = "/user-roles/user/{userId}/site/{siteRef}";
     String path = userRolePath.replace("{userId}", sub.getUserId());
     path = path.replace("{siteRef}", sub.getSiteRef());
 
     WebTarget target = httpClient.target(customerServiceUrl).path(path);
-    Response response = target.request().post(Entity.json(getUserRoleParam(sub)));
+    Response response = target.request()
+        .header(HttpHeaders.AUTHORIZATION, liteJwtUserHelper.generateTokenInAuthHeaderFormat(sub.getLiteJwtUser()))
+        .post(Entity.json(getUserRoleParam(sub)));
     if (isOk(response)) {
       return true;
     } else {
@@ -123,7 +130,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     WebTarget target = httpClient.target(customerServiceUrl).path("/create-customer");
     try {
-      Response response = target.request().post(Entity.json(getCustomerParam(sub)));
+      Response response = target.request()
+          .header(HttpHeaders.AUTHORIZATION, liteJwtUserHelper.generateTokenInAuthHeaderFormat(sub.getLiteJwtUser()))
+          .post(Entity.json(getCustomerParam(sub)));
       if (isOk(response)) {
         return Optional.of(response.readEntity(CustomerView.class).getCustomerId());
       } else {
@@ -139,12 +148,14 @@ public class CustomerServiceImpl implements CustomerService {
    * Uses CustomerService to get CustomerId from the companyNumber
    */
   @VisibleForTesting
-  public Optional<String> getCustomerIdByCompanyNumber(String companyNumber) {
+  public Optional<String> getCustomerIdByCompanyNumber(OgelSubmission sub, String companyNumber) {
     String customerSearchByCompanyNumberPath = "/search-customers/registered-number/{chNumber}";
     WebTarget target = httpClient.target(customerServiceUrl)
         .path(customerSearchByCompanyNumberPath.replace("{chNumber}", companyNumber));
     try {
-      Response response = target.request().get();
+      Response response = target.request()
+          .header(HttpHeaders.AUTHORIZATION, liteJwtUserHelper.generateTokenInAuthHeaderFormat(sub.getLiteJwtUser()))
+          .get();
       if (isOk(response)) {
         CustomerView customer = response.readEntity(CustomerView.class);
         return Optional.of(customer.getCustomerId());

@@ -10,11 +10,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.bis.lite.permissions.api.view.LicenceTestUtil.assertLicenceViewA;
 import static uk.gov.bis.lite.permissions.api.view.LicenceTestUtil.assertLicenceViewB;
 import static uk.gov.bis.lite.permissions.api.view.LicenceTestUtil.assertLicenceViewC;
-import static uk.gov.bis.lite.permissions.spire.SpireLicenceUtil.generateToken;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.Test;
+import uk.gov.bis.lite.common.jwt.LiteJwtConfig;
+import uk.gov.bis.lite.common.jwt.LiteJwtUser;
+import uk.gov.bis.lite.common.jwt.LiteJwtUserHelper;
 import uk.gov.bis.lite.permissions.Util;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
 
@@ -22,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 /**
@@ -35,7 +38,13 @@ public class LicenceIntegrationTest extends BaseIntegrationTest {
   private static final String LICENCES_URL = "/licences/user/";
   private static final String JWT_SHARED_SECRET = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
 
-  private static final ObjectMapper MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
+  private final ObjectMapper MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
+  private final LiteJwtUserHelper liteJwtUserHelper = new LiteJwtUserHelper(new LiteJwtConfig(JWT_SHARED_SECRET, "some-lite-service"));
+
+  private String jwtAuthorizationHeader(String userId) {
+    LiteJwtUser liteJwtUser = new LiteJwtUser().setUserId(userId).setEmail("example@example.com").setFullName("Mr Test");
+    return liteJwtUserHelper.generateTokenInAuthHeaderFormat(liteJwtUser);
+  }
 
   private void stubForBody(String body) {
     stubFor(post(urlEqualTo("/spire/fox/ispire/SPIRE_LICENCES"))
@@ -54,7 +63,7 @@ public class LicenceIntegrationTest extends BaseIntegrationTest {
     return RULE.client()
         .target(localUrl(url))
         .request()
-        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "123456"))
+        .header(HttpHeaders.AUTHORIZATION, jwtAuthorizationHeader("123456"))
         .get();
   }
 
@@ -63,7 +72,7 @@ public class LicenceIntegrationTest extends BaseIntegrationTest {
         .target(localUrl(url))
         .queryParam(queryParamName, queryParamValue)
         .request()
-        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "123456"))
+        .header(HttpHeaders.AUTHORIZATION, jwtAuthorizationHeader("123456"))
         .get();
   }
 
@@ -129,7 +138,7 @@ public class LicenceIntegrationTest extends BaseIntegrationTest {
     Response response = RULE.client()
         .target(localUrl(LICENCES_URL + "123456"))
         .request()
-        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "999999"))
+        .header(HttpHeaders.AUTHORIZATION, jwtAuthorizationHeader("999999"))
         .get();
 
     assertThat(response.getStatus()).isEqualTo(401);

@@ -18,9 +18,13 @@ import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.JerseyInvocation;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.junit.Test;
+import uk.gov.bis.lite.common.jwt.LiteJwtConfig;
+import uk.gov.bis.lite.common.jwt.LiteJwtUser;
+import uk.gov.bis.lite.common.jwt.LiteJwtUserHelper;
 import uk.gov.bis.lite.permissions.api.view.OgelSubmissionView;
 
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -39,6 +43,7 @@ public class OgelIntegrationTest extends BaseIntegrationTest {
   private static final String REGISTER_OGEL_URL = "/register-ogel";
   private static final String OGEL_SUBMISSION_URL = "/ogel-submissions/";
   private static final String SUB_ID = "1";
+  private static final String JWT_SHARED_SECRET = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
 
   @Test
   public void registerOgelSuccessImmediate() throws Exception {
@@ -47,6 +52,7 @@ public class OgelIntegrationTest extends BaseIntegrationTest {
         .target(localUrl(REGISTER_OGEL_URL))
         .queryParam("callbackUrl", "http://localhost:" + wireMockClassRule.port() + "/callback")
         .request()
+        .header(HttpHeaders.AUTHORIZATION, jwtAuthorizationHeader())
         .post(Entity.entity(fixture("fixture/integration/registerOgel/registerOgelNewCustomer.json"), MediaType.APPLICATION_JSON_TYPE));
 
     assertThat(response.getStatus()).isEqualTo(200);
@@ -87,6 +93,18 @@ public class OgelIntegrationTest extends BaseIntegrationTest {
         .withRequestBody(equalToJson(fixture("fixture/integration/registerOgel/callBackRequest.json"))));
   }
 
+  @Test
+  public void registerOgelUnauthorized() {
+    initRegisterOgelStubs();
+    Response response = JerseyClientBuilder.createClient()
+        .target(localUrl(REGISTER_OGEL_URL))
+        .queryParam("callbackUrl", "http://localhost:" + wireMockClassRule.port() + "/callback")
+        .request()
+        .post(Entity.entity(fixture("fixture/integration/registerOgel/registerOgelNewCustomer.json"), MediaType.APPLICATION_JSON_TYPE));
+
+    assertThat(response.getStatus()).isEqualTo(401);
+  }
+
   private void initRegisterOgelStubs() {
     // return customer not found for new customer
     stubFor(get(urlEqualTo("/search-customers/registered-number/GB6788"))
@@ -124,5 +142,14 @@ public class OgelIntegrationTest extends BaseIntegrationTest {
     //submission status complete. now callback
     stubFor(post(urlEqualTo("/callback"))
         .willReturn(aResponse().withStatus(200)));
+  }
+
+  private String jwtAuthorizationHeader() {
+    LiteJwtUser liteJwtUser = new LiteJwtUser()
+        .setUserId("123456")
+        .setEmail("test@test.com")
+        .setFullName("Mr Test");
+    LiteJwtUserHelper liteJwtUserHelper = new LiteJwtUserHelper(new LiteJwtConfig(JWT_SHARED_SECRET, "some-lite-service"));
+    return liteJwtUserHelper.generateTokenInAuthHeaderFormat(liteJwtUser);
   }
 }

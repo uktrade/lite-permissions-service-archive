@@ -12,11 +12,15 @@ import au.com.dius.pact.model.PactFragment;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import uk.gov.bis.lite.common.jwt.LiteJwtConfig;
+import uk.gov.bis.lite.common.jwt.LiteJwtUserHelper;
+import uk.gov.bis.lite.permissions.JwtTestHelper;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.service.CustomerService;
 import uk.gov.bis.lite.permissions.service.CustomerServiceImpl;
 
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.HttpHeaders;
 
 /**
  * CustomerUserRolePactTest
@@ -28,6 +32,7 @@ public class CustomerUserRolePactTest extends CustomerBasePactTest {
   private static final String ADMIN_USER_ID = "ADMIN_USER_ID";
   private static final String USER_ID = "USER123";
   private static final String SITE_REF = "SITE123";
+  private static final String JWT_SHARED_SECRET = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
 
   private CustomerService customerService;
 
@@ -36,7 +41,8 @@ public class CustomerUserRolePactTest extends CustomerBasePactTest {
 
   @Before
   public void before() {
-    customerService = new CustomerServiceImpl(ClientBuilder.newClient(), mockProvider.getConfig().url());
+    LiteJwtUserHelper liteJwtUserHelper = new LiteJwtUserHelper(new LiteJwtConfig(JWT_SHARED_SECRET, "lite-permissions-service"));
+    customerService = new CustomerServiceImpl(ClientBuilder.newClient(), mockProvider.getConfig().url(), liteJwtUserHelper);
   }
 
   @Pact(provider = PROVIDER, consumer = CONSUMER)
@@ -46,6 +52,7 @@ public class CustomerUserRolePactTest extends CustomerBasePactTest {
         .given("user role update request is valid")
         .uponReceiving("request to update user role")
         .path("/user-roles/user/" + USER_ID + "/site/" + SITE_REF)
+        .matchHeader(HttpHeaders.AUTHORIZATION, JwtTestHelper.JWT_AUTHORIZATION_HEADER_REGEX, JwtTestHelper.JWT_AUTHORIZATION_HEADER_VALUE)
         .headers(headers())
         .method("POST")
         .body(userRoleParamPactDsl())
@@ -61,6 +68,7 @@ public class CustomerUserRolePactTest extends CustomerBasePactTest {
         .given("user role update request is invalid")
         .uponReceiving("request to update user role")
         .path("/user-roles/user/" + USER_ID + "/site/" + SITE_REF)
+        .matchHeader(HttpHeaders.AUTHORIZATION, JwtTestHelper.JWT_AUTHORIZATION_HEADER_REGEX, JwtTestHelper.JWT_AUTHORIZATION_HEADER_VALUE)
         .headers(headers())
         .method("POST")
         .body(userRoleParamPactDsl())

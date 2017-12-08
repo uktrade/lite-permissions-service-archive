@@ -1,6 +1,7 @@
 package uk.gov.bis.lite.permissions.model;
 
 import org.apache.commons.lang3.StringUtils;
+import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.permissions.api.view.CallbackView;
 
 import java.time.LocalDateTime;
@@ -30,6 +31,7 @@ public class OgelSubmission {
   private String created;
   private boolean roleUpdate;
   private boolean roleUpdated;
+  private LiteJwtUser liteJwtUser;
 
   private transient FailEvent failEvent = null;
 
@@ -368,5 +370,13 @@ public class OgelSubmission {
 
   public void setCallBackFailCount(int callBackFailCount) {
     this.callBackFailCount = callBackFailCount;
+  }
+
+  public LiteJwtUser getLiteJwtUser() {
+    return liteJwtUser;
+  }
+
+  public void setLiteJwtUser(LiteJwtUser liteJwtUser) {
+    this.liteJwtUser = liteJwtUser;
   }
 }

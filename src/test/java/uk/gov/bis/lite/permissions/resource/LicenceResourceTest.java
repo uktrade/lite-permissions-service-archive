@@ -7,7 +7,6 @@ import static uk.gov.bis.lite.permissions.api.view.LicenceTestUtil.assertLicence
 import static uk.gov.bis.lite.permissions.api.view.LicenceTestUtil.assertLicenceViewB;
 import static uk.gov.bis.lite.permissions.api.view.LicenceTestUtil.generateLicenceViewA;
 import static uk.gov.bis.lite.permissions.api.view.LicenceTestUtil.generateLicenceViewB;
-import static uk.gov.bis.lite.permissions.spire.SpireLicenceUtil.generateToken;
 
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.auth.AuthDynamicFeature;
@@ -17,7 +16,9 @@ import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
 import org.junit.Rule;
 import org.junit.Test;
 import uk.gov.bis.lite.common.jwt.LiteJwtAuthFilterHelper;
+import uk.gov.bis.lite.common.jwt.LiteJwtConfig;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
+import uk.gov.bis.lite.common.jwt.LiteJwtUserHelper;
 import uk.gov.bis.lite.permissions.Util;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
 import uk.gov.bis.lite.permissions.service.LicenceService;
@@ -30,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 public class LicenceResourceTest {
@@ -38,6 +40,12 @@ public class LicenceResourceTest {
   private static final String JWT_SHARED_SECRET = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
 
   private final LicenceService licenceService = mock(LicenceService.class);
+  private final LiteJwtUserHelper liteJwtUserHelper = new LiteJwtUserHelper(new LiteJwtConfig(JWT_SHARED_SECRET, "some-lite-service"));
+
+  private String jwtAuthorizationHeader(String userId) {
+    LiteJwtUser liteJwtUser = new LiteJwtUser().setUserId(userId).setEmail("example@example.com").setFullName("Mr Test");
+    return liteJwtUserHelper.generateTokenInAuthHeaderFormat(liteJwtUser);
+  }
 
   @Rule
   public final ResourceTestRule rule = ResourceTestRule.builder()
@@ -55,7 +63,7 @@ public class LicenceResourceTest {
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
         .request()
-        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "123456"))
+        .header(HttpHeaders.AUTHORIZATION, jwtAuthorizationHeader("123456"))
         .get();
 
     assertThat(response.getStatus()).isEqualTo(200);
@@ -75,7 +83,7 @@ public class LicenceResourceTest {
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
         .request()
-        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "123456"))
+        .header(HttpHeaders.AUTHORIZATION, jwtAuthorizationHeader("123456"))
         .get();
 
     assertThat(response.getStatus()).isEqualTo(200);
@@ -95,7 +103,7 @@ public class LicenceResourceTest {
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
         .request()
-        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "123456"))
+        .header(HttpHeaders.AUTHORIZATION, jwtAuthorizationHeader("123456"))
         .get();
 
     assertThat(response.getStatus()).isEqualTo(200);
@@ -109,7 +117,7 @@ public class LicenceResourceTest {
     Response response = rule.getJerseyTest()
         .target(URL + "/123456")
         .request()
-        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "999999"))
+        .header(HttpHeaders.AUTHORIZATION, jwtAuthorizationHeader("999999"))
         .get();
 
     assertThat(response.getStatus()).isEqualTo(401);
@@ -129,7 +137,7 @@ public class LicenceResourceTest {
         .target(URL + "/123456")
         .queryParam("licenceReference", "REF-123")
         .request()
-        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "123456"))
+        .header(HttpHeaders.AUTHORIZATION, jwtAuthorizationHeader("123456"))
         .get();
 
     assertThat(response.getStatus()).isEqualTo(200);
@@ -151,7 +159,7 @@ public class LicenceResourceTest {
         .target(URL + "/123456")
         .queryParam("licenceReference", "REF-123")
         .request()
-        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "123456"))
+        .header(HttpHeaders.AUTHORIZATION, jwtAuthorizationHeader("123456"))
         .get();
 
     Map<String, String> map = Util.getResponseMap(response);
@@ -169,7 +177,7 @@ public class LicenceResourceTest {
         .target(URL + "/123456")
         .queryParam("licenceReference", "REF-123")
         .request()
-        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "123456"))
+        .header(HttpHeaders.AUTHORIZATION, jwtAuthorizationHeader("123456"))
         .get();
 
     assertThat(response.getStatus()).isEqualTo(404);
@@ -186,7 +194,7 @@ public class LicenceResourceTest {
         .target(URL + "/123456")
         .queryParam("licenceReference", "REF-123")
         .request()
-        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "999999"))
+        .header(HttpHeaders.AUTHORIZATION, jwtAuthorizationHeader("999999"))
         .get();
 
     assertThat(response.getStatus()).isEqualTo(401);
@@ -206,7 +214,7 @@ public class LicenceResourceTest {
         .target(URL + "/123456")
         .queryParam("type", "SIEL")
         .request()
-        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "123456"))
+        .header(HttpHeaders.AUTHORIZATION, jwtAuthorizationHeader("123456"))
         .get();
 
     assertThat(response.getStatus()).isEqualTo(200);
@@ -225,7 +233,7 @@ public class LicenceResourceTest {
         .target(URL + "/123456")
         .queryParam("type", "SIEL")
         .request()
-        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "123456"))
+        .header(HttpHeaders.AUTHORIZATION, jwtAuthorizationHeader("123456"))
         .get();
 
     assertThat(response.getStatus()).isEqualTo(404);
@@ -242,7 +250,7 @@ public class LicenceResourceTest {
         .target(URL + "/123456")
         .queryParam("type", "OIEL")
         .request()
-        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "123456"))
+        .header(HttpHeaders.AUTHORIZATION, jwtAuthorizationHeader("123456"))
         .get();
 
     assertThat(response.getStatus()).isEqualTo(400);
@@ -259,7 +267,7 @@ public class LicenceResourceTest {
         .target(URL + "/123456")
         .queryParam("type", "SIEL")
         .request()
-        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "999999"))
+        .header(HttpHeaders.AUTHORIZATION, jwtAuthorizationHeader("999999"))
         .get();
 
     assertThat(response.getStatus()).isEqualTo(401);
@@ -282,7 +290,7 @@ public class LicenceResourceTest {
         .queryParam("type", "SIEL")
         .queryParam("licenceReference", "REF-123")
         .request()
-        .header("Authorization", "Bearer " + generateToken(JWT_SHARED_SECRET, "123456"))
+        .header(HttpHeaders.AUTHORIZATION, jwtAuthorizationHeader("123456"))
         .get();
 
     assertThat(response.getStatus()).isEqualTo(400);

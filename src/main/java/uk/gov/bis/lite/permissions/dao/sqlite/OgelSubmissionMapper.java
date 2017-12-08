@@ -6,6 +6,7 @@ import org.skife.jdbi.v2.tweak.ResultSetMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
+import uk.gov.bis.lite.permissions.util.LiteJwtUserUtil;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -33,6 +34,7 @@ public class OgelSubmissionMapper implements ResultSetMapper<OgelSubmission> {
     sub.setLastFail(r.getString("LAST_FAIL"));
     sub.setLastFailMessage(r.getString("LAST_FAIL_MESSAGE"));
     sub.setCallBackFailCount(r.getInt("CALLBACK_FAIL_COUNT"));
+    sub.setLiteJwtUser(LiteJwtUserUtil.fromJson(r.getString("LITE_JWT_USER")));
 
     if (r.getString("FAIL_REASON") == null) {
       sub.setFailReason(null);

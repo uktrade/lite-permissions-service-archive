@@ -10,10 +10,15 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import ru.vyarus.dropwizard.guice.injector.lookup.InjectorLookup;
+import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.permissions.TestPermissionsApp;
 import uk.gov.bis.lite.permissions.Util;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
+import uk.gov.bis.lite.permissions.model.OgelSubmission.FailReason;
+import uk.gov.bis.lite.permissions.model.OgelSubmission.Mode;
+import uk.gov.bis.lite.permissions.model.OgelSubmission.Stage;
+import uk.gov.bis.lite.permissions.model.OgelSubmission.Status;
 
 /**
  * Integration test for OgelSubmissionDao
@@ -84,9 +89,44 @@ public class SubmissionDaoTest {
     assertThat(submissionDao.getPendingSubmissions()).hasSize(3);
     assertThat(submissionDao.getCancelledSubmissions()).hasSize(1);
     assertThat(submissionDao.getFinishedSubmissions()).hasSize(1);
+
+    OgelSubmission sub = new OgelSubmission("userId", "ogelType");
+    sub.setJson("{}");
+    sub.setSubmissionRef("OGEL1");
+    sub.setCustomerRef("SAR1");
+    sub.setSiteRef("SAR1_SITE1");
+    sub.setUserId("123456");
+    sub.setOgelType("OGL1");
+    sub.setStatus(Status.ACTIVE);
+    sub.setSpireRef("SPIRE1");
+    sub.setMode(Mode.SCHEDULED);
+    sub.setStage(Stage.CREATED);
+    sub.setLiteJwtUser(new LiteJwtUser()
+        .setUserId("123456")
+        .setEmail("test@test.com")
+        .setFullName("Mr Test"));
+    sub.setFailReason(FailReason.ENDPOINT_ERROR);
+
+    int subId = submissionDao.create(sub);
+    OgelSubmission newSub = submissionDao.findBySubmissionId(subId);
+
+    assertThat(sub.getJson()).isEqualTo(newSub.getJson());
+    assertThat(sub.getSubmissionRef()).isEqualTo(newSub.getSubmissionRef());
+    assertThat(sub.getCustomerRef()).isEqualTo(newSub.getCustomerRef());
+    assertThat(sub.getSiteRef()).isEqualTo(newSub.getSiteRef());
+    assertThat(sub.getUserId()).isEqualTo(newSub.getUserId());
+    assertThat(sub.getOgelType()).isEqualTo(newSub.getOgelType());
+    assertThat(sub.getStatus()).isEqualTo(newSub.getStatus());
+    assertThat(sub.getSpireRef()).isEqualTo(newSub.getSpireRef());
+    assertThat(sub.getMode()).isEqualTo(newSub.getMode());
+    assertThat(sub.getStage()).isEqualTo(newSub.getStage());
+    assertThat(sub.getLiteJwtUser().getUserId()).isEqualTo(newSub.getLiteJwtUser().getUserId());
+    assertThat(sub.getLiteJwtUser().getEmail()).isEqualTo(newSub.getLiteJwtUser().getEmail());
+    assertThat(sub.getLiteJwtUser().getFullName()).isEqualTo(newSub.getLiteJwtUser().getFullName());
+    assertThat(sub.getLiteJwtUser().getName()).isEqualTo(newSub.getLiteJwtUser().getName());
   }
 
-  private OgelSubmission getScheduled(OgelSubmission.Stage stage) {
+  private OgelSubmission getScheduled(Stage stage) {
     OgelSubmission sub = new OgelSubmission("userId", "ogelType");
     sub.setScheduledMode();
     sub.setStage(stage);

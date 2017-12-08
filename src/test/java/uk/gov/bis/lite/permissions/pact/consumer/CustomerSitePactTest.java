@@ -11,6 +11,9 @@ import au.com.dius.pact.model.PactFragment;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import uk.gov.bis.lite.common.jwt.LiteJwtConfig;
+import uk.gov.bis.lite.common.jwt.LiteJwtUserHelper;
+import uk.gov.bis.lite.permissions.JwtTestHelper;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.service.CustomerService;
 import uk.gov.bis.lite.permissions.service.CustomerServiceImpl;
@@ -18,6 +21,7 @@ import uk.gov.bis.lite.permissions.service.CustomerServiceImpl;
 import java.util.Optional;
 
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.HttpHeaders;
 
 /**
  * CustomerSitePactTest
@@ -32,12 +36,15 @@ public class CustomerSitePactTest extends CustomerBasePactTest {
   private static final String PROVIDER = "lite-customer-service";
   private static final String CONSUMER = "lite-permissions-service";
 
+  private static final String JWT_SHARED_SECRET = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
+
   @Rule
   public final PactProviderRule mockProvider = new PactProviderRule(PROVIDER, this);
 
   @Before
   public void before() {
-    customerService = new CustomerServiceImpl(ClientBuilder.newClient(), mockProvider.getConfig().url());
+    LiteJwtUserHelper liteJwtUserHelper = new LiteJwtUserHelper(new LiteJwtConfig(JWT_SHARED_SECRET, "lite-permissions-service"));
+    customerService = new CustomerServiceImpl(ClientBuilder.newClient(), mockProvider.getConfig().url(), liteJwtUserHelper);
   }
 
   @Pact(provider = PROVIDER, consumer = CONSUMER)
@@ -47,6 +54,7 @@ public class CustomerSitePactTest extends CustomerBasePactTest {
         .given("new site is valid")
         .uponReceiving("request to create a new site")
         .path("/customer-sites/" + CUSTOMER_ID)
+        .matchHeader(HttpHeaders.AUTHORIZATION, JwtTestHelper.JWT_AUTHORIZATION_HEADER_REGEX, JwtTestHelper.JWT_AUTHORIZATION_HEADER_VALUE)
         .headers(headers())
         .method("POST")
         .query("userId=userId")
@@ -66,6 +74,7 @@ public class CustomerSitePactTest extends CustomerBasePactTest {
         .given("new site is invalid")
         .uponReceiving("request to create a new site")
         .path("/customer-sites/" + CUSTOMER_ID)
+        .matchHeader(HttpHeaders.AUTHORIZATION, JwtTestHelper.JWT_AUTHORIZATION_HEADER_REGEX, JwtTestHelper.JWT_AUTHORIZATION_HEADER_VALUE)
         .headers(headers())
         .method("POST")
         .query("userId=")

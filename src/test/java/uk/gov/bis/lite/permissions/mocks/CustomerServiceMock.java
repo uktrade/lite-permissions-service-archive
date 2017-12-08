@@ -44,7 +44,7 @@ public class CustomerServiceMock implements CustomerService {
     return Optional.empty();
   }
 
-  public Optional<String> getCustomerIdByCompanyNumber(String companyNumber) {
+  public Optional<String> getCustomerIdByCompanyNumber(OgelSubmission sub, String companyNumber) {
     return Optional.empty();
   }
 
