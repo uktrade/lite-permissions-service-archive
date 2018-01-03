@@ -10,6 +10,7 @@ import uk.gov.bis.lite.permissions.util.LiteJwtUserUtil;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 public class OgelSubmissionMapper implements ResultSetMapper<OgelSubmission> {
 
@@ -30,8 +31,8 @@ public class OgelSubmissionMapper implements ResultSetMapper<OgelSubmission> {
     sub.setSpireRef(r.getString("SPIRE_REF"));
     sub.setCallbackUrl(r.getString("CALLBACK_URL"));
     sub.setCalledBack(r.getBoolean("CALLED_BACK"));
-    sub.setFirstFail(r.getString("FIRST_FAIL"));
-    sub.setLastFail(r.getString("LAST_FAIL"));
+    sub.setFirstFail(r.getObject("FIRST_FAIL", LocalDateTime.class));
+    sub.setLastFail(r.getObject("LAST_FAIL", LocalDateTime.class));
     sub.setLastFailMessage(r.getString("LAST_FAIL_MESSAGE"));
     sub.setCallBackFailCount(r.getInt("CALLBACK_FAIL_COUNT"));
     sub.setLiteJwtUser(LiteJwtUserUtil.fromJson(r.getString("LITE_JWT_USER")));
@@ -49,7 +50,7 @@ public class OgelSubmissionMapper implements ResultSetMapper<OgelSubmission> {
     }
 
     sub.setJson(r.getString("JSON"));
-    sub.setCreated(r.getString("CREATED"));
+    sub.setCreated(r.getObject("CREATED", LocalDateTime.class));
     sub.setRoleUpdate(r.getBoolean("ROLE_UPDATE"));
     sub.setRoleUpdated(r.getBoolean("ROLE_UPDATED"));
     return sub;

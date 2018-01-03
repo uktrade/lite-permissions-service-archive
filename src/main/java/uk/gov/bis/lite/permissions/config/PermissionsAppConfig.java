@@ -2,8 +2,8 @@ package uk.gov.bis.lite.permissions.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
-import io.dropwizard.db.DataSourceFactory;
 import org.hibernate.validator.constraints.NotEmpty;
+import uk.gov.bis.lite.common.paas.db.SchemaAwareDataSourceFactory;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -37,7 +37,7 @@ public class PermissionsAppConfig extends Configuration {
   @Valid
   @NotNull
   @JsonProperty("database")
-  private DataSourceFactory database;
+  private SchemaAwareDataSourceFactory dataSourceFactory;
 
   @NotEmpty
   private String adminLogin;
@@ -48,8 +48,8 @@ public class PermissionsAppConfig extends Configuration {
   @NotEmpty
   private String jwtSharedSecret;
 
-  public DataSourceFactory getDataSourceFactory() {
-    return database;
+  public SchemaAwareDataSourceFactory getDataSourceFactory() {
+    return dataSourceFactory;
   }
 
   public String getProcessScheduledJobCron() {
@@ -74,10 +74,6 @@ public class PermissionsAppConfig extends Configuration {
 
   public String getMaxMinutesRetryAfterFail() {
     return maxMinutesRetryAfterFail;
-  }
-
-  public DataSourceFactory getDatabase() {
-    return database;
   }
 
   public String getAdminLogin() {

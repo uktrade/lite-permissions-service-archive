@@ -1,5 +1,3 @@
-import java.text.SimpleDateFormat
-
 buildscript {
   repositories {
     mavenCentral()
@@ -24,9 +22,7 @@ group 'uk.gov.bis.lite'
 if (project.hasProperty('projVersion')) {
   project.version = project.projVersion
 } else {
-  SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMdd.HHmmss")
-  sdf.setTimeZone(new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "UTC"))
-  project.version = sdf.format(new Date()) + "-SNAPSHOT"
+  project.version = "1.0-SNAPSHOT"
 }
 
 mainClassName = "uk.gov.bis.lite.permissions.PermissionsApp"
@@ -35,6 +31,7 @@ ext.dropwizardVersion = '1.2.0'
 
 repositories {
   mavenCentral()
+  jcenter()
   maven {
     name "releases"
     url "http://nexus.mgmt.licensing.service.trade.gov.uk.test/repository/maven-releases/"
@@ -53,7 +50,7 @@ dependencies {
   compile "io.dropwizard:dropwizard-client:$dropwizardVersion"
   compile 'ru.vyarus:dropwizard-guicey:3.2.0'
   compile 'org.quartz-scheduler:quartz:2.1.5'
-  compile 'org.xerial:sqlite-jdbc:3.8.11.2'
+  compile 'org.postgresql:postgresql:42.1.4'
   compile 'org.flywaydb:flyway-core:4.0.1'
   compile 'net.logstash.logback:logstash-logback-encoder:4.10'
   compile 'ch.qos.logback.contrib:logback-jackson:0.1.5'
@@ -64,6 +61,7 @@ dependencies {
   compile 'uk.gov.bis.lite:jwt:1.2'
   compile 'uk.gov.bis.lite:lite-customer-service-api:1.1'
   compile 'uk.gov.bis.lite:jersey-correlation-id:1.0'
+  compile 'uk.gov.bis.lite:paas-utils:1.0'
 
   testCompile 'junit:junit:4.12'
   testCompile 'org.mockito:mockito-core:1.10.19'
@@ -94,7 +92,7 @@ pact {
 }
 
 flyway {
-  url = 'jdbc:sqlite:localPermissions.db'
+  url = 'jdbc:postgresql://localhost:5432/postgres?currentSchema=permissionsvc'
 }
 
 shadowJar {
@@ -112,7 +110,7 @@ build {
   dependsOn shadowJar
 }
 
-run { args 'server', 'src/main/resources/config.yaml' }
+run { args 'server', 'config.yaml' }
 
 
 publishing {

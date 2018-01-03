@@ -1,8 +1,8 @@
 processScheduledJobCron: 0/10 * * * * ?  # every 10 seconds
 
-spireClientUserName: spire_user
-spireClientPassword: spire_password
-spireClientUrl: http://service-mocking.svc.dev.licensing.service.trade.gov.uk.test/spire/fox/ispire/
+spireClientUserName: bisuat.api@test.com
+spireClientPassword: sp1reUAT
+spireClientUrl: https://www.spiretest.trade.gov.uk/spireuat/fox/ispire/
 
 jwtSharedSecret: demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement
 
@@ -15,10 +15,7 @@ server:
   type: default
   applicationConnectors:
     - type: http
-      port: 8080
-  adminConnectors:
-    - type: http
-      port: 8081
+      port: ${PORT}
 
 logging:
   level: INFO
@@ -27,13 +24,12 @@ logging:
       includeCallerData : true
       logFormat: "[%mdc{corrID}] %d [%p] %marker %logger %m%n"
   loggers:
-    uk.gov.bis.lite.common.spire.client: TRACE
+    uk.gov.bis.lite.common.spire.client: WARN
 
 database:
   driverClass: org.postgresql.Driver
-  url: jdbc:postgresql://localhost:5432/postgres?currentSchema=permissionsvc
-  user: postgres
-  password: password
+  url: ${VCAP_JDBC_URL}
+  schema: permissionsvc
   properties:
     charSet: UTF-8
   maxWaitForConnection: 30s

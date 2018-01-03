@@ -32,8 +32,10 @@ logging:
     uk.gov.bis.lite.common.spire.client: TRACE
 
 database:
-  driverClass: org.sqlite.JDBC
-  url: jdbc:sqlite:file::memory:?cache=shared
+  driverClass: org.postgresql.Driver
+  url: jdbc:postgresql://localhost:5432/postgres?currentSchema=permissionsvc
+  user: postgres
+  password: password
   properties:
     charSet: UTF-8
   maxWaitForConnection: 30s

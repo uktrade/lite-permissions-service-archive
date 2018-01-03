@@ -41,9 +41,9 @@ public class ProcessFailureTest {
   public void testFirstFail() throws Exception {
     OgelSubmission sub = Util.getMockActiveOgelSubmission();
     sub.setFailEvent(new FailEvent(Util.PERMISSION_DENIED, Util.ORIGIN_SITE, Util.ERROR_MESSAGE));
-    assertThat(sub.getFirstFailDateTime()).isNull();
+    assertThat(sub.getFirstFail()).isNull();
     service.updateForProcessFailure(sub);
-    assertThat(sub.getFirstFailDateTime()).isNotNull();
+    assertThat(sub.getFirstFail()).isNotNull();
     assertThat(sub.getLastFailMessage()).isNotNull();
   }
 

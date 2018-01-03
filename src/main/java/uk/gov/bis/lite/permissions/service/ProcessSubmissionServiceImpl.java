@@ -253,7 +253,7 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
         sub.setFirstFailDateTime(); // Set first fail
       } else {
         // Check for repeating error
-        if (sub.getFirstFailDateTime().isBefore(LocalDateTime.now().minus(maxMinutesRetryAfterFail, MINUTES))) {
+        if (sub.getFirstFail().isBefore(LocalDateTime.now().minus(maxMinutesRetryAfterFail, MINUTES))) {
           LOGGER.info("Repeating Error - setting status to COMPLETE SubID[{}]", sub.getId());
           sub.updateStatusToComplete();
         }

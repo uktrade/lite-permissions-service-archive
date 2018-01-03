@@ -9,6 +9,8 @@ import io.dropwizard.auth.PolymorphicAuthDynamicFeature;
 import io.dropwizard.auth.PolymorphicAuthValueFactoryProvider;
 import io.dropwizard.auth.PrincipalImpl;
 import io.dropwizard.auth.basic.BasicCredentialAuthFilter;
+import io.dropwizard.configuration.ResourceConfigurationSourceProvider;
+import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -20,6 +22,7 @@ import ru.vyarus.dropwizard.guice.module.installer.feature.jersey.ResourceInstal
 import uk.gov.bis.lite.common.jersey.filter.ContainerCorrelationIdFilter;
 import uk.gov.bis.lite.common.jwt.LiteJwtAuthFilterHelper;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
+import uk.gov.bis.lite.common.paas.db.CloudFoundryEnvironmentSubstitutor;
 import uk.gov.bis.lite.permissions.config.GuiceModule;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
 import uk.gov.bis.lite.permissions.resource.LicenceResource;
@@ -44,6 +47,11 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
 
   @Override
   public void initialize(Bootstrap<PermissionsAppConfig> bootstrap) {
+    // Load config from a resource (i.e. file within the JAR), and substitute environment variables into it
+    bootstrap.setConfigurationSourceProvider(
+        new SubstitutingSourceProvider(
+            new ResourceConfigurationSourceProvider(), new CloudFoundryEnvironmentSubstitutor()));
+
     GuiceBundle<PermissionsAppConfig> guiceBundle = new GuiceBundle.Builder<PermissionsAppConfig>()
         .modules(module)
         .installers(ResourceInstaller.class, ManagedInstaller.class)
@@ -75,11 +83,14 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
     environment.jersey().register(ContainerCorrelationIdFilter.class);
 
     // Perform/validate flyway migration on startup
+    flywayMigrate(config);
+  }
+
+  protected void flywayMigrate(PermissionsAppConfig config) {
     DataSourceFactory dataSourceFactory = config.getDataSourceFactory();
     Flyway flyway = new Flyway();
     flyway.setDataSource(dataSourceFactory.getUrl(), dataSourceFactory.getUser(), dataSourceFactory.getPassword());
     flyway.migrate();
-
   }
 
   public static void main(String[] args) throws Exception {
