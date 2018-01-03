@@ -1,0 +1,51 @@
+processScheduledJobCron: 59 59 23 31 12 ? 2099  # 5am 31st February
+
+spireClientUserName: username
+spireClientPassword: password
+spireClientUrl: http://localhost:9000/spire/fox/ispire/
+#spireClientUrl: https://www.spiretest.trade.gov.uk/spireuat/fox/ispire/
+
+jwtSharedSecret: demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement
+
+customerServiceUrl: http://localhost:9000/
+#customerServiceUrl: http://customer-service.svc.dev.licensing.service.trade.gov.uk.test
+
+maxMinutesRetryAfterFail: -1
+maxCallbackFailCount: 1
+
+server:
+  type: default
+  applicationConnectors:
+    - type: http
+      port: 0 # random application port
+  adminConnectors:
+    - type: http
+      port: 0 # random admin port
+
+logging:
+  level: INFO
+  appenders:
+    - type: console
+      includeCallerData : true
+      logFormat: "[%mdc{corrID}] %d [%p] %marker %logger %m%n"
+  loggers:
+    uk.gov.bis.lite.common.spire.client: TRACE
+
+database:
+  driverClass: org.postgresql.Driver
+  url: jdbc:postgresql://localhost:5432/postgres?currentSchema=permissionsvc
+  user: postgres
+  password: password
+  properties:
+    charSet: UTF-8
+  maxWaitForConnection: 30s
+  validationQuery: "SELECT 1"
+  initialSize: 1
+  minSize: 1
+  maxSize: 1
+  checkConnectionWhileIdle: false
+  evictionInterval: 10s
+  minIdleTime: 1 minute
+
+adminLogin: user
+adminPassword: password
