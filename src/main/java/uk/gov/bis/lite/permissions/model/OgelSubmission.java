@@ -5,7 +5,6 @@ import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.permissions.api.view.CallbackView;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class OgelSubmission {
 
@@ -155,14 +154,6 @@ public class OgelSubmission {
 
   public boolean hasAdminUserId() {
     return !StringUtils.isBlank(adminUserId);
-  }
-
-  public void setFirstFailDateTime() {
-    firstFail = LocalDateTime.now();
-  }
-
-  public void setLastFailDateTime() {
-    lastFail = LocalDateTime.now();
   }
 
   public void setScheduledMode() {

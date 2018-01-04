@@ -250,7 +250,7 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
       LOGGER.error("{} SubID[{}]", failMessage, sub.getId());
 
       if (!sub.hasFail()) {
-        sub.setFirstFailDateTime(); // Set first fail
+        sub.setFirstFail(LocalDateTime.now()); // Set first fail
       } else {
         // Check for repeating error
         if (sub.getFirstFail().isBefore(LocalDateTime.now().minus(maxMinutesRetryAfterFail, MINUTES))) {
@@ -261,12 +261,14 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
 
       sub.setFailReason(failReason);
       sub.setLastFailMessage(failMessage);
-      sub.setLastFailDateTime();
+      sub.setLastFail(LocalDateTime.now());
 
       // Set status to complete with configured fail reason
       if (STATUS_COMPLETE_FAIL_REASONS.contains(failReason)) {
         LOGGER.info("Found setStatusComplete FailReason - setting status to COMPLETE SubID[{}]", sub.getId());
         sub.updateStatusToComplete();
+      } else {
+        LOGGER.info("FailReason {} - status remains {} SubID[{}]", failReason, sub.getStatus(), sub.getId());
       }
 
       // Remove FailEvent

@@ -77,6 +77,10 @@ dependencies {
     exclude group: 'junit', module: 'junit'
   }
   testCompile 'org.awaitility:awaitility-groovy:3.0.0'
+
+  testCompile 'ru.yandex.qatools.embed:postgresql-embedded:2.6'
+  testCompile 'com.h2database:h2:1.4.196'
+
   // Pact
   testCompile 'au.com.dius:pact-jvm-consumer-junit_2.11:3.3.7'
   testCompile 'au.com.dius:pact-jvm-provider-junit_2.11:3.3.7'
