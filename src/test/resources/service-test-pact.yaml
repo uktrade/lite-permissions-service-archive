@@ -32,8 +32,8 @@ logging:
     uk.gov.bis.lite.common.spire.client: TRACE
 
 database:
-  driverClass: org.postgresql.Driver
-  url: jdbc:postgresql://localhost:5432/postgres?currentSchema=permissionsvc
+  driverClass: org.h2.Driver
+  url: "jdbc:h2:mem:"
   user: postgres
   password: password
   properties:

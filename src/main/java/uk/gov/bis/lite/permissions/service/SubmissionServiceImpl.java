@@ -1,5 +1,6 @@
 package uk.gov.bis.lite.permissions.service;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import uk.gov.bis.lite.permissions.api.view.OgelSubmissionView;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
@@ -43,7 +44,7 @@ public class SubmissionServiceImpl implements SubmissionService {
     } else if (Filter.FINISHED.name().equalsIgnoreCase(filter)) {
       subs = submissionDao.getFinishedSubmissions();
     }
-    return subs.stream().map(this::getOgelSubmissionView).collect(Collectors.toList());
+    return subs.stream().map(SubmissionServiceImpl::getOgelSubmissionView).collect(Collectors.toList());
   }
 
   public OgelSubmissionView getOgelSubmission(int submissionId) {
@@ -68,7 +69,8 @@ public class SubmissionServiceImpl implements SubmissionService {
     }
   }
 
-  private OgelSubmissionView getOgelSubmissionView(OgelSubmission sub) {
+  @VisibleForTesting
+  public static OgelSubmissionView getOgelSubmissionView(OgelSubmission sub) {
     OgelSubmissionView view = new OgelSubmissionView();
     view.setId("" + sub.getId());
     view.setUserId(sub.getUserId());

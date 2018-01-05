@@ -14,9 +14,16 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import io.dropwizard.jackson.Jackson;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.JerseyClient;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.JerseyInvocation;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
+import org.junit.Before;
 import org.junit.Test;
 import uk.gov.bis.lite.common.jwt.LiteJwtConfig;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
@@ -45,6 +52,17 @@ public class OgelIntegrationTest extends BaseIntegrationTest {
   private static final String SUB_ID = "1";
   private static final String JWT_SHARED_SECRET = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
 
+  private JerseyClient client;
+
+  @Before
+  public void setUp() throws Exception {
+    ObjectMapper mapper = Jackson.newObjectMapper()
+        .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    ClientConfig config = new ClientConfig()
+        .register(new JacksonJsonProvider(mapper));
+    client = JerseyClientBuilder.createClient(config);
+  }
+
   @Test
   public void registerOgelSuccessImmediate() throws Exception {
     initRegisterOgelStubs();
@@ -57,8 +75,7 @@ public class OgelIntegrationTest extends BaseIntegrationTest {
 
     assertThat(response.getStatus()).isEqualTo(200);
 
-    JerseyInvocation.Builder ogelSubmissionRequest = JerseyClientBuilder
-        .createClient()
+    JerseyInvocation.Builder ogelSubmissionRequest = client
         .register(HttpAuthenticationFeature.basic("user", "password"))
         .target(localUrl(OGEL_SUBMISSION_URL + SUB_ID))
         .request();
@@ -96,7 +113,7 @@ public class OgelIntegrationTest extends BaseIntegrationTest {
   @Test
   public void registerOgelUnauthorized() {
     initRegisterOgelStubs();
-    Response response = JerseyClientBuilder.createClient()
+    Response response = client
         .target(localUrl(REGISTER_OGEL_URL))
         .queryParam("callbackUrl", "http://localhost:" + wireMockClassRule.port() + "/callback")
         .request()

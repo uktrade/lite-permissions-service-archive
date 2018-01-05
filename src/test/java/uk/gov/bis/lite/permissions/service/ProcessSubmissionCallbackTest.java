@@ -1,16 +1,19 @@
 package uk.gov.bis.lite.permissions.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.yandex.qatools.embed.postgresql.distribution.Version.Main.V9_5;
 
 import com.google.inject.Injector;
-import io.dropwizard.db.DataSourceFactory;
-import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.flywaydb.core.Flyway;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
 import org.junit.Test;
 import ru.vyarus.dropwizard.guice.injector.lookup.InjectorLookup;
+import ru.yandex.qatools.embed.postgresql.EmbeddedPostgres;
+import uk.gov.bis.lite.common.paas.db.SchemaAwareDataSourceFactory;
 import uk.gov.bis.lite.permissions.TestPermissionsApp;
 import uk.gov.bis.lite.permissions.Util;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
@@ -32,17 +35,22 @@ public class ProcessSubmissionCallbackTest {
   private static OgelSubmissionDao submissionDao;
   private static CustomerServiceMock customerServiceMock;
   private static OgelServiceMock ogelServiceMock;
+  private static EmbeddedPostgres postgres;
+  private static Flyway flyway;
 
-  @ClassRule
-  public static final DropwizardAppRule<PermissionsAppConfig> APP_RULE = new DropwizardAppRule<>(TestPermissionsApp.class,
-      ResourceHelpers.resourceFilePath("test-config.yaml"));
+  private static DropwizardAppRule<PermissionsAppConfig> APP_RULE;
 
   @BeforeClass
-  public static void before() {
-    Flyway flyway = new Flyway();
-    DataSourceFactory dsf = APP_RULE.getConfiguration().getDataSourceFactory();
-    flyway.setDataSource(dsf.getUrl(), dsf.getUser(), dsf.getPassword());
-    flyway.migrate();
+  public static void beforeClass() throws Exception {
+    postgres = new EmbeddedPostgres(V9_5);
+    postgres.start("localhost", 5432, "dbName", "postgres", "password");
+
+    APP_RULE = new DropwizardAppRule<>(TestPermissionsApp.class, "test-config.yaml");
+    APP_RULE.getTestSupport().before();
+
+    SchemaAwareDataSourceFactory dataSourceFactory = APP_RULE.getConfiguration().getDataSourceFactory();
+    flyway = new Flyway();
+    flyway.setDataSource(dataSourceFactory.getUrl(), dataSourceFactory.getUser(), dataSourceFactory.getPassword());
 
     Injector injector = InjectorLookup.getInjector(APP_RULE.getApplication()).get();
     ogelServiceMock = (OgelServiceMock) injector.getInstance(OgelService.class);
@@ -50,6 +58,23 @@ public class ProcessSubmissionCallbackTest {
     submissionDao = injector.getInstance(OgelSubmissionDao.class);
     customerServiceMock = (CustomerServiceMock) injector.getInstance(CustomerService.class);
   }
+
+  @AfterClass
+  public static void afterClass() throws Exception {
+    APP_RULE.getTestSupport().after();
+    postgres.stop();
+  }
+
+  @Before
+  public void setUp() throws Exception {
+    flyway.migrate();
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    flyway.clean();
+  }
+
 
   @Test
   public void runSuccessToCallback() {
