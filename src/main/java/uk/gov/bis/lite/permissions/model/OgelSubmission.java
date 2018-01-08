@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 public class OgelSubmission {
 
-  private int id;
+  private long id;
   private String userId;
   private String adminUserId;
   private String ogelType;
@@ -86,7 +86,7 @@ public class OgelSubmission {
     }
   }
 
-  public OgelSubmission(int id) {
+  public OgelSubmission(long id) {
     this.id = id;
   }
 
@@ -200,11 +200,11 @@ public class OgelSubmission {
     this.siteRef = siteRef;
   }
 
-  public int getId() {
+  public long getId() {
     return id;
   }
 
-  public void setId(int id) {
+  public void setId(long id) {
     this.id = id;
   }
 

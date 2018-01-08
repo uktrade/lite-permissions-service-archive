@@ -18,7 +18,7 @@ public class OgelSubmissionMapper implements ResultSetMapper<OgelSubmission> {
 
   @Override
   public OgelSubmission map(int index, ResultSet r, StatementContext ctx) throws SQLException {
-    OgelSubmission sub = new OgelSubmission(r.getInt("ID"));
+    OgelSubmission sub = new OgelSubmission(r.getLong("ID"));
     sub.setUserId(r.getString("USER_ID"));
     sub.setAdminUserId(r.getString("ADMIN_USER_ID"));
     sub.setOgelType(r.getString("OGEL_TYPE"));

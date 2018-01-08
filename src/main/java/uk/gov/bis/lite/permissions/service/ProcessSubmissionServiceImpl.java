@@ -61,7 +61,8 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
   /**
    * Process OgelSubmission through all stages - set Mode to SCHEDULED if process cannot be completed
    */
-  public void processImmediate(int submissionId) {
+  @Override
+  public void processImmediate(long submissionId) {
     LOGGER.info("IMMEDIATE SubID[{}]", submissionId);
 
     OgelSubmission sub = submissionDao.findBySubmissionId(submissionId);

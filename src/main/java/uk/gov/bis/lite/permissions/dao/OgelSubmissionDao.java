@@ -8,7 +8,7 @@ public interface OgelSubmissionDao {
 
   void update(OgelSubmission sub);
 
-  int create(OgelSubmission sub);
+  long create(OgelSubmission sub);
 
 
   List<OgelSubmission> getScheduledActive();
@@ -23,7 +23,7 @@ public interface OgelSubmissionDao {
   List<OgelSubmission> getFinishedSubmissions();
 
 
-  OgelSubmission findBySubmissionId(int submissionId);
+  OgelSubmission findBySubmissionId(long submissionId);
 
   OgelSubmission findRecentBySubmissionRef(String submissionRef);
 

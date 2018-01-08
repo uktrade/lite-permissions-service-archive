@@ -4,7 +4,7 @@ import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
 public interface ProcessSubmissionService {
 
-  void processImmediate(int submissionId);
+  void processImmediate(long submissionId);
 
   void processOgelSubmissions();
 

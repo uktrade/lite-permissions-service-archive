@@ -133,7 +133,7 @@ public class SubmissionDaoTest {
         .setFullName("Mr Test"));
     sub.setFailReason(FailReason.ENDPOINT_ERROR);
 
-    int subId = submissionDao.create(sub);
+    long subId = submissionDao.create(sub);
     OgelSubmission newSub = submissionDao.findBySubmissionId(subId);
 
     assertThat(sub.getJson()).isEqualTo(newSub.getJson());

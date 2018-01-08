@@ -33,7 +33,7 @@ public class OgelSubmissionViewTest {
     OgelSubmissionView subView = SubmissionServiceImpl.getOgelSubmissionView(sub);
 
     assertThat(subView.getJson()).isEqualTo(sub.getJson());
-    assertThat(subView.getId()).isEqualTo(Integer.toString(sub.getId()));
+    assertThat(subView.getId()).isEqualTo(Long.toString(sub.getId()));
     assertThat(subView.getUserId()).isEqualTo(sub.getUserId());
     assertThat(subView.getOgelType()).isEqualTo(sub.getOgelType());
     assertThat(subView.getMode()).isEqualTo(sub.getMode().toString());

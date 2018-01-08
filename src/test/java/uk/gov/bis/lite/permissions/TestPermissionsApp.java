@@ -13,8 +13,4 @@ public class TestPermissionsApp extends PermissionsApp {
     super(Modules.override(new GuiceModule()).with(new TestGuiceModule()));
   }
 
-  @Override
-  protected void flywayMigrate(PermissionsAppConfig config) {
-
-  }
 }

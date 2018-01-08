@@ -46,7 +46,7 @@ public class CallbackServiceImpl implements CallbackService {
         sub.setFailEvent(new FailEvent(OgelSubmission.FailReason.UNCLASSIFIED, ProcessSubmissionServiceImpl.Origin.CALLBACK, Util.info(e)));
       }
     } else {
-      String subId = sub != null ? Integer.toString(sub.getId()) : "";
+      String subId = sub != null ? Long.toString(sub.getId()) : "";
       LOGGER.warn("OgelSubmission has not completed its processing. Postponing callback SubID[{}]", subId);
     }
     return callbackCompleted;

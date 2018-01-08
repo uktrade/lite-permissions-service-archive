@@ -11,7 +11,7 @@ import javax.ws.rs.core.Response;
 public class Util {
 
   public static final String MOCK_CALLBACK_URL = "/callback";
-  public static final int MOCK_ID = 1;
+  public static final long MOCK_ID = 1;
   public static final String SUBMISSION_REF = "SUBMISSION_REF";
   public static final String SPIRE_REF = "SPIRE_REF";
   public static final String CUSTOMER_REF = "CUSTOMER_REF";

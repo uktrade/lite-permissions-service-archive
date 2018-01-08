@@ -6,7 +6,7 @@ import uk.gov.bis.lite.permissions.service.ProcessSubmissionService;
 public class ProcessSubmissionServiceMock implements ProcessSubmissionService {
 
   @Override
-  public void processImmediate(int submissionId) {
+  public void processImmediate(long submissionId) {
 
   }
 

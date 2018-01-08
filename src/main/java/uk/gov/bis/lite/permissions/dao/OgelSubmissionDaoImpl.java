@@ -24,7 +24,7 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
 
   @Override
   @Transaction
-  public OgelSubmission findBySubmissionId(int submissionId) {
+  public OgelSubmission findBySubmissionId(long submissionId) {
     try (final Handle handle = jdbi.open()) {
       return attach(handle).findBySubmissionId(submissionId);
     }
@@ -88,7 +88,7 @@ public class OgelSubmissionDaoImpl implements OgelSubmissionDao {
 
   @Override
   @Transaction
-  public int create(OgelSubmission sub) {
+  public long create(OgelSubmission sub) {
     try (final Handle handle = jdbi.open()) {
       OgelSubmissionInterface subInterface = handle.attach(OgelSubmissionInterface.class);
       return subInterface.insert(
