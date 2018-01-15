@@ -1,12 +1,12 @@
 processScheduledJobCron: 0/10 * * * * ?  # every 10 seconds
 
-spireClientUserName: bisuat.api@test.com
-spireClientPassword: sp1reUAT
-spireClientUrl: https://www.spiretest.trade.gov.uk/spireuat/fox/ispire/
+spireClientUserName: ${SPIRE_CLIENT_USERNAME}
+spireClientPassword: ${SPIRE_CLIENT_PASSWORD}
+spireClientUrl: ${SPIRE_CLIENT_URL}
 
-jwtSharedSecret: demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement
+jwtSharedSecret: ${JWT_SHARED_SECRET}
 
-customerServiceUrl: http://customer-service.svc.dev.licensing.service.trade.gov.uk.test
+customerServiceUrl: ${CUSTOMER_SERVICE_URL}
 
 maxMinutesRetryAfterFail: 1
 maxCallbackFailCount: 5
@@ -29,7 +29,7 @@ logging:
 database:
   driverClass: org.postgresql.Driver
   url: ${VCAP_JDBC_URL}
-  schema: permissionsvc
+  schema: ${DATABASE_SCHEMA}
   properties:
     charSet: UTF-8
   maxWaitForConnection: 30s
@@ -41,5 +41,5 @@ database:
   evictionInterval: 10s
   minIdleTime: 1 minute
 
-adminLogin: user
-adminPassword: password
+adminLogin: ${ADMIN_LOGIN}
+adminPassword: ${ADMIN_PASSWORD}
