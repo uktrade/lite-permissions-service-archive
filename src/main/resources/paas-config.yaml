@@ -1,12 +1,12 @@
 processScheduledJobCron: 0/10 * * * * ?  # every 10 seconds
 
-spireClientUserName: ${SPIRE_CLIENT_USERNAME}
-spireClientPassword: ${SPIRE_CLIENT_PASSWORD}
-spireClientUrl: ${SPIRE_CLIENT_URL}
+spireClientUserName: "${SPIRE_CLIENT_USERNAME}"
+spireClientPassword: "${SPIRE_CLIENT_PASSWORD}"
+spireClientUrl: "${SPIRE_CLIENT_URL}"
 
-jwtSharedSecret: ${JWT_SHARED_SECRET}
+jwtSharedSecret: "${JWT_SHARED_SECRET}"
 
-customerServiceUrl: ${CUSTOMER_SERVICE_URL}
+customerServiceUrl: "${CUSTOMER_SERVICE_URL}"
 
 maxMinutesRetryAfterFail: 1
 maxCallbackFailCount: 5
@@ -28,8 +28,8 @@ logging:
 
 database:
   driverClass: org.postgresql.Driver
-  url: ${VCAP_JDBC_URL}
-  schema: ${DATABASE_SCHEMA}
+  url: "${VCAP_JDBC_URL}"
+  schema: "${DATABASE_SCHEMA}"
   properties:
     charSet: UTF-8
   maxWaitForConnection: 30s
@@ -41,5 +41,5 @@ database:
   evictionInterval: 10s
   minIdleTime: 1 minute
 
-adminLogin: ${ADMIN_LOGIN}
-adminPassword: ${ADMIN_PASSWORD}
+adminLogin: "${ADMIN_LOGIN}"
+adminPassword: "${ADMIN_PASSWORD}"
