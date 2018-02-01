@@ -3,6 +3,8 @@ package uk.gov.bis.lite.permissions.api.view;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 
+import java.time.LocalDateTime;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OgelSubmissionView {
 
@@ -15,13 +17,13 @@ public class OgelSubmissionView {
   private String customerRef;
   private String siteRef;
   private String spireRef;
-  private String firstFail;
-  private String lastFail;
+  private LocalDateTime firstFail;
+  private LocalDateTime lastFail;
   private String lastFailMessage;
   private String failReason;
   private String callbackUrl;
   private boolean calledBack;
-  private String created;
+  private LocalDateTime created;
   private boolean roleUpdate;
   private boolean roleUpdated;
   private Object json;
@@ -103,11 +105,11 @@ public class OgelSubmissionView {
     this.spireRef = spireRef;
   }
 
-  public String getFirstFail() {
+  public LocalDateTime getFirstFail() {
     return firstFail;
   }
 
-  public void setFirstFail(String firstFail) {
+  public void setFirstFail(LocalDateTime firstFail) {
     this.firstFail = firstFail;
   }
 
@@ -143,11 +145,11 @@ public class OgelSubmissionView {
     this.calledBack = calledBack;
   }
 
-  public String getCreated() {
+  public LocalDateTime getCreated() {
     return created;
   }
 
-  public void setCreated(String created) {
+  public void setCreated(LocalDateTime created) {
     this.created = created;
   }
 
@@ -171,11 +173,11 @@ public class OgelSubmissionView {
     this.json = json;
   }
 
-  public String getLastFail() {
+  public LocalDateTime getLastFail() {
     return lastFail;
   }
 
-  public void setLastFail(String lastFail) {
+  public void setLastFail(LocalDateTime lastFail) {
     this.lastFail = lastFail;
   }
 }

@@ -1,19 +1,22 @@
 package uk.gov.bis.lite.permissions.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.yandex.qatools.embed.postgresql.distribution.Version.Main.V9_5;
 
-import io.dropwizard.db.DataSourceFactory;
-import io.dropwizard.testing.ResourceHelpers;
-import io.dropwizard.testing.junit.DropwizardAppRule;
+import com.codahale.metrics.MetricRegistry;
+import com.google.common.collect.ImmutableMap;
+import io.dropwizard.util.Duration;
 import org.flywaydb.core.Flyway;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
 import org.junit.Test;
-import ru.vyarus.dropwizard.guice.injector.lookup.InjectorLookup;
+import org.skife.jdbi.v2.DBI;
+import ru.yandex.qatools.embed.postgresql.EmbeddedPostgres;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
-import uk.gov.bis.lite.permissions.TestPermissionsApp;
+import uk.gov.bis.lite.common.paas.db.SchemaAwareDataSourceFactory;
 import uk.gov.bis.lite.permissions.Util;
-import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.model.OgelSubmission.FailReason;
 import uk.gov.bis.lite.permissions.model.OgelSubmission.Mode;
@@ -23,26 +26,53 @@ import uk.gov.bis.lite.permissions.model.OgelSubmission.Status;
 /**
  * Integration test for OgelSubmissionDao
  */
-public class SubmissionDaoTest {
+public class OgelSubmissionDaoIntegrationTest {
+  private static EmbeddedPostgres postgres;
 
-  private static OgelSubmissionDao submissionDao;
-
-  @ClassRule
-  public static final DropwizardAppRule<PermissionsAppConfig> APP_RULE = new DropwizardAppRule<>(TestPermissionsApp.class,
-      ResourceHelpers.resourceFilePath("test-config.yaml"));
+  private Flyway flyway;
+  private OgelSubmissionDao submissionDao;
 
   @BeforeClass
-  public static void before() {
-    Flyway flyway = new Flyway();
-    DataSourceFactory dsf = APP_RULE.getConfiguration().getDataSourceFactory();
+  public static void beforeClass() throws Exception {
+    postgres = new EmbeddedPostgres(V9_5);
+    postgres.start("localhost", 5432, "dbName", "postgres", "password");
+  }
+
+  @AfterClass
+  public static void afterClass() {
+    postgres.stop();
+  }
+
+  @Before
+  public void before() {
+    // Build DataSourceFactory like Dropwizard would
+    SchemaAwareDataSourceFactory dsf = new SchemaAwareDataSourceFactory();
+    dsf.setDriverClass("org.postgresql.Driver");
+    dsf.setUrl("jdbc:postgresql://localhost:5432/postgres?currentSchema=permissionsvc");
+    dsf.setUser("postgres");
+    dsf.setPassword("password");
+    dsf.setProperties(ImmutableMap.of("charSet", "UTF-8"));
+    dsf.setMaxWaitForConnection(Duration.seconds(30));
+    dsf.setValidationQuery("SELECT 1");
+    dsf.setInitialSize(1);
+    dsf.setMinSize(1);
+    dsf.setMaxSize(1);
+    dsf.setCheckConnectionWhileIdle(false);
+    dsf.setEvictionInterval(Duration.seconds(10));
+    dsf.setMinIdleTime(Duration.minutes(1));
+    submissionDao = new OgelSubmissionDaoImpl(new DBI(dsf.build(new MetricRegistry(), "postgres")));
+    flyway = new Flyway();
     flyway.setDataSource(dsf.getUrl(), dsf.getUser(), dsf.getPassword());
     flyway.migrate();
-    submissionDao = InjectorLookup.getInjector(APP_RULE.getApplication()).get().getInstance(OgelSubmissionDao.class);
+  }
+
+  @After
+  public void after() {
+    flyway.clean();
   }
 
   @Test
   public void runSubmissionDaoTest() {
-
     submissionDao.create(getScheduled(Util.STAGE_CREATED));
 
     assertThat(submissionDao.getScheduledActive()).hasSize(1);
@@ -107,7 +137,7 @@ public class SubmissionDaoTest {
         .setFullName("Mr Test"));
     sub.setFailReason(FailReason.ENDPOINT_ERROR);
 
-    int subId = submissionDao.create(sub);
+    long subId = submissionDao.create(sub);
     OgelSubmission newSub = submissionDao.findBySubmissionId(subId);
 
     assertThat(sub.getJson()).isEqualTo(newSub.getJson());

@@ -1,24 +1,26 @@
-processScheduledJobCron: 0/10 * * * * ?  # every 10 seconds
+processScheduledJobCron: 59 59 23 31 12 ? 2099  # 5am 31st February
 
-spireClientUserName: spire_user
-spireClientPassword: spire_password
-spireClientUrl: http://service-mocking.svc.dev.licensing.service.trade.gov.uk.test/spire/fox/ispire/
+spireClientUserName: username
+spireClientPassword: password
+spireClientUrl: http://localhost:9000/spire/fox/ispire/
+#spireClientUrl: https://www.spiretest.trade.gov.uk/spireuat/fox/ispire/
 
 jwtSharedSecret: demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement
 
-customerServiceUrl: http://customer-service.svc.dev.licensing.service.trade.gov.uk.test
+customerServiceUrl: http://localhost:9000/
+#customerServiceUrl: http://customer-service.svc.dev.licensing.service.trade.gov.uk.test
 
-maxMinutesRetryAfterFail: 1
-maxCallbackFailCount: 5
+maxMinutesRetryAfterFail: -1
+maxCallbackFailCount: 1
 
 server:
   type: default
   applicationConnectors:
     - type: http
-      port: 8080
+      port: 0 # random application port
   adminConnectors:
     - type: http
-      port: 8081
+      port: 0 # random admin port
 
 logging:
   level: INFO
@@ -30,8 +32,8 @@ logging:
     uk.gov.bis.lite.common.spire.client: TRACE
 
 database:
-  driverClass: org.postgresql.Driver
-  url: jdbc:postgresql://localhost:5432/postgres?currentSchema=permissionsvc
+  driverClass: org.h2.Driver
+  url: "jdbc:h2:mem:"
   user: postgres
   password: password
   properties:
@@ -40,7 +42,7 @@ database:
   validationQuery: "SELECT 1"
   initialSize: 1
   minSize: 1
-  maxSize: 3
+  maxSize: 1
   checkConnectionWhileIdle: false
   evictionInterval: 10s
   minIdleTime: 1 minute

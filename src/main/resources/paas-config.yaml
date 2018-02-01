@@ -1,0 +1,45 @@
+processScheduledJobCron: 0/10 * * * * ?  # every 10 seconds
+
+spireClientUserName: "${SPIRE_CLIENT_USERNAME}"
+spireClientPassword: "${SPIRE_CLIENT_PASSWORD}"
+spireClientUrl: "${SPIRE_CLIENT_URL}"
+
+jwtSharedSecret: "${JWT_SHARED_SECRET}"
+
+customerServiceUrl: "${CUSTOMER_SERVICE_URL}"
+
+maxMinutesRetryAfterFail: 1
+maxCallbackFailCount: 5
+
+server:
+  type: default
+  applicationConnectors:
+    - type: http
+      port: ${PORT}
+
+logging:
+  level: INFO
+  appenders:
+    - type: console
+      includeCallerData : true
+      logFormat: "[%mdc{corrID}] %d [%p] %marker %logger %m%n"
+  loggers:
+    uk.gov.bis.lite.common.spire.client: WARN
+
+database:
+  driverClass: org.postgresql.Driver
+  url: "${VCAP_JDBC_URL}"
+  schema: "${DATABASE_SCHEMA}"
+  properties:
+    charSet: UTF-8
+  maxWaitForConnection: 30s
+  validationQuery: "SELECT 1"
+  initialSize: 1
+  minSize: 1
+  maxSize: 3
+  checkConnectionWhileIdle: false
+  evictionInterval: 10s
+  minIdleTime: 1 minute
+
+adminLogin: "${ADMIN_LOGIN}"
+adminPassword: "${ADMIN_PASSWORD}"

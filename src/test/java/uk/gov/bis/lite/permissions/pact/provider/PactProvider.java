@@ -1,7 +1,5 @@
 package uk.gov.bis.lite.permissions.pact.provider;
 
-import static io.dropwizard.testing.ResourceHelpers.resourceFilePath;
-
 import au.com.dius.pact.provider.junit.PactRunner;
 import au.com.dius.pact.provider.junit.Provider;
 import au.com.dius.pact.provider.junit.State;
@@ -21,12 +19,12 @@ import uk.gov.bis.lite.permissions.mocks.RegistrationServiceMock;
 
 @RunWith(PactRunner.class)
 @Provider("lite-permissions-service")
-@PactBroker(host = "pact-broker.mgmt.licensing.service.trade.gov.uk.test", port = "80")
+@PactBroker(host = "pact-broker.ci.uktrade.io", port = "80")
 public class PactProvider {
 
   @ClassRule
   public static final DropwizardAppRule<PermissionsAppConfig> RULE =
-      new DropwizardAppRule<>(PactPermissionsApp.class, resourceFilePath("service-test.yaml"));
+      new DropwizardAppRule<>(PactPermissionsApp.class, "service-test-pact.yaml");
 
   @TestTarget
   public final Target target = new HttpTarget(RULE.getLocalPort());

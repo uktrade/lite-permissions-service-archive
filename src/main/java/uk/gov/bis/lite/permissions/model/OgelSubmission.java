@@ -5,11 +5,10 @@ import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.permissions.api.view.CallbackView;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class OgelSubmission {
 
-  private int id;
+  private long id;
   private String userId;
   private String adminUserId;
   private String ogelType;
@@ -20,22 +19,21 @@ public class OgelSubmission {
   private String customerRef;
   private String siteRef;
   private String spireRef;
-  private String firstFail;
-  private String lastFail;
+  private LocalDateTime firstFail;
+  private LocalDateTime lastFail;
   private String lastFailMessage;
   private FailReason failReason;
   private String callbackUrl;
   private boolean calledBack;
   private int callBackFailCount = 0;
   private String json;
-  private String created;
+  private LocalDateTime created;
   private boolean roleUpdate;
   private boolean roleUpdated;
   private LiteJwtUser liteJwtUser;
 
   private transient FailEvent failEvent = null;
 
-  private static final DateTimeFormatter OGEL_SUBMISSION_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
   /**
    * IMMEDIATE      - submission is being processed immediately, through all stages
@@ -88,7 +86,7 @@ public class OgelSubmission {
     }
   }
 
-  public OgelSubmission(int id) {
+  public OgelSubmission(long id) {
     this.id = id;
   }
 
@@ -143,7 +141,7 @@ public class OgelSubmission {
   }
 
   public boolean hasFail() {
-    return !StringUtils.isBlank(firstFail);
+    return firstFail != null;
   }
 
   public boolean hasFailEvent() {
@@ -156,24 +154,6 @@ public class OgelSubmission {
 
   public boolean hasAdminUserId() {
     return !StringUtils.isBlank(adminUserId);
-  }
-
-  public LocalDateTime getFirstFailDateTime() {
-    LocalDateTime date = null;
-    if (!StringUtils.isBlank(firstFail)) {
-      date = LocalDateTime.parse(firstFail, OGEL_SUBMISSION_DATE_FORMATTER);
-    }
-    return date;
-  }
-
-  public void setFirstFailDateTime() {
-    LocalDateTime now = LocalDateTime.now();
-    firstFail = now.format(OGEL_SUBMISSION_DATE_FORMATTER);
-  }
-
-  public void setLastFailDateTime() {
-    LocalDateTime now = LocalDateTime.now();
-    lastFail = now.format(OGEL_SUBMISSION_DATE_FORMATTER);
   }
 
   public void setScheduledMode() {
@@ -220,11 +200,11 @@ public class OgelSubmission {
     this.siteRef = siteRef;
   }
 
-  public int getId() {
+  public long getId() {
     return id;
   }
 
-  public void setId(int id) {
+  public void setId(long id) {
     this.id = id;
   }
 
@@ -252,11 +232,11 @@ public class OgelSubmission {
     this.status = status;
   }
 
-  public String getCreated() {
+  public LocalDateTime getCreated() {
     return created;
   }
 
-  public void setCreated(String created) {
+  public void setCreated(LocalDateTime created) {
     this.created = created;
   }
 
@@ -308,11 +288,11 @@ public class OgelSubmission {
     this.calledBack = calledBack;
   }
 
-  public String getFirstFail() {
+  public LocalDateTime getFirstFail() {
     return firstFail;
   }
 
-  public void setFirstFail(String firstFail) {
+  public void setFirstFail(LocalDateTime firstFail) {
     this.firstFail = firstFail;
   }
 
@@ -356,11 +336,11 @@ public class OgelSubmission {
     this.failEvent = failEvent;
   }
 
-  public String getLastFail() {
+  public LocalDateTime getLastFail() {
     return lastFail;
   }
 
-  public void setLastFail(String lastFail) {
+  public void setLastFail(LocalDateTime lastFail) {
     this.lastFail = lastFail;
   }
 

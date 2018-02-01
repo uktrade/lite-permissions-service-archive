@@ -2,6 +2,7 @@ package uk.gov.bis.lite.permissions;
 
 import com.google.inject.util.Modules;
 import uk.gov.bis.lite.permissions.config.GuiceModule;
+import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
 
 /**
  * Use for integration tests - see ProcessSubmissionServiceTest

@@ -8,7 +8,7 @@ import uk.gov.bis.lite.permissions.service.ProcessSubmissionService;
 public class ProcessImmediateJob implements Job {
 
   private ProcessSubmissionService processSubmissionService;
-  private int submissionId;
+  private long submissionId;
 
   @Override
   public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -18,6 +18,6 @@ public class ProcessImmediateJob implements Job {
 
   private void init(JobExecutionContext context) {
     processSubmissionService = (ProcessSubmissionService) context.getMergedJobDataMap().get(Scheduler.JOB_PROCESS_SERVICE_NAME);
-    submissionId = (int) context.getMergedJobDataMap().get(Scheduler.SUBMISSION_ID);
+    submissionId = (long) context.getMergedJobDataMap().get(Scheduler.SUBMISSION_ID);
   }
 }

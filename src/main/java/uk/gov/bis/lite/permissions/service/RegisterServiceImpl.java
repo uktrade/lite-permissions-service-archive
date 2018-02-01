@@ -80,7 +80,7 @@ public class RegisterServiceImpl implements RegisterService {
 
     // Persist OgelSubmission
     sub.setCallbackUrl(callbackUrl);
-    int submissionId = submissionDao.create(sub);
+    long submissionId = submissionDao.create(sub);
 
     // Trigger ProcessImmediateJob to process this submission
     triggerProcessSubmissionJob(submissionId);
@@ -191,7 +191,7 @@ public class RegisterServiceImpl implements RegisterService {
     return registerString + customerString + siteString + adminString;
   }
 
-  private void triggerProcessSubmissionJob(int submissionId) {
+  private void triggerProcessSubmissionJob(long submissionId) {
     JobDetail detail = JobBuilder.newJob(ProcessImmediateJob.class).build();
     JobDataMap dataMap = detail.getJobDataMap();
     dataMap.put(Scheduler.JOB_PROCESS_SERVICE_NAME, processSubmissionService);

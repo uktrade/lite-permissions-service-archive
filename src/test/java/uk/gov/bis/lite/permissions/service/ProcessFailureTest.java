@@ -13,6 +13,9 @@ import uk.gov.bis.lite.permissions.mocks.OgelSubmissionDaoMock;
 import uk.gov.bis.lite.permissions.model.FailEvent;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
 public class ProcessFailureTest {
 
   private ProcessSubmissionServiceImpl service;
@@ -41,9 +44,9 @@ public class ProcessFailureTest {
   public void testFirstFail() throws Exception {
     OgelSubmission sub = Util.getMockActiveOgelSubmission();
     sub.setFailEvent(new FailEvent(Util.PERMISSION_DENIED, Util.ORIGIN_SITE, Util.ERROR_MESSAGE));
-    assertThat(sub.getFirstFailDateTime()).isNull();
+    assertThat(sub.getFirstFail()).isNull();
     service.updateForProcessFailure(sub);
-    assertThat(sub.getFirstFailDateTime()).isNotNull();
+    assertThat(sub.getFirstFail()).isNotNull();
     assertThat(sub.getLastFailMessage()).isNotNull();
   }
 
@@ -95,7 +98,9 @@ public class ProcessFailureTest {
   @Test
   public void testRepeatingError() throws Exception {
     OgelSubmission sub = Util.getMockActiveOgelSubmission();
-    sub.setFirstFailDateTime();
+
+    // One minute in the past to trigger repeat based on maxMinutesRetryAfterFail being set to 0
+    sub.setFirstFail(LocalDateTime.now().minus(1, ChronoUnit.MINUTES));
     sub.setFailEvent(new FailEvent(Util.UNCLASSIFIED, Util.ORIGIN_SITE, Util.ERROR_MESSAGE));
 
     // maxMinutesRetryAfterFail set to 0 minutes so we expect Status to be set to TERMINATED

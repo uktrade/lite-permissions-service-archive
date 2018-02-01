@@ -15,7 +15,7 @@ public class OgelSubmissionDaoMock implements OgelSubmissionDao {
   }
 
   @Override
-  public int create(OgelSubmission sub) {
+  public long create(OgelSubmission sub) {
     return 0;
   }
 
@@ -45,7 +45,7 @@ public class OgelSubmissionDaoMock implements OgelSubmissionDao {
   }
 
   @Override
-  public OgelSubmission findBySubmissionId(int submissionId) {
+  public OgelSubmission findBySubmissionId(long submissionId) {
     return null;
   }
 

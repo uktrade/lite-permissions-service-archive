@@ -61,7 +61,8 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
   /**
    * Process OgelSubmission through all stages - set Mode to SCHEDULED if process cannot be completed
    */
-  public void processImmediate(int submissionId) {
+  @Override
+  public void processImmediate(long submissionId) {
     LOGGER.info("IMMEDIATE SubID[{}]", submissionId);
 
     OgelSubmission sub = submissionDao.findBySubmissionId(submissionId);
@@ -250,10 +251,10 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
       LOGGER.error("{} SubID[{}]", failMessage, sub.getId());
 
       if (!sub.hasFail()) {
-        sub.setFirstFailDateTime(); // Set first fail
+        sub.setFirstFail(LocalDateTime.now()); // Set first fail
       } else {
         // Check for repeating error
-        if (sub.getFirstFailDateTime().isBefore(LocalDateTime.now().minus(maxMinutesRetryAfterFail, MINUTES))) {
+        if (sub.getFirstFail().isBefore(LocalDateTime.now().minus(maxMinutesRetryAfterFail, MINUTES))) {
           LOGGER.info("Repeating Error - setting status to COMPLETE SubID[{}]", sub.getId());
           sub.updateStatusToComplete();
         }
@@ -261,12 +262,14 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
 
       sub.setFailReason(failReason);
       sub.setLastFailMessage(failMessage);
-      sub.setLastFailDateTime();
+      sub.setLastFail(LocalDateTime.now());
 
       // Set status to complete with configured fail reason
       if (STATUS_COMPLETE_FAIL_REASONS.contains(failReason)) {
         LOGGER.info("Found setStatusComplete FailReason - setting status to COMPLETE SubID[{}]", sub.getId());
         sub.updateStatusToComplete();
+      } else {
+        LOGGER.info("FailReason {} - status remains {} SubID[{}]", failReason, sub.getStatus(), sub.getId());
       }
 
       // Remove FailEvent
