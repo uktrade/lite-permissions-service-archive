@@ -4,11 +4,11 @@ import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import au.com.dius.pact.consumer.Pact;
-import au.com.dius.pact.consumer.PactProviderRule;
+import au.com.dius.pact.consumer.PactProviderRuleMk2;
 import au.com.dius.pact.consumer.PactVerification;
 import au.com.dius.pact.consumer.dsl.PactDslJsonBody;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
-import au.com.dius.pact.model.PactFragment;
+import au.com.dius.pact.model.RequestResponsePact;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,16 +37,16 @@ public class CustomerUserRolePactTest extends CustomerBasePactTest {
   private CustomerService customerService;
 
   @Rule
-  public final PactProviderRule mockProvider = new PactProviderRule(PROVIDER, this);
+  public final PactProviderRuleMk2 mockProvider = new PactProviderRuleMk2(PROVIDER, this);
 
   @Before
   public void before() {
     LiteJwtUserHelper liteJwtUserHelper = new LiteJwtUserHelper(new LiteJwtConfig(JWT_SHARED_SECRET, "lite-permissions-service"));
-    customerService = new CustomerServiceImpl(ClientBuilder.newClient(), mockProvider.getConfig().url(), liteJwtUserHelper);
+    customerService = new CustomerServiceImpl(ClientBuilder.newClient(), mockProvider.getUrl(), liteJwtUserHelper);
   }
 
   @Pact(provider = PROVIDER, consumer = CONSUMER)
-  public PactFragment updateUserRoleSuccess(PactDslWithProvider builder) {
+  public RequestResponsePact updateUserRoleSuccess(PactDslWithProvider builder) {
 
     return builder
         .given("user role update request is valid")
@@ -58,11 +58,11 @@ public class CustomerUserRolePactTest extends CustomerBasePactTest {
         .body(userRoleParamPactDsl())
         .willRespondWith()
         .status(200)
-        .toFragment();
+        .toPact();
   }
 
   @Pact(provider = PROVIDER, consumer = CONSUMER)
-  public PactFragment updateUserRoleFail(PactDslWithProvider builder) {
+  public RequestResponsePact updateUserRoleFail(PactDslWithProvider builder) {
 
     return builder
         .given("user role update request is invalid")
@@ -74,7 +74,7 @@ public class CustomerUserRolePactTest extends CustomerBasePactTest {
         .body(userRoleParamPactDsl())
         .willRespondWith()
         .status(400)
-        .toFragment();
+        .toPact();
   }
 
   @Test

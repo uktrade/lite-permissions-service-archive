@@ -3,12 +3,12 @@ package uk.gov.bis.lite.permissions.pact.consumer;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import au.com.dius.pact.consumer.Pact;
-import au.com.dius.pact.consumer.PactProviderRule;
+import au.com.dius.pact.consumer.PactProviderRuleMk2;
 import au.com.dius.pact.consumer.PactVerification;
 import au.com.dius.pact.consumer.dsl.DslPart;
 import au.com.dius.pact.consumer.dsl.PactDslJsonBody;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
-import au.com.dius.pact.model.PactFragment;
+import au.com.dius.pact.model.RequestResponsePact;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,16 +37,16 @@ public class CustomerCustomerPactTest extends CustomerBasePactTest {
   private CustomerService customerService;
 
   @Rule
-  public final PactProviderRule mockProvider = new PactProviderRule(PROVIDER, this);
+  public final PactProviderRuleMk2 mockProvider = new PactProviderRuleMk2(PROVIDER, this);
 
   @Before
   public void before() {
     LiteJwtUserHelper liteJwtUserHelper = new LiteJwtUserHelper(new LiteJwtConfig(JWT_SHARED_SECRET, "lite-permissions-service"));
-    customerService = new CustomerServiceImpl(ClientBuilder.newClient(), mockProvider.getConfig().url(), liteJwtUserHelper);
+    customerService = new CustomerServiceImpl(ClientBuilder.newClient(), mockProvider.getUrl(), liteJwtUserHelper);
   }
 
   @Pact(provider = PROVIDER, consumer = CONSUMER)
-  public PactFragment createCustomerSuccess(PactDslWithProvider builder) {
+  public RequestResponsePact createCustomerSuccess(PactDslWithProvider builder) {
 
     return builder
         .given("new customer is valid")
@@ -60,11 +60,11 @@ public class CustomerCustomerPactTest extends CustomerBasePactTest {
         .headers(headers())
         .status(200)
         .body(customerViewPactDsl())
-        .toFragment();
+        .toPact();
   }
 
   @Pact(provider = PROVIDER, consumer = CONSUMER)
-  public PactFragment createCustomerFail(PactDslWithProvider builder) {
+  public RequestResponsePact createCustomerFail(PactDslWithProvider builder) {
 
     return builder
         .given("new customer is invalid")
@@ -75,11 +75,11 @@ public class CustomerCustomerPactTest extends CustomerBasePactTest {
         .method("POST")
         .willRespondWith()
         .status(400)
-        .toFragment();
+        .toPact();
   }
 
   @Pact(provider = PROVIDER, consumer = CONSUMER)
-  public PactFragment customerByCompanyNumberSuccess(PactDslWithProvider builder) {
+  public RequestResponsePact customerByCompanyNumberSuccess(PactDslWithProvider builder) {
 
     return builder
         .given("customer successfully retrieved")
@@ -91,11 +91,11 @@ public class CustomerCustomerPactTest extends CustomerBasePactTest {
         .status(200)
         .headers(headers())
         .body(customerViewPactDsl())
-        .toFragment();
+        .toPact();
   }
 
   @Pact(provider = PROVIDER, consumer = CONSUMER)
-  public PactFragment customerByCompanyNumberFail(PactDslWithProvider builder) {
+  public RequestResponsePact customerByCompanyNumberFail(PactDslWithProvider builder) {
 
     return builder
         .given("customer not found")
@@ -105,7 +105,7 @@ public class CustomerCustomerPactTest extends CustomerBasePactTest {
         .method("GET")
         .willRespondWith()
         .status(404)
-        .toFragment();
+        .toPact();
   }
 
   @Test
