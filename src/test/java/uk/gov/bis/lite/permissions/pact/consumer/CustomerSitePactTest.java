@@ -3,11 +3,11 @@ package uk.gov.bis.lite.permissions.pact.consumer;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import au.com.dius.pact.consumer.Pact;
-import au.com.dius.pact.consumer.PactProviderRule;
+import au.com.dius.pact.consumer.PactProviderRuleMk2;
 import au.com.dius.pact.consumer.PactVerification;
 import au.com.dius.pact.consumer.dsl.PactDslJsonBody;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
-import au.com.dius.pact.model.PactFragment;
+import au.com.dius.pact.model.RequestResponsePact;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,16 +39,16 @@ public class CustomerSitePactTest extends CustomerBasePactTest {
   private static final String JWT_SHARED_SECRET = "demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement";
 
   @Rule
-  public final PactProviderRule mockProvider = new PactProviderRule(PROVIDER, this);
+  public final PactProviderRuleMk2 mockProvider = new PactProviderRuleMk2(PROVIDER, this);
 
   @Before
   public void before() {
     LiteJwtUserHelper liteJwtUserHelper = new LiteJwtUserHelper(new LiteJwtConfig(JWT_SHARED_SECRET, "lite-permissions-service"));
-    customerService = new CustomerServiceImpl(ClientBuilder.newClient(), mockProvider.getConfig().url(), liteJwtUserHelper);
+    customerService = new CustomerServiceImpl(ClientBuilder.newClient(), mockProvider.getUrl(), liteJwtUserHelper);
   }
 
   @Pact(provider = PROVIDER, consumer = CONSUMER)
-  public PactFragment createSiteSuccess(PactDslWithProvider builder) {
+  public RequestResponsePact createSiteSuccess(PactDslWithProvider builder) {
 
     return builder
         .given("new site is valid")
@@ -63,12 +63,12 @@ public class CustomerSitePactTest extends CustomerBasePactTest {
         .headers(headers())
         .status(200)
         .body(siteViewPactDsl())
-        .toFragment();
+        .toPact();
   }
 
 
   @Pact(provider = PROVIDER, consumer = CONSUMER)
-  public PactFragment createSiteFail(PactDslWithProvider builder) {
+  public RequestResponsePact createSiteFail(PactDslWithProvider builder) {
 
     return builder
         .given("new site is invalid")
@@ -81,7 +81,7 @@ public class CustomerSitePactTest extends CustomerBasePactTest {
         .body(siteParamPactDsl())
         .willRespondWith()
         .status(400)
-        .toFragment();
+        .toPact();
   }
 
   @Test
