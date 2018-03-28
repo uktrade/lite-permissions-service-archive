@@ -159,7 +159,7 @@ public class LicenceIntegrationTest extends BaseIntegrationTest {
 
     Response response = get(LICENCES_URL + "123456");
 
-    assertThat(response.getStatus()).isEqualTo(400);
+    assertThat(response.getStatus()).isEqualTo(500);
   }
 
   @Test

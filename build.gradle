@@ -53,7 +53,7 @@ dependencies {
 
   // Lite dependencies
   compile 'uk.gov.bis.lite:json-console-appender:1.1'
-  compile 'uk.gov.bis.lite:spire-client:1.6'
+  compile 'uk.gov.bis.lite:spire-client:1.8'
   compile 'uk.gov.bis.lite:jwt:1.2'
   compile 'uk.gov.bis.lite:lite-customer-service-api:1.1'
   compile 'uk.gov.bis.lite:jersey-correlation-id:1.0'
