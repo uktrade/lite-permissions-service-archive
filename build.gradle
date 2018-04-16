@@ -49,11 +49,9 @@ dependencies {
   compile 'org.quartz-scheduler:quartz:2.1.5'
   compile 'org.postgresql:postgresql:42.1.4'
   compile 'org.flywaydb:flyway-core:4.0.1'
-  compile 'net.logstash.logback:logstash-logback-encoder:4.10'
-  compile 'ch.qos.logback.contrib:logback-jackson:0.1.5'
 
   // Lite dependencies
-  compile 'uk.gov.bis.lite:json-console-appender:1.1'
+  compile 'uk.gov.bis.lite:json-console-appender:1.1.1'
   compile 'uk.gov.bis.lite:spire-client:1.8'
   compile 'uk.gov.bis.lite:jwt:1.2'
   compile 'uk.gov.bis.lite:lite-customer-service-api:1.1'

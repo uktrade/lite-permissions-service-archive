@@ -16,15 +16,14 @@ server:
   applicationConnectors:
     - type: http
       port: ${PORT}
+  requestLog:
+    appenders:
+      - type: json-console-access
 
 logging:
   level: INFO
   appenders:
-    - type: console
-      includeCallerData : true
-      logFormat: "[%mdc{corrID}] %d [%p] %marker %logger %m%n"
-  loggers:
-    uk.gov.bis.lite.common.spire.client: WARN
+    - type: json-console
 
 database:
   driverClass: org.postgresql.Driver
