@@ -29,7 +29,7 @@ import uk.gov.bis.lite.permissions.resource.LicenceResource;
 import uk.gov.bis.lite.permissions.resource.OgelRegistrationResource;
 import uk.gov.bis.lite.permissions.resource.OgelSubmissionResource;
 import uk.gov.bis.lite.permissions.resource.RegisterOgelResource;
-import uk.gov.bis.lite.permissions.scheduler.Scheduler;
+import uk.gov.bis.lite.permissions.scheduler.ProcessSubmissionScheduler;
 import uk.gov.bis.lite.permissions.util.SimpleAuthenticator;
 
 public class PermissionsApp extends Application<PermissionsAppConfig> {
@@ -55,7 +55,8 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
     GuiceBundle<PermissionsAppConfig> guiceBundle = new GuiceBundle.Builder<PermissionsAppConfig>()
         .modules(module)
         .installers(ResourceInstaller.class, ManagedInstaller.class)
-        .extensions(RegisterOgelResource.class, OgelRegistrationResource.class, OgelSubmissionResource.class, LicenceResource.class, Scheduler.class)
+        .extensions(RegisterOgelResource.class, OgelRegistrationResource.class, OgelSubmissionResource.class,
+            LicenceResource.class, ProcessSubmissionScheduler.class)
         .build();
     bootstrap.addBundle(guiceBundle);
   }

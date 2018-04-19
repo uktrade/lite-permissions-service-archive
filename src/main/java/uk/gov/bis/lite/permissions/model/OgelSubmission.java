@@ -31,15 +31,12 @@ public class OgelSubmission {
   private boolean roleUpdate;
   private boolean roleUpdated;
   private LiteJwtUser liteJwtUser;
-
-  private transient FailEvent failEvent = null;
-
+  private FailEvent failEvent;
 
   /**
    * IMMEDIATE      - submission is being processed immediately, through all stages
    * SCHEDULED      - submission processed by scheduled jobs
    */
-
   public enum Mode {
     IMMEDIATE, SCHEDULED
   }

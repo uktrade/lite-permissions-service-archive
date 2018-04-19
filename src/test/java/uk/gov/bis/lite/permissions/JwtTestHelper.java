@@ -25,7 +25,7 @@ public class JwtTestHelper {
     }
     Secret: demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement
   */
-  public static final String JWT_TOKEN =
+  private static final String JWT_TOKEN =
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJTb21lIGxpdGUgYXBwbGljYXRpb24iLCJleHAiOjE4MjU1MDgzMTksImp0aSI6Ikp2MVhkbWhsRmhyYlFocTVRYVBneWciLCJpYXQiOjE1MTAxNDgzMTksIm5iZiI6MTUxMDE0ODE5OSwic3ViIjoiMTIzNDU2IiwiZW1haWwiOiJleGFtcGxlQGV4YW1wbGUuY29tIiwiZnVsbE5hbWUiOiJNciBUZXN0In0.4IUJs49UGBaN_c8Huf1dpYtFbOD43hzrWFvWUmz-_ak";
 
   public static final String JWT_AUTHORIZATION_HEADER_VALUE = "Bearer " + JWT_TOKEN;

@@ -20,7 +20,7 @@ import uk.gov.bis.lite.permissions.api.param.RegisterParam;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.scheduler.ProcessImmediateJob;
-import uk.gov.bis.lite.permissions.scheduler.Scheduler;
+import uk.gov.bis.lite.permissions.scheduler.ProcessSubmissionScheduler;
 import uk.gov.bis.lite.permissions.util.Util;
 
 import java.util.ArrayList;
@@ -194,8 +194,8 @@ public class RegisterServiceImpl implements RegisterService {
   private void triggerProcessSubmissionJob(long submissionId) {
     JobDetail detail = JobBuilder.newJob(ProcessImmediateJob.class).build();
     JobDataMap dataMap = detail.getJobDataMap();
-    dataMap.put(Scheduler.JOB_PROCESS_SERVICE_NAME, processSubmissionService);
-    dataMap.put(Scheduler.SUBMISSION_ID, submissionId);
+    dataMap.put(ProcessSubmissionScheduler.JOB_PROCESS_SERVICE_NAME, processSubmissionService);
+    dataMap.put(ProcessSubmissionScheduler.SUBMISSION_ID, submissionId);
     Trigger trigger = TriggerBuilder.newTrigger()
         .withIdentity(TriggerKey.triggerKey("SubmissionProcessJobTrigger-" + submissionId))
         .startNow().build();
