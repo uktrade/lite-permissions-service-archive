@@ -18,6 +18,6 @@ public class ProcessScheduledJob implements Job {
   }
 
   private void init(JobExecutionContext context) {
-    processSubmissionService = (ProcessSubmissionService) context.getMergedJobDataMap().get(Scheduler.JOB_PROCESS_SERVICE_NAME);
+    processSubmissionService = (ProcessSubmissionService) context.getMergedJobDataMap().get(ProcessSubmissionScheduler.JOB_PROCESS_SERVICE_NAME);
   }
 }

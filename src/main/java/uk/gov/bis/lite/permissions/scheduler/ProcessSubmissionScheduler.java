@@ -15,9 +15,9 @@ import org.slf4j.LoggerFactory;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
 import uk.gov.bis.lite.permissions.service.ProcessSubmissionService;
 
-public class Scheduler implements Managed {
+public class ProcessSubmissionScheduler implements Managed {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(Scheduler.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessSubmissionScheduler.class);
 
   private final org.quartz.Scheduler scheduler;
   private final PermissionsAppConfig config;
@@ -27,7 +27,8 @@ public class Scheduler implements Managed {
   public static final String SUBMISSION_ID = "SUBMISSION_ID";
 
   @Inject
-  public Scheduler(org.quartz.Scheduler scheduler, PermissionsAppConfig config, ProcessSubmissionService processSubmissionService) {
+  public ProcessSubmissionScheduler(org.quartz.Scheduler scheduler, PermissionsAppConfig config,
+                                    ProcessSubmissionService processSubmissionService) {
     this.scheduler = scheduler;
     this.config = config;
     this.processSubmissionService = processSubmissionService;
@@ -35,7 +36,7 @@ public class Scheduler implements Managed {
 
   @Override
   public void start() throws Exception {
-    LOGGER.info("Scheduler start...");
+    LOGGER.info("ProcessSubmissionScheduler start...");
 
     // Set up ProcessScheduledJob
     JobKey key = JobKey.jobKey("ProcessScheduledJob");

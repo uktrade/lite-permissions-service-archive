@@ -73,11 +73,9 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
 
       // If no FailEvent we attempt callback
       boolean updateToScheduled = sub.hasFailEvent();
-      if (!updateToScheduled) {
-        if (!callbackService.completeCallback(sub)) {
-          // We have callback failure so we need to ensure OgelSubmission mode is set to SCHEDULED
-          updateToScheduled = true;
-        }
+      if (!updateToScheduled && !callbackService.completeCallback(sub)) {
+        // We have callback failure so we need to ensure OgelSubmission mode is set to SCHEDULED
+        updateToScheduled = true;
       }
 
       // Change mode of OgelSubmission to SCHEDULED if we have had a previous failure
@@ -90,8 +88,8 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
       // Update state of OgelSubmission
       submissionDao.update(sub);
 
-    } catch (Throwable e) {
-      errorThrown(sub, e, "ProcessSubmissionServiceImpl.processImmediate");
+    } catch (Exception exception) {
+      errorThrown(sub, exception, "ProcessSubmissionServiceImpl.processImmediate");
     }
   }
 
@@ -181,8 +179,8 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
     for (OgelSubmission sub : subs) {
       try {
         doProcessOgelSubmission(sub);
-      } catch (Throwable e) {
-        errorThrown(sub, e, "ProcessSubmissionServiceImpl.processScheduled");
+      } catch (Exception exception) {
+        errorThrown(sub, exception, "ProcessSubmissionServiceImpl.processScheduled");
       }
     }
   }
@@ -199,8 +197,8 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
           updateForCallbackFailure(sub);
         }
         submissionDao.update(sub);
-      } catch (Throwable e) {
-        errorThrown(sub, e, "ProcessSubmissionServiceImpl.processScheduled");
+      } catch (Exception exception) {
+        errorThrown(sub, exception, "ProcessSubmissionServiceImpl.processScheduled");
       }
     }
   }
@@ -359,9 +357,9 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
     return hasCompletedStage(sub, sub.getStage());
   }
 
-  private void errorThrown(OgelSubmission sub, Throwable e, String info) {
-    String stackTrace = Throwables.getStackTraceAsString(e);
+  private void errorThrown(OgelSubmission sub, Exception exception, String info) {
+    String stackTrace = Throwables.getStackTraceAsString(exception);
     sub.setFailEvent(new FailEvent(OgelSubmission.FailReason.UNCLASSIFIED, Origin.UNKNOWN, stackTrace));
-    LOGGER.error(info + ": " + e.getMessage() + " SubID[" + sub.getId() + "]", e);
+    LOGGER.error("{} SubID[{}]", info, sub.getId(), exception);
   }
 }

@@ -17,7 +17,7 @@ public class ProcessImmediateJob implements Job {
   }
 
   private void init(JobExecutionContext context) {
-    processSubmissionService = (ProcessSubmissionService) context.getMergedJobDataMap().get(Scheduler.JOB_PROCESS_SERVICE_NAME);
-    submissionId = (long) context.getMergedJobDataMap().get(Scheduler.SUBMISSION_ID);
+    processSubmissionService = (ProcessSubmissionService) context.getMergedJobDataMap().get(ProcessSubmissionScheduler.JOB_PROCESS_SERVICE_NAME);
+    submissionId = (long) context.getMergedJobDataMap().get(ProcessSubmissionScheduler.SUBMISSION_ID);
   }
 }

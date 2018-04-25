@@ -67,8 +67,8 @@ public class LicenceServiceMock implements LicenceService {
     licenceView.setSiteId("siteId");
     licenceView.setType(Type.SIEL);
     licenceView.setSubType(null);
-    licenceView.setIssueDate(LocalDate.of(2010, 04, 21));
-    licenceView.setExpiryDate(LocalDate.of(2010, 04, 21));
+    licenceView.setIssueDate(LocalDate.of(2010, 4, 21));
+    licenceView.setExpiryDate(LocalDate.of(2010, 4, 21));
     licenceView.setStatus(LicenceView.Status.ACTIVE);
     licenceView.setCountryList(Arrays.asList("Germany", "France"));
     licenceView.setExternalDocumentUrl("externalDocumentUrl");
