@@ -1,7 +1,9 @@
 package uk.gov.bis.lite.permissions;
 
+import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
 import uk.gov.bis.lite.permissions.service.ProcessSubmissionServiceImpl;
+import uk.gov.bis.lite.user.api.view.enums.AccountType;
 
 import java.util.Map;
 
@@ -45,6 +47,19 @@ public class Util {
   public static final OgelSubmission.FailReason SITE_ALREADY_REGISTERED = OgelSubmission.FailReason.SITE_ALREADY_REGISTERED;
   public static final OgelSubmission.FailReason ENDPOINT_ERROR = OgelSubmission.FailReason.ENDPOINT_ERROR;
   public static final OgelSubmission.FailReason UNCLASSIFIED = OgelSubmission.FailReason.UNCLASSIFIED;
+
+
+  public static LiteJwtUser getTestLiteJwtUser(String userId) {
+    return new LiteJwtUser()
+        .setUserId(userId)
+        .setEmail("test@test.com")
+        .setFullName("Mr Test")
+        .setAccountType(AccountType.UNKNOWN);
+  }
+
+  public static LiteJwtUser getTestLiteJwtUser() {
+    return getTestLiteJwtUser("123456");
+  }
 
   public static OgelSubmission getMockOgelSubmission(String userId) {
     OgelSubmission sub = getMockOgelSubmission();

@@ -15,7 +15,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.Test;
 import uk.gov.bis.lite.common.jwt.LiteJwtConfig;
-import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.common.jwt.LiteJwtUserHelper;
 import uk.gov.bis.lite.permissions.Util;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
@@ -42,8 +41,7 @@ public class LicenceIntegrationTest extends BaseIntegrationTest {
   private final LiteJwtUserHelper liteJwtUserHelper = new LiteJwtUserHelper(new LiteJwtConfig(JWT_SHARED_SECRET, "some-lite-service"));
 
   private String jwtAuthorizationHeader(String userId) {
-    LiteJwtUser liteJwtUser = new LiteJwtUser().setUserId(userId).setEmail("example@example.com").setFullName("Mr Test");
-    return liteJwtUserHelper.generateTokenInAuthHeaderFormat(liteJwtUser);
+    return liteJwtUserHelper.generateTokenInAuthHeaderFormat(Util.getTestLiteJwtUser(userId));
   }
 
   private void stubForBody(String body) {

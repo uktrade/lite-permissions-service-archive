@@ -14,7 +14,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.skife.jdbi.v2.DBI;
 import ru.yandex.qatools.embed.postgresql.EmbeddedPostgres;
-import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.common.paas.db.SchemaAwareDataSourceFactory;
 import uk.gov.bis.lite.permissions.Util;
 import uk.gov.bis.lite.permissions.model.OgelSubmission;
@@ -131,10 +130,7 @@ public class OgelSubmissionDaoIntegrationTest {
     sub.setSpireRef("SPIRE1");
     sub.setMode(Mode.SCHEDULED);
     sub.setStage(Stage.CREATED);
-    sub.setLiteJwtUser(new LiteJwtUser()
-        .setUserId("123456")
-        .setEmail("test@test.com")
-        .setFullName("Mr Test"));
+    sub.setLiteJwtUser(Util.getTestLiteJwtUser());
     sub.setFailReason(FailReason.ENDPOINT_ERROR);
 
     long subId = submissionDao.create(sub);

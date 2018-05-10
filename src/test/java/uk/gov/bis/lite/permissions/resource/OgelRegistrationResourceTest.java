@@ -44,8 +44,7 @@ public class OgelRegistrationResourceTest {
       .addResource(new OgelRegistrationResource(MOCK_REGISTRATIONS_SERVICE)).build();
 
   private String jwtAuthorizationHeader(String userId) {
-    LiteJwtUser liteJwtUser = new LiteJwtUser().setUserId(userId).setEmail("example@example.com").setFullName("Mr Test");
-    return liteJwtUserHelper.generateTokenInAuthHeaderFormat(liteJwtUser);
+    return liteJwtUserHelper.generateTokenInAuthHeaderFormat(Util.getTestLiteJwtUser(userId));
   }
 
   @Test

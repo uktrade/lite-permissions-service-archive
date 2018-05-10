@@ -11,6 +11,7 @@ import uk.gov.bis.lite.common.jwt.LiteJwtAuthFilterHelper;
 import uk.gov.bis.lite.common.jwt.LiteJwtConfig;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.common.jwt.LiteJwtUserHelper;
+import uk.gov.bis.lite.permissions.Util;
 import uk.gov.bis.lite.permissions.api.RegisterOgelResponse;
 import uk.gov.bis.lite.permissions.api.param.RegisterParam;
 import uk.gov.bis.lite.permissions.mocks.RegisterServiceMock;
@@ -100,7 +101,6 @@ public class ResourceRegisterOgelTest {
 
   private String jwtAuthorizationHeader() {
     LiteJwtUserHelper liteJwtUserHelper = new LiteJwtUserHelper(new LiteJwtConfig(JWT_SHARED_SECRET, "some-lite-service"));
-    LiteJwtUser liteJwtUser = new LiteJwtUser().setUserId("123456").setEmail("test@test.com").setFullName("Mr Test");
-    return liteJwtUserHelper.generateTokenInAuthHeaderFormat(liteJwtUser);
+    return liteJwtUserHelper.generateTokenInAuthHeaderFormat(Util.getTestLiteJwtUser());
   }
 }

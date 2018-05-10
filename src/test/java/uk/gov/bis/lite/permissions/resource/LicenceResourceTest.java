@@ -43,8 +43,7 @@ public class LicenceResourceTest {
   private final LiteJwtUserHelper liteJwtUserHelper = new LiteJwtUserHelper(new LiteJwtConfig(JWT_SHARED_SECRET, "some-lite-service"));
 
   private String jwtAuthorizationHeader(String userId) {
-    LiteJwtUser liteJwtUser = new LiteJwtUser().setUserId(userId).setEmail("example@example.com").setFullName("Mr Test");
-    return liteJwtUserHelper.generateTokenInAuthHeaderFormat(liteJwtUser);
+    return liteJwtUserHelper.generateTokenInAuthHeaderFormat(Util.getTestLiteJwtUser(userId));
   }
 
   @Rule
