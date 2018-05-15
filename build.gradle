@@ -57,6 +57,7 @@ dependencies {
   compile 'uk.gov.bis.lite:lite-customer-service-api:1.1'
   compile 'uk.gov.bis.lite:jersey-correlation-id:1.0'
   compile 'uk.gov.bis.lite:paas-utils:1.0'
+  compile 'uk.gov.bis.lite:basic-auth:1.1'
 
   testCompile 'junit:junit:4.12'
   testCompile 'org.mockito:mockito-core:1.10.19'
