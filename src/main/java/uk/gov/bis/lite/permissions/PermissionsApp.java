@@ -1,5 +1,6 @@
 package uk.gov.bis.lite.permissions;
 
+import com.codahale.metrics.servlets.AdminServlet;
 import com.github.toastshaman.dropwizard.auth.jwt.JwtAuthFilter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -19,6 +20,7 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import ru.vyarus.dropwizard.guice.GuiceBundle;
 import ru.vyarus.dropwizard.guice.module.installer.feature.ManagedInstaller;
 import ru.vyarus.dropwizard.guice.module.installer.feature.jersey.ResourceInstaller;
+import uk.gov.bis.lite.common.auth.admin.AdminConstraintSecurityHandler;
 import uk.gov.bis.lite.common.jersey.filter.ContainerCorrelationIdFilter;
 import uk.gov.bis.lite.common.jwt.LiteJwtAuthFilterHelper;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
@@ -82,6 +84,9 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
     environment.jersey().register(authFeature);
     environment.jersey().register(authBinder);
     environment.jersey().register(ContainerCorrelationIdFilter.class);
+
+    environment.admin().addServlet("admin", new AdminServlet()).addMapping("/admin");
+    environment.admin().setSecurityHandler(new AdminConstraintSecurityHandler(config.getLogin(), config.getPassword()));
 
     // Perform/validate flyway migration on startup
     flywayMigrate(config);

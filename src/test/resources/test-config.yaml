@@ -13,13 +13,12 @@ maxMinutesRetryAfterFail: -1
 maxCallbackFailCount: 1
 
 server:
-  type: default
-  applicationConnectors:
-    - type: http
-      port: 8093
-  adminConnectors:
-    - type: http
-      port: 8094
+  type: simple
+  applicationContextPath: /
+  adminContextPath: /admin
+  connector:
+    type: http
+    port: 8093
 
 logging:
   level: INFO
@@ -48,3 +47,6 @@ database:
 
 adminLogin: user
 adminPassword: password
+
+login: user
+password: pass

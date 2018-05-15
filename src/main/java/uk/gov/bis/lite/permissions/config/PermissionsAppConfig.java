@@ -48,6 +48,12 @@ public class PermissionsAppConfig extends Configuration {
   @NotEmpty
   private String jwtSharedSecret;
 
+  @NotEmpty
+  private String login;
+
+  @NotEmpty
+  private String password;
+
   public SchemaAwareDataSourceFactory getDataSourceFactory() {
     return dataSourceFactory;
   }
@@ -91,4 +97,13 @@ public class PermissionsAppConfig extends Configuration {
   public String getJwtSharedSecret() {
     return jwtSharedSecret;
   }
+
+  public String getLogin() {
+    return login;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
 }
