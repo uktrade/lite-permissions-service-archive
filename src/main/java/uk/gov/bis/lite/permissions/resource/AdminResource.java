@@ -18,9 +18,10 @@ public class AdminResource {
 
   @RolesAllowed(Roles.SERVICE)
   @GET
-  @Path("/ping")
-  public Response ping(@Auth User user) {
-    LOGGER.info("Admin ping received, responding with 200 OK");
+  @Path("/check")
+  public Response adminCheck(@Auth User user) {
+    LOGGER.info("Admin check request received, responding with 200 OK");
     return Response.status(Response.Status.OK).build();
   }
+
 }

@@ -27,6 +27,7 @@ import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.common.paas.db.CloudFoundryEnvironmentSubstitutor;
 import uk.gov.bis.lite.permissions.config.GuiceModule;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
+import uk.gov.bis.lite.permissions.resource.AdminResource;
 import uk.gov.bis.lite.permissions.resource.LicenceResource;
 import uk.gov.bis.lite.permissions.resource.OgelRegistrationResource;
 import uk.gov.bis.lite.permissions.resource.OgelSubmissionResource;
@@ -58,7 +59,7 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
         .modules(module)
         .installers(ResourceInstaller.class, ManagedInstaller.class)
         .extensions(RegisterOgelResource.class, OgelRegistrationResource.class, OgelSubmissionResource.class,
-            LicenceResource.class, ProcessSubmissionScheduler.class)
+            LicenceResource.class, ProcessSubmissionScheduler.class, AdminResource.class)
         .build();
     bootstrap.addBundle(guiceBundle);
   }

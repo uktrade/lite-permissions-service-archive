@@ -45,7 +45,8 @@ dependencies {
   compile "io.dropwizard:dropwizard-jdbi:$dropwizardVersion"
   compile "io.dropwizard:dropwizard-auth:$dropwizardVersion"
   compile "io.dropwizard:dropwizard-client:$dropwizardVersion"
-  compile 'ru.vyarus:dropwizard-guicey:3.2.0'
+  compile 'ru.vyarus:dropwizard-guicey:4.1.0'
+  compile 'com.github.toastshaman:dropwizard-auth-jwt:1.1.2-0'
   compile 'org.quartz-scheduler:quartz:2.1.5'
   compile 'org.postgresql:postgresql:42.1.4'
   compile 'org.flywaydb:flyway-core:4.0.1'
