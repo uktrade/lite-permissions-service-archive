@@ -15,7 +15,7 @@ import org.junit.Test;
 import ru.vyarus.dropwizard.guice.injector.lookup.InjectorLookup;
 import ru.yandex.qatools.embed.postgresql.EmbeddedPostgres;
 import uk.gov.bis.lite.common.paas.db.SchemaAwareDataSourceFactory;
-import uk.gov.bis.lite.permissions.TestPermissionsApp;
+import uk.gov.bis.lite.permissions.CallbackPermissionsApp;
 import uk.gov.bis.lite.permissions.Util;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
 import uk.gov.bis.lite.permissions.dao.OgelSubmissionDao;
@@ -42,7 +42,7 @@ public class ProcessSubmissionServiceTest {
     postgres = new EmbeddedPostgres(V9_5);
     postgres.start("localhost", 5432, "dbName", "postgres", "password");
 
-    APP_RULE = new DropwizardAppRule<>(TestPermissionsApp.class, "test-config.yaml");
+    APP_RULE = new DropwizardAppRule<>(CallbackPermissionsApp.class, "test-config-spire.yaml");
     APP_RULE.getTestSupport().before();
 
     SchemaAwareDataSourceFactory dataSourceFactory = APP_RULE.getConfiguration().getDataSourceFactory();

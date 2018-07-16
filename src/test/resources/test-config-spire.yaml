@@ -2,7 +2,6 @@ processScheduledJobCron: 59 59 23 31 12 ? 2099  # 5am 31st February
 
 spireClientUserName: bisuat.api@test.com
 spireClientPassword: sp1reUAT
-#spireClientUrl: http://localhost:8080/spire/fox/ispire/
 spireClientUrl: https://www.spiretest.trade.gov.uk/spireuat/fox/ispire/
 
 jwtSharedSecret: demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement
@@ -50,3 +49,21 @@ adminPassword: password
 
 login: user
 password: pass
+
+redis:
+  host: localhost
+  password: ""
+  port: 6379
+  timeout: 2000
+  database: 0
+  ssl: false
+  poolMinIdle: 1
+  poolMaxTotal: 5
+  keyPrefix: local
+  key: lite-permissions-service
+  ttl:
+    getLicenceByRef: "2 minutes"
+    getAllLicences: "2 minutes"
+    getLicencesByType: "2 minutes"
+    getRegistration: "2 minutes"
+    getRegistrations: "2 minutes"

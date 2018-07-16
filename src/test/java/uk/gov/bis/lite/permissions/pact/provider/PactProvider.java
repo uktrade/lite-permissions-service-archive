@@ -8,6 +8,7 @@ import au.com.dius.pact.provider.junit.target.HttpTarget;
 import au.com.dius.pact.provider.junit.target.Target;
 import au.com.dius.pact.provider.junit.target.TestTarget;
 import com.google.inject.Injector;
+import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.junit.ClassRule;
 import org.junit.runner.RunWith;
@@ -24,7 +25,9 @@ public class PactProvider {
 
   @ClassRule
   public static final DropwizardAppRule<PermissionsAppConfig> RULE =
-      new DropwizardAppRule<>(PactPermissionsApp.class, "service-test-pact.yaml");
+      new DropwizardAppRule<>(PactPermissionsApp.class, "test-config-local.yaml",
+          ConfigOverride.config("database.driverClass", "org.h2.Driver"),
+          ConfigOverride.config("database.url", "jdbc:h2:mem:"));
 
   @TestTarget
   public final Target target = new HttpTarget(RULE.getLocalPort());

@@ -5,7 +5,6 @@ import uk.gov.bis.lite.permissions.api.view.LicenceView;
 import uk.gov.bis.lite.permissions.api.view.LicenceView.Type;
 import uk.gov.bis.lite.permissions.service.LicenceService;
 import uk.gov.bis.lite.permissions.service.model.LicenceResult;
-import uk.gov.bis.lite.permissions.service.model.LicenceTypeParam;
 import uk.gov.bis.lite.permissions.service.model.Status;
 
 import java.time.LocalDate;
@@ -48,7 +47,7 @@ public class LicenceServiceMock implements LicenceService {
   }
 
   @Override
-  public LicenceResult getLicencesByType(String userId, LicenceTypeParam type) {
+  public LicenceResult getLicencesByType(String userId, String type) {
     if (userNotFound) {
       return new LicenceResult(Status.USER_ID_NOT_FOUND, "Unable to find user with user id 1", null);
     } else if (noResults) {

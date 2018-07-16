@@ -47,3 +47,21 @@ adminPassword: "${ADMIN_PASSWORD}"
 
 login: "${BASIC_AUTH_USER}"
 password: "${BASIC_AUTH_PASSWORD}"
+
+redis:
+  host: "${REDIS_HOST}"
+  password: "${REDIS_PASSWORD}"
+  port: "${REDIS_PORT}"
+  timeout: "${REDIS_TIMEOUT}"
+  database: 0
+  ssl: "${REDIS_SSL}"
+  poolMinIdle: "${REDIS_POOL_MIN_IDLE}"
+  poolMaxTotal: "${REDIS_POOL_MAX_TOTAL}"
+  keyPrefix: "${REDIS_KEY_PREFIX}"
+  key: "${REDIS_KEY}"
+  ttl:
+    getLicenceByRef: "${REDIS_TTL_GET_LICENCE_BY_REF}"
+    getAllLicences: "${REDIS_TTL_GET_ALL_LICENCES}"
+    getLicencesByType: "${REDIS_TTL_GET_LICENCES_BY_TYPE}"
+    getRegistration: "${REDIS_TTL_GET_REGISTRATION}"
+    getRegistrations: "${REDIS_TTL_GET_REGISTRATIONS}"

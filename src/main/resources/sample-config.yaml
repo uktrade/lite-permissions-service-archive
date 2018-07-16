@@ -49,3 +49,21 @@ adminPassword: ENTER_PASSWORD_HERE
 
 login: ENTER_USERNAME_HERE
 password: ENTER_PASSWORD_HERE
+
+redis:
+  host: localhost
+  password: ""
+  port: 6379
+  timeout: 2000
+  database: 0
+  ssl: false
+  poolMinIdle: 1
+  poolMaxTotal: 5
+  keyPrefix: local
+  key: lite-permissions-service
+  ttl:
+    getLicenceByRef: "2 minutes"
+    getAllLicences: "2 minutes"
+    getLicencesByType: "2 minutes"
+    getRegistration: "2 minutes"
+    getRegistrations: "2 minutes"
