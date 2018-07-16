@@ -1,12 +1,12 @@
 processScheduledJobCron: 0/10 * * * * ?  # every 10 seconds
 
-spireClientUserName: spire_user
-spireClientPassword: spire_password
-spireClientUrl: http://service-mocking.svc.dev.licensing.service.trade.gov.uk.test/spire/fox/ispire/
+spireClientUserName: ENTER_USERNAME_HERE
+spireClientPassword: ENTER_PASSWORD_HERE
+spireClientUrl: https://lite-service-mocking-dev.cloudapps.digital/spire/fox/ispire/
 
 jwtSharedSecret: demo-secret-which-is-very-long-so-as-to-hit-the-byte-requirement
 
-customerServiceUrl: http://customer-service.svc.dev.licensing.service.trade.gov.uk.test
+customerServiceUrl: https://lite-customer-service-dev.cloudapps.digital
 
 maxMinutesRetryAfterFail: 1
 maxCallbackFailCount: 5
@@ -44,8 +44,8 @@ database:
   evictionInterval: 10s
   minIdleTime: 1 minute
 
-adminLogin: user
-adminPassword: password
+adminLogin: ENTER_USERNAME_HERE
+adminPassword: ENTER_PASSWORD_HERE
 
-login: user
-password: pass
+login: ENTER_USERNAME_HERE
+password: ENTER_PASSWORD_HERE
