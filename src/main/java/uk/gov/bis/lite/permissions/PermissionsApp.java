@@ -21,6 +21,8 @@ import ru.vyarus.dropwizard.guice.GuiceBundle;
 import ru.vyarus.dropwizard.guice.module.installer.feature.ManagedInstaller;
 import ru.vyarus.dropwizard.guice.module.installer.feature.jersey.ResourceInstaller;
 import uk.gov.bis.lite.common.auth.admin.AdminConstraintSecurityHandler;
+import uk.gov.bis.lite.common.auth.basic.SimpleAuthorizer;
+import uk.gov.bis.lite.common.auth.basic.User;
 import uk.gov.bis.lite.common.jersey.filter.ContainerCorrelationIdFilter;
 import uk.gov.bis.lite.common.jwt.LiteJwtAuthFilterHelper;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
@@ -69,6 +71,17 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
 
     String jwtSharedSecret = config.getJwtSharedSecret();
 
+    uk.gov.bis.lite.common.auth.basic.SimpleAuthenticator simpleAuthenticator = new uk.gov.bis.lite.common.auth.basic.SimpleAuthenticator(config.getAdminLogin(),
+        config.getAdminPassword(),
+        config.getServiceLogin(),
+        config.getServicePassword());
+
+    BasicCredentialAuthFilter<User> userBasicCredentialAuthFilter = new BasicCredentialAuthFilter.Builder<User>()
+        .setAuthenticator(simpleAuthenticator)
+        .setAuthorizer(new SimpleAuthorizer())
+        .setRealm("User Service Authentication")
+        .buildAuthFilter();
+
     BasicCredentialAuthFilter<PrincipalImpl> basicAuthFilter = new BasicCredentialAuthFilter.Builder<PrincipalImpl>()
         .setAuthenticator(new SimpleAuthenticator(config.getAdminLogin(), config.getAdminPassword()))
         .setRealm("Permissions Service Admin Authentication")
@@ -77,10 +90,10 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
     JwtAuthFilter<LiteJwtUser> liteJwtUserJwtAuthFilter = LiteJwtAuthFilterHelper.buildAuthFilter(jwtSharedSecret);
 
     PolymorphicAuthDynamicFeature authFeature = new PolymorphicAuthDynamicFeature<>(
-        ImmutableMap.of(PrincipalImpl.class, basicAuthFilter, LiteJwtUser.class, liteJwtUserJwtAuthFilter));
+        ImmutableMap.of(PrincipalImpl.class, basicAuthFilter, LiteJwtUser.class, liteJwtUserJwtAuthFilter, User.class, userBasicCredentialAuthFilter));
 
     AbstractBinder authBinder = new PolymorphicAuthValueFactoryProvider.Binder<>(
-        ImmutableSet.of(PrincipalImpl.class, LiteJwtUser.class));
+        ImmutableSet.of(PrincipalImpl.class, LiteJwtUser.class, User.class));
 
     environment.jersey().register(authFeature);
     environment.jersey().register(authBinder);
@@ -88,7 +101,6 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
 
     environment.admin().addServlet("admin", new AdminServlet()).addMapping("/admin");
     environment.admin().setSecurityHandler(new AdminConstraintSecurityHandler(config.getServiceLogin(), config.getServicePassword()));
-    //environment.admin().setSecurityHandler(new AdminConstraintSecurityHandler(config.getLogin(), config.getPassword()));
 
     // Perform/validate flyway migration on startup
     flywayMigrate(config);

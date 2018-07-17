@@ -11,7 +11,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
-@Path("/admin")
+@Path("/ping")
 public class AdminResource {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AdminResource.class);
