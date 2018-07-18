@@ -49,10 +49,10 @@ public class RegistrationServiceImpl implements RegistrationService {
   public RegistrationResult getRegistration(String userId, String reference) {
     SpireRequest request = registrationClient.createRequest();
     request.addChild("userId", userId);
+    request.addChild("registrationRef", reference);
     try {
       List<OgelRegistrationView> registrations = registrationClient.sendRequest(request)
           .stream()
-          .filter(sor -> reference.equalsIgnoreCase(sor.getRegistrationRef()))
           .map(this::getOgelRegistrationView)
           .collect(Collectors.toList());
       if (registrations.isEmpty()) {
