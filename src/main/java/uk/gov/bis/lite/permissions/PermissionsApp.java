@@ -86,7 +86,7 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
     environment.jersey().register(ContainerCorrelationIdFilter.class);
 
     environment.admin().addServlet("admin", new AdminServlet()).addMapping("/admin");
-    environment.admin().setSecurityHandler(new AdminConstraintSecurityHandler(config.getLogin(), config.getPassword()));
+    environment.admin().setSecurityHandler(new AdminConstraintSecurityHandler(config.getServiceLogin(), config.getServicePassword()));
 
     // Perform/validate flyway migration on startup
     flywayMigrate(config);

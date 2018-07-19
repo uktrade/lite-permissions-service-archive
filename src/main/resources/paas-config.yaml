@@ -45,5 +45,5 @@ database:
 adminLogin: "${ADMIN_LOGIN}"
 adminPassword: "${ADMIN_PASSWORD}"
 
-login: "${BASIC_AUTH_USER}"
-password: "${BASIC_AUTH_PASSWORD}"
+serviceLogin: "${SERVICE_LOGIN}"
+servicePassword: "${SERVICE_PASSWORD}"
