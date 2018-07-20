@@ -175,7 +175,7 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
    */
   private void processScheduled() {
     List<OgelSubmission> subs = submissionDao.getScheduledActive();
-    LOGGER.info("SCHEDULED ACTIVE Size[{}]", subs.size());
+    LOGGER.debug("SCHEDULED ACTIVE Size[{}]", subs.size());
     for (OgelSubmission sub : subs) {
       try {
         doProcessOgelSubmission(sub);
@@ -190,7 +190,7 @@ public class ProcessSubmissionServiceImpl implements ProcessSubmissionService {
    */
   private void processCallbacks() {
     List<OgelSubmission> subs = submissionDao.getScheduledCompleteToCallback();
-    LOGGER.info("SCHEDULED CALLBACK Size[{}]", subs.size());
+    LOGGER.debug("SCHEDULED CALLBACK Size[{}]", subs.size());
     for (OgelSubmission sub : subs) {
       try {
         if (!callbackService.completeCallback(sub)) {
