@@ -16,18 +16,18 @@ public class RedisRegistrationServiceImpl implements RegistrationService {
 
   private final RegistrationServiceImpl registrationServiceImpl;
   private final RedissonCache redissonCache;
-  private final Ttl getRegistrations;
-  private final Ttl getRegistration;
+  private final Ttl getRegistrationsTtl;
+  private final Ttl getRegistrationByReferenceTtl;
 
   @Inject
   public RedisRegistrationServiceImpl(RegistrationServiceImpl registrationServiceImpl,
                                       RedissonCache redissonCache,
-                                      @Named("getRegistrations") Ttl getRegistrations,
-                                      @Named("getRegistration") Ttl getRegistration) {
+                                      @Named("getRegistrationsTtl") Ttl getRegistrationsTtl,
+                                      @Named("getRegistrationByReferenceTtl") Ttl getRegistrationByReferenceTtl) {
     this.registrationServiceImpl = registrationServiceImpl;
     this.redissonCache = redissonCache;
-    this.getRegistrations = getRegistrations;
-    this.getRegistration = getRegistration;
+    this.getRegistrationsTtl = getRegistrationsTtl;
+    this.getRegistrationByReferenceTtl = getRegistrationByReferenceTtl;
   }
 
   @Override
@@ -35,16 +35,16 @@ public class RedisRegistrationServiceImpl implements RegistrationService {
     return redissonCache.get(() -> registrationServiceImpl.getRegistrations(userId),
         CACHE_IF_OK,
         "getRegistrations",
-        getRegistrations,
+        getRegistrationsTtl,
         userId);
   }
 
   @Override
-  public RegistrationResult getRegistration(String userId, String reference) {
-    return redissonCache.get(() -> registrationServiceImpl.getRegistration(userId, reference),
+  public RegistrationResult getRegistrationByReference(String userId, String reference) {
+    return redissonCache.get(() -> registrationServiceImpl.getRegistrationByReference(userId, reference),
         CACHE_IF_OK,
         "getRegistration",
-        getRegistration,
+        getRegistrationByReferenceTtl,
         userId, reference);
   }
 

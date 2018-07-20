@@ -60,8 +60,5 @@ redis:
   keyPrefix: "${REDIS_KEY_PREFIX}"
   key: "${REDIS_KEY}"
   ttl:
-    getLicenceByRef: "${REDIS_TTL_GET_LICENCE_BY_REF}"
-    getAllLicences: "${REDIS_TTL_GET_ALL_LICENCES}"
-    getLicencesByType: "${REDIS_TTL_GET_LICENCES_BY_TYPE}"
-    getRegistration: "${REDIS_TTL_GET_REGISTRATION}"
+    getRegistrationByReference: "${REDIS_TTL_GET_REGISTRATION_BY_REFERENCE}"
     getRegistrations: "${REDIS_TTL_GET_REGISTRATIONS}"

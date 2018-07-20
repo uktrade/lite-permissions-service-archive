@@ -2,17 +2,17 @@ package uk.gov.bis.lite.permissions.config;
 
 import com.google.inject.AbstractModule;
 import ru.vyarus.dropwizard.guice.module.support.ConfigurationAwareModule;
-import uk.gov.bis.lite.common.redis.RedisModule;
+import uk.gov.bis.lite.common.redis.RedisCacheModule;
 import uk.gov.bis.lite.permissions.service.CallbackService;
 import uk.gov.bis.lite.permissions.service.CallbackServiceImpl;
 import uk.gov.bis.lite.permissions.service.CustomerService;
 import uk.gov.bis.lite.permissions.service.CustomerServiceImpl;
 import uk.gov.bis.lite.permissions.service.LicenceService;
+import uk.gov.bis.lite.permissions.service.LicenceServiceImpl;
 import uk.gov.bis.lite.permissions.service.OgelService;
 import uk.gov.bis.lite.permissions.service.OgelServiceImpl;
 import uk.gov.bis.lite.permissions.service.ProcessSubmissionService;
 import uk.gov.bis.lite.permissions.service.ProcessSubmissionServiceImpl;
-import uk.gov.bis.lite.permissions.service.RedisLicenceServiceImpl;
 import uk.gov.bis.lite.permissions.service.RedisRegistrationServiceImpl;
 import uk.gov.bis.lite.permissions.service.RegisterService;
 import uk.gov.bis.lite.permissions.service.RegisterServiceImpl;
@@ -26,11 +26,11 @@ public class RedisServiceModule extends AbstractModule implements ConfigurationA
 
   @Override
   protected void configure() {
-    install(new RedisModule(permissionsAppConfig.getRedisConfiguration()));
+    install(new RedisCacheModule(permissionsAppConfig.getRedisConfiguration()));
 
     bind(CallbackService.class).to(CallbackServiceImpl.class);
     bind(CustomerService.class).to(CustomerServiceImpl.class);
-    bind(LicenceService.class).to(RedisLicenceServiceImpl.class);
+    bind(LicenceService.class).to(LicenceServiceImpl.class);
     bind(OgelService.class).to(OgelServiceImpl.class);
     bind(ProcessSubmissionService.class).to(ProcessSubmissionServiceImpl.class);
     bind(RegisterService.class).to(RegisterServiceImpl.class);

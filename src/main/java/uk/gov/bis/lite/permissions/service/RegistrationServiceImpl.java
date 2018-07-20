@@ -29,6 +29,7 @@ public class RegistrationServiceImpl implements RegistrationService {
   /**
    * Call SpireClient using userId.
    */
+  @Override
   public RegistrationResult getRegistrations(String userId) {
     SpireRequest request = registrationClient.createRequest();
     request.addChild("userId", userId);
@@ -46,7 +47,8 @@ public class RegistrationServiceImpl implements RegistrationService {
   /**
    * Call SpireClient using userId and registrationReference.
    */
-  public RegistrationResult getRegistration(String userId, String reference) {
+  @Override
+  public RegistrationResult getRegistrationByReference(String userId, String reference) {
     SpireRequest request = registrationClient.createRequest();
     request.addChild("userId", userId);
     try {

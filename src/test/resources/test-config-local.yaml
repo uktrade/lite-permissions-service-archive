@@ -62,8 +62,5 @@ redis:
   keyPrefix: local
   key: lite-permissions-service
   ttl:
-    getLicenceByRef: "2 minutes"
-    getAllLicences: "2 minutes"
-    getLicencesByType: "2 minutes"
-    getRegistration: "2 minutes"
+    getRegistrationByReference: "2 minutes"
     getRegistrations: "2 minutes"
