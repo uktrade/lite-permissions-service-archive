@@ -206,7 +206,7 @@ public class LicenceResourceTest {
 
   @Test
   public void typeParamSingleLicenceTest() throws Exception {
-    when(licenceService.getLicencesByType("123456", LicenceTypeParam.SIEL))
+    when(licenceService.getLicencesByType("123456", LicenceTypeParam.SIEL.toString()))
         .thenReturn(new LicenceResult(Status.OK, null, ImmutableList.of(generateLicenceViewA())));
 
     Response response = rule.getJerseyTest()
@@ -225,7 +225,7 @@ public class LicenceResourceTest {
 
   @Test
   public void typeParamNoUserFoundTest() throws Exception {
-    when(licenceService.getLicencesByType("123456", LicenceTypeParam.SIEL))
+    when(licenceService.getLicencesByType("123456", LicenceTypeParam.SIEL.toString()))
         .thenReturn(new LicenceResult(Status.USER_ID_NOT_FOUND, "Unable to find user with user id 123456", null));
 
     Response response = rule.getJerseyTest()

@@ -12,6 +12,6 @@ public interface RegistrationService {
   /**
    * Get registrations for userId, filtered to registrationReference.
    */
-  RegistrationResult getRegistration(String userId, String reference);
+  RegistrationResult getRegistrationByReference(String userId, String reference);
 
 }

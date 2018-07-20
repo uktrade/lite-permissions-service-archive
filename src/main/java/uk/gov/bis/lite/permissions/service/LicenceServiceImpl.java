@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import uk.gov.bis.lite.common.spire.client.SpireRequest;
 import uk.gov.bis.lite.permissions.api.view.LicenceView;
 import uk.gov.bis.lite.permissions.service.model.LicenceResult;
-import uk.gov.bis.lite.permissions.service.model.LicenceTypeParam;
 import uk.gov.bis.lite.permissions.service.model.Status;
 import uk.gov.bis.lite.permissions.spire.adapters.SpireLicenceAdapter;
 import uk.gov.bis.lite.permissions.spire.clients.SpireLicencesClient;
@@ -66,10 +65,10 @@ public class LicenceServiceImpl implements LicenceService {
   }
 
   @Override
-  public LicenceResult getLicencesByType(String userId, LicenceTypeParam type) {
+  public LicenceResult getLicencesByType(String userId, String type) {
     SpireRequest spireRequest = client.createRequest();
     spireRequest.addChild("userId", userId);
-    spireRequest.addChild("type", type.name());
+    spireRequest.addChild("type", type);
     try {
       List<LicenceView> licenceViews = client.sendRequest(spireRequest)
           .stream()

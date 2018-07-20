@@ -1,7 +1,6 @@
 package uk.gov.bis.lite.permissions.service;
 
 import uk.gov.bis.lite.permissions.service.model.LicenceResult;
-import uk.gov.bis.lite.permissions.service.model.LicenceTypeParam;
 
 public interface LicenceService {
 
@@ -9,5 +8,5 @@ public interface LicenceService {
 
   LicenceResult getAllLicences(String userId);
 
-  LicenceResult getLicencesByType(String userId, LicenceTypeParam type);
+  LicenceResult getLicencesByType(String userId, String type);
 }

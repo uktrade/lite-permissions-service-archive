@@ -15,7 +15,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import ru.yandex.qatools.embed.postgresql.EmbeddedPostgres;
 import uk.gov.bis.lite.common.paas.db.SchemaAwareDataSourceFactory;
-import uk.gov.bis.lite.permissions.PermissionsApp;
+import uk.gov.bis.lite.permissions.TestPermissionsApp;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
 
 public class BaseIntegrationTest {
@@ -49,9 +49,9 @@ public class BaseIntegrationTest {
     // Setup WireMock StubFor
     configureFor(wireMockClassRule.port());
 
-    RULE = new DropwizardAppRule<>(PermissionsApp.class, "service-test.yaml",
-        ConfigOverride.config("customerServiceUrl", "http://localhost:" +  wireMockClassRule.port() + "/"),
-        ConfigOverride.config("spireClientUrl", "http://localhost:" +  wireMockClassRule.port() + "/spire/fox/ispire/"));
+    RULE = new DropwizardAppRule<>(TestPermissionsApp.class, "test-config-local.yaml",
+        ConfigOverride.config("customerServiceUrl", "http://localhost:" + wireMockClassRule.port() + "/"),
+        ConfigOverride.config("spireClientUrl", "http://localhost:" + wireMockClassRule.port() + "/spire/fox/ispire/"));
     RULE.getTestSupport().before();
 
     SchemaAwareDataSourceFactory dataSourceFactory = RULE.getConfiguration().getDataSourceFactory();
