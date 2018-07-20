@@ -121,7 +121,7 @@ public class LicenceServiceTest {
     when(client.sendRequest(any()))
         .thenReturn(Collections.singletonList(generateSpireLicenceA()));
 
-    LicenceResult licenceResult = service.getLicencesByType("123456", LicenceTypeParam.SIEL);
+    LicenceResult licenceResult = service.getLicencesByType("123456", LicenceTypeParam.SIEL.toString());
     assertThat(licenceResult.getStatus()).isEqualTo(Status.OK);
     assertThat(licenceResult.getErrorMessage()).isNull();
     assertThat(licenceResult.getLicenceViews()).hasSize(1);
@@ -133,7 +133,7 @@ public class LicenceServiceTest {
     when(client.createRequest()).thenReturn(mock(SpireRequest.class));
     when(client.sendRequest(any())).thenThrow(new SpireUserNotFoundException("User not found"));
 
-    LicenceResult licenceResult = service.getLicencesByType("123456", LicenceTypeParam.SIEL);
+    LicenceResult licenceResult = service.getLicencesByType("123456", LicenceTypeParam.SIEL.toString());
     assertThat(licenceResult.getStatus()).isEqualTo(Status.USER_ID_NOT_FOUND);
     assertThat(licenceResult.getErrorMessage()).isEqualTo("Unable to find user with user id 123456");
     assertThat(licenceResult.getLicenceViews()).isNull();

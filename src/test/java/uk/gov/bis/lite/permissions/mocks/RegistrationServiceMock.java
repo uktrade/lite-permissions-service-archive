@@ -21,7 +21,8 @@ public class RegistrationServiceMock implements RegistrationService {
     setUserNotFound(false);
   }
 
-  public RegistrationResult getRegistration(String userId, String reference) {
+  @Override
+  public RegistrationResult getRegistrationByReference(String userId, String reference) {
     if (userNotFound) {
       return new RegistrationResult(Status.USER_ID_NOT_FOUND, "Unable to find user with user id 1", null);
     } else if (noResults) {
@@ -31,6 +32,7 @@ public class RegistrationServiceMock implements RegistrationService {
     }
   }
 
+  @Override
   public RegistrationResult getRegistrations(String userId) {
     if (userNotFound) {
       return new RegistrationResult(Status.USER_ID_NOT_FOUND, "Unable to find user with user id 1", null);

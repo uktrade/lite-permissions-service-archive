@@ -1,15 +1,14 @@
 package uk.gov.bis.lite.permissions;
 
-import com.google.inject.util.Modules;
+import com.google.inject.Module;
+import uk.gov.bis.lite.permissions.config.DaoModule;
 import uk.gov.bis.lite.permissions.config.GuiceModule;
+import uk.gov.bis.lite.permissions.config.TestServiceModule;
 
-/**
- * Use for integration tests - see ProcessSubmissionServiceTest
- */
 public class TestPermissionsApp extends PermissionsApp {
 
   public TestPermissionsApp() {
-    super(Modules.override(new GuiceModule()).with(new TestGuiceModule()));
+    super(new Module[]{new GuiceModule(), new TestServiceModule(), new DaoModule()});
   }
 
 }

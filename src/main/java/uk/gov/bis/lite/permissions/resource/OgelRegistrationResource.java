@@ -40,7 +40,7 @@ public class OgelRegistrationResource {
     validateUserIdToJwt(userId, user);
     RegistrationResult registrationResult;
     if (StringUtils.isNotBlank(registrationReference)) {
-      registrationResult = registrationService.getRegistration(userId, registrationReference);
+      registrationResult = registrationService.getRegistrationByReference(userId, registrationReference);
     } else {
       registrationResult = registrationService.getRegistrations(userId);
     }

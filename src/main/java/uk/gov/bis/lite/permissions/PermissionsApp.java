@@ -25,8 +25,10 @@ import uk.gov.bis.lite.common.jersey.filter.ContainerCorrelationIdFilter;
 import uk.gov.bis.lite.common.jwt.LiteJwtAuthFilterHelper;
 import uk.gov.bis.lite.common.jwt.LiteJwtUser;
 import uk.gov.bis.lite.common.paas.db.CloudFoundryEnvironmentSubstitutor;
+import uk.gov.bis.lite.permissions.config.DaoModule;
 import uk.gov.bis.lite.permissions.config.GuiceModule;
 import uk.gov.bis.lite.permissions.config.PermissionsAppConfig;
+import uk.gov.bis.lite.permissions.config.RedisServiceModule;
 import uk.gov.bis.lite.permissions.resource.LicenceResource;
 import uk.gov.bis.lite.permissions.resource.OgelRegistrationResource;
 import uk.gov.bis.lite.permissions.resource.OgelSubmissionResource;
@@ -36,15 +38,11 @@ import uk.gov.bis.lite.permissions.util.SimpleAuthenticator;
 
 public class PermissionsApp extends Application<PermissionsAppConfig> {
 
-  private final Module module;
+  private final Module[] modules;
 
-  public PermissionsApp() {
-    this(new GuiceModule());
-  }
-
-  public PermissionsApp(Module module) {
+  public PermissionsApp(Module[] modules) {
     super();
-    this.module = module;
+    this.modules = modules;
   }
 
   @Override
@@ -55,7 +53,7 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
             new ResourceConfigurationSourceProvider(), new CloudFoundryEnvironmentSubstitutor()));
 
     GuiceBundle<PermissionsAppConfig> guiceBundle = new GuiceBundle.Builder<PermissionsAppConfig>()
-        .modules(module)
+        .modules(modules)
         .installers(ResourceInstaller.class, ManagedInstaller.class)
         .extensions(RegisterOgelResource.class, OgelRegistrationResource.class, OgelSubmissionResource.class,
             LicenceResource.class, ProcessSubmissionScheduler.class)
@@ -100,7 +98,7 @@ public class PermissionsApp extends Application<PermissionsAppConfig> {
   }
 
   public static void main(String[] args) throws Exception {
-    new PermissionsApp().run(args);
+    new PermissionsApp(new Module[]{new GuiceModule(), new RedisServiceModule(), new DaoModule()}).run(args);
   }
 }
 

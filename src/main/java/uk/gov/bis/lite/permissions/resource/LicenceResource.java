@@ -42,7 +42,7 @@ public class LicenceResource {
     if (licenceReference != null) {
       licenceResult = licenceService.getLicenceByRef(userId, licenceReference);
     } else if (type != null) {
-      licenceResult = licenceService.getLicencesByType(userId, type);
+      licenceResult = licenceService.getLicencesByType(userId, type.toString());
     } else {
       licenceResult = licenceService.getAllLicences(userId);
     }
