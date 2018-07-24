@@ -1,10 +1,10 @@
 # Permissions Service
 
-The permissions service is responsible for handling a submission (from the OGEL Registration Application) to register 
-an OGEL.
+The permissions service is responsible for handling a submissions for OGEL registrations to SPIRE. 
+It also provides API's to view a users' OGEL registrations and information on ongoing submissions.
 
-The service will create a customer, create a site, update a user role where necessary and respond with a callback request
-detailing the result of its processing.
+As part of the submission process the service will create a customer, create a site, update a user role where necessary 
+and respond with a callback request which will detail the result of the submission processing.
 
 # Running locally
 
