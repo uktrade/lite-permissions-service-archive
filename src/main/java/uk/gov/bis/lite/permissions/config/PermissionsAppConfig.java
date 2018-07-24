@@ -50,10 +50,10 @@ public class PermissionsAppConfig extends Configuration {
   private String jwtSharedSecret;
 
   @NotEmpty
-  private String login;
+  private String serviceLogin;
 
   @NotEmpty
-  private String password;
+  private String servicePassword;
 
   @NotNull
   @Valid
@@ -104,12 +104,12 @@ public class PermissionsAppConfig extends Configuration {
     return jwtSharedSecret;
   }
 
-  public String getLogin() {
-    return login;
+  public String getServiceLogin() {
+    return serviceLogin;
   }
 
-  public String getPassword() {
-    return password;
+  public String getServicePassword() {
+    return servicePassword;
   }
 
   public RedisConfiguration getRedisConfiguration() {
