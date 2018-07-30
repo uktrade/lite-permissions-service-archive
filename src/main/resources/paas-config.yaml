@@ -1,4 +1,4 @@
-processScheduledJobCron: 0/10 * * * * ?  # every 10 seconds
+processScheduledJobCron: "${PROCESS_SCHEDULED_JOB_CRON}"
 
 spireClientUserName: "${SPIRE_CLIENT_USERNAME}"
 spireClientPassword: "${SPIRE_CLIENT_PASSWORD}"
@@ -8,8 +8,8 @@ jwtSharedSecret: "${JWT_SHARED_SECRET}"
 
 customerServiceUrl: "${CUSTOMER_SERVICE_URL}"
 
-maxMinutesRetryAfterFail: 1
-maxCallbackFailCount: 5
+maxMinutesRetryAfterFail: ${MAX_MINUTES_RETRY_AFTER_FAIL}
+maxCallbackFailCount: ${MAX_CALLBACK_FAIL_COUNT}
 
 server:
   type: simple
