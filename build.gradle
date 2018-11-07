@@ -40,6 +40,8 @@ repositories {
 }
 
 dependencies {
+  compile "org.eclipse.jetty:jetty-http:9.4.12.v20180830"
+  compile "com.fasterxml.jackson.core:jackson-databind:2.9.7"
   compile "io.dropwizard:dropwizard-core:$dropwizardVersion"
   compile "io.dropwizard:dropwizard-db:$dropwizardVersion"
   compile "io.dropwizard:dropwizard-jdbi:$dropwizardVersion"
